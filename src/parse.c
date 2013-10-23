@@ -169,12 +169,97 @@ int check_netlist_file(FILE *input_file , LIST* list){
         }
         add_to_list( list , NODE_RCL_TYPE , &rcl , sizeof(RCL_T));
       }
-      /*
-      else if((first_letter=='C')||(first_letter=='c'))
+      else if((first_letter=='M')||(first_letter=='m'))
       {
- 	printf("To %do stoixeio Einai pyknwths\n", line_number);     
+      	MOSFET_T mosfet;
+      	 /* get name */
+        next_field = strtok(line, " \n");
+        strcpy( mosfet.name , next_field);
+ 	  	//printf("To %do stoixeio Einai pyknwths\n", line_number);     
+		while ((next_field != NULL) && (first_letter!='*')) {
+          
+          next_field = strtok(NULL, " \n");
+          counter++;
+          if( counter == 1 ){
+            int drain = atoi( next_field);
+            mosfet.drain = drain;
+
+            if( drain == 0)
+              found_zero = 1;
+            }
+          else if( counter == 2){
+            int gate = atoi( next_field);
+            mosfet.gate = gate;
+            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+
+            if( gate == 0)
+              found_zero = 1;
+          }
+          else if( counter == 3){
+            int source =atoi(source);
+            mosfet.source=source;
+          }
+          else if(counter == 4){
+          	int body = atoi(next_field);
+          	mosfet.body = body;
+          }
+          else if(counter == 5){
+          	sscanf(next_field , "%lf",&(mosfet.l));
+          }
+          else if(counter == 6){
+          	sscanf(next_field , "%lf",&(mosfet.w));
+          }
+          else if( counter > 7 ) {
+            /* INPUT FILE has errors*/
+            printf("Error while parsing input file...\n");
+            exit(1);
+          }
+        }  
+        add_to_list( list , NODE_MOSFET_TYPE , &mosfet , sizeof(MOSFET_T));
       }
-      */
+      else if(first_letter == 'Q' || first_letter == 'q'){
+      	BJT_T bjt;
+
+        /* get name */
+        next_field = strtok(line, " \n");
+        strcpy( bjt.name , next_field);
+
+        while ((next_field != NULL) && (first_letter!='*')) {
+          
+          next_field = strtok(NULL, " \n");
+          counter++;
+          if( counter == 1 ){
+            int collector = atoi( next_field);
+            bjt.collector = collector;
+
+            if( collector == 0)
+              found_zero = 1;
+            }
+          else if( counter == 2){
+            int base = atoi( next_field);
+            bjt.base = base;
+            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+
+            if( base == 0)
+              found_zero = 1;
+          }
+          else if( counter == 3){
+            int emitter = atoi( next_field);
+            bjt.emitter = emitter;
+            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+
+            if( emitter == 0)
+              found_zero = 1;
+          }
+          else if( counter > 4 ) {
+            /* INPUT FILE has errors*/
+            printf("Error while parsing input file...\n");
+            exit(1);
+          }
+        }
+        add_to_list( list , NODE_BJT_TYPE , &bjt , sizeof(BJT_T));
+      }
+      
       else if(first_letter=='*')
       {
         printf("H %d grammh einai sxolio", line_number);
