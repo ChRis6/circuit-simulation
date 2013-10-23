@@ -12,7 +12,7 @@ enum{
 /*
  * R: resistor
  * C: capacity
- * L: phnio
+ * L: inductance
  */
 typedef struct rcl{
 

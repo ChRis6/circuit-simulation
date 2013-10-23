@@ -50,6 +50,8 @@ int main( int argc , char* argv[]){
 
  	print_list(list);
 
+ 	free_list(&list);
+ 	print_list(list);
 
 	return 0;
 }

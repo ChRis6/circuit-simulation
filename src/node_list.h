@@ -3,7 +3,7 @@
 
 #include "nodes.h"
 
-/* a single node a list*/
+/* a single node  list*/
 typedef struct list_node{
 
 	int type;
@@ -34,9 +34,9 @@ void init_list(LIST* list);
 void print_list(LIST list);
 
 /*
- * dealocate a list
+ * deallocate a list
  */
-void free_list(LIST list);
+void free_list(LIST* list);
 
 /*
  *

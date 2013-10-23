@@ -22,7 +22,7 @@ void print_list(LIST list){
 	
 	for( i = 0 ; i < list.len ; i++){
 		if( list.head->type == NODE_RCL_TYPE ){
-			printf("RESISTANCE: %s <%s> <%s> %f\n",list.head->node.rcl.name , list.head->node.rcl.node1 , list.head->node.rcl.node2 , list.head->node.rcl.value );
+			printf("RCL : %s <%s> <%s> %f\n",list.head->node.rcl.name , list.head->node.rcl.node1 , list.head->node.rcl.node2 , list.head->node.rcl.value );
 		}
 		else if( list.head->type == NODE_SOURCE_V_TYPE ){
 			printf("VOLTAGE SOURCE: %s <%s> <%s> %f\n",list.head->node.rcl.name , list.head->node.rcl.node1 , list.head->node.rcl.node2 , list.head->node.rcl.value );
@@ -32,10 +32,18 @@ void print_list(LIST list){
 }
 
 /*
- * dealocate a list
+ * deallocate a list
  */
-void free_list(LIST list){
+void free_list(LIST* list){
 
+	LIST_NODE* dummy;
+	while( list->head){
+		dummy = list->head->next;
+		free(list->head);
+		list->head = dummy;
+	}
+
+	list->len = 0; 
 }
 /*
  *
