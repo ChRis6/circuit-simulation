@@ -3,6 +3,9 @@
 
 enum{
 	NODE_RCL_TYPE = 0,
+	NODE_RESISTANCE_TYPE,
+	NODE_CAPACITY_TYPE,
+	NODE_INDUCTANCE_TYPE,
 	NODE_SOURCE_V_TYPE,
 	NODE_SOURCE_I_TYPE,
 	NODE_MOSFET_TYPE,
@@ -14,14 +17,33 @@ enum{
  * C: capacity
  * L: inductance
  */
-typedef struct rcl{
+typedef struct resistance{
 
 	char name[10]; // these should be arrays
 	int node1;
 	int node2;
 
 	double value; 
-}RCL_T;
+}RESISTANCE_T;
+
+
+typedef struct capacity{
+
+	char name[10]; // these should be arrays
+	int node1;
+	int node2;
+
+	double value; 
+}CAPACITY_T;
+
+typedef struct inductance{
+
+	char name[10]; // these should be arrays
+	int node1;
+	int node2;
+
+	double value; 
+}INDUCTANCE_T;
 
 /* Voltage source.DC for now */
 typedef struct source_v {
@@ -86,7 +108,9 @@ typedef union node{
 	MOSFET_T mosfet;
 	SOURCE_V_T source_v;
 	SOURCE_I_T source_i;
-	RCL_T rcl;
+	RESISTANCE_T resistance;
+	CAPACITY_T capacity;
+	INDUCTANCE_T inductance;
 	DIODE_T diode;
 }NODE;
 #endif

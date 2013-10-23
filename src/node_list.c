@@ -21,8 +21,14 @@ void print_list(LIST list){
 	printf("------------ PRINTING NODE LIST------------------\n\n");
 	
 	for( i = 0 ; i < list.len ; i++){
-		if( list.head->type == NODE_RCL_TYPE ){
-			printf("RCL : %s <%d> <%d> %f\n",list.head->node.rcl.name , list.head->node.rcl.node1 , list.head->node.rcl.node2 , list.head->node.rcl.value );
+		if( list.head->type == NODE_RESISTANCE_TYPE ){
+			printf("RESISTANCE : %s <%d> <%d> %f\n",list.head->node.resistance.name , list.head->node.resistance.node1 , list.head->node.resistance.node2 , list.head->node.resistance.value );
+		}
+		else if( list.head->type == NODE_CAPACITY_TYPE ){
+			printf("CAPACITY : %s <%d> <%d> %f\n",list.head->node.capacity.name , list.head->node.capacity.node1 , list.head->node.capacity.node2 , list.head->node.capacity.value );
+		}
+		if( list.head->type == NODE_INDUCTANCE_TYPE ){
+			printf("INDUCTANCE : %s <%d> <%d> %f\n",list.head->node.inductance.name , list.head->node.inductance.node1 , list.head->node.inductance.node2 , list.head->node.inductance.value );
 		}
 		else if( list.head->type == NODE_SOURCE_V_TYPE ){
 			printf("VOLTAGE SOURCE: %s <%d> <%d> %f\n",list.head->node.source_v.name , list.head->node.source_v.node1 , list.head->node.source_v.node2 , list.head->node.source_v.value );
@@ -30,6 +36,13 @@ void print_list(LIST list){
 		else if( list.head->type == NODE_SOURCE_I_TYPE ){
 			printf("CURRENT SOURCE: %s <%d> <%d> %f\n",list.head->node.source_i.name , list.head->node.source_i.node1 , list.head->node.source_i.node2 , list.head->node.source_i.value );
 		}
+		else if( list.head->type == NODE_MOSFET_TYPE ){
+			printf("MOSFET TRANSISTOR: %s <%d> <%d> <%d> <%d> %lf %lf \n",list.head->node.mosfet.name , list.head->node.mosfet.drain , list.head->node.mosfet.gate, list.head->node.mosfet.source , list.head->node.mosfet.body , list.head->node.mosfet.l , list.head->node.mosfet.w );
+		}
+		else if( list.head->type == NODE_BJT_TYPE ){
+			printf("BJT TRANSISTOR: %s <%d> <%d> <%d> \n",list.head->node.bjt.name , list.head->node.bjt.collector , list.head->node.bjt.base  , list.head->node.bjt.emitter );
+		}
+
 		list.head = list.head->next;
 	}
 }
@@ -63,9 +76,17 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 		return 0;
 
 	new->type = type;
-	if( type == NODE_RCL_TYPE){
+	if( type == NODE_RESISTANCE_TYPE){
 
-		memcpy( &(new->node.rcl) , element , size );
+		memcpy( &(new->node.resistance) , element , size );
+	}
+	else if( type == NODE_CAPACITY_TYPE){
+
+		memcpy( &(new->node.capacity) , element , size );
+	}
+	if( type == NODE_INDUCTANCE_TYPE){
+
+		memcpy( &(new->node.inductance) , element , size );
 	}
 	else if( type == NODE_SOURCE_V_TYPE ){
 		memcpy( &(new->node.source_v) , element , size );
