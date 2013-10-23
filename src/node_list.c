@@ -20,14 +20,14 @@ void print_list(LIST list){
 
 	printf("------------ PRINTING NODE LIST------------------\n\n");
 	
-	for( i = 0 ; i < list.len ; i++){
+	for( i = 0 ; i < list.len ; i++ ){
 		if( list.head->type == NODE_RESISTANCE_TYPE ){
 			printf("RESISTANCE : %s <%d> <%d> %f\n",list.head->node.resistance.name , list.head->node.resistance.node1 , list.head->node.resistance.node2 , list.head->node.resistance.value );
 		}
 		else if( list.head->type == NODE_CAPACITY_TYPE ){
-			printf("CAPACITY : %s <%d> <%d> %f\n",list.head->node.capacity.name , list.head->node.capacity.node1 , list.head->node.capacity.node2 , list.head->node.capacity.value );
+			printf("CAPACITY : %s <%d> <%d> %e \n",list.head->node.capacity.name , list.head->node.capacity.node1 , list.head->node.capacity.node2 , list.head->node.capacity.value );
 		}
-		if( list.head->type == NODE_INDUCTANCE_TYPE ){
+		else if( list.head->type == NODE_INDUCTANCE_TYPE ){
 			printf("INDUCTANCE : %s <%d> <%d> %f\n",list.head->node.inductance.name , list.head->node.inductance.node1 , list.head->node.inductance.node2 , list.head->node.inductance.value );
 		}
 		else if( list.head->type == NODE_SOURCE_V_TYPE ){
@@ -37,7 +37,7 @@ void print_list(LIST list){
 			printf("CURRENT SOURCE: %s <%d> <%d> %f\n",list.head->node.source_i.name , list.head->node.source_i.node1 , list.head->node.source_i.node2 , list.head->node.source_i.value );
 		}
 		else if( list.head->type == NODE_MOSFET_TYPE ){
-			printf("MOSFET TRANSISTOR: %s <%d> <%d> <%d> <%d> %lf %lf \n",list.head->node.mosfet.name , list.head->node.mosfet.drain , list.head->node.mosfet.gate, list.head->node.mosfet.source , list.head->node.mosfet.body , list.head->node.mosfet.l , list.head->node.mosfet.w );
+			printf("MOSFET TRANSISTOR: %s <%d> <%d> <%d> <%d> %e %e \n",list.head->node.mosfet.name , list.head->node.mosfet.drain , list.head->node.mosfet.gate, list.head->node.mosfet.source , list.head->node.mosfet.body , list.head->node.mosfet.l , list.head->node.mosfet.w );
 		}
 		else if( list.head->type == NODE_BJT_TYPE ){
 			printf("BJT TRANSISTOR: %s <%d> <%d> <%d> \n",list.head->node.bjt.name , list.head->node.bjt.collector , list.head->node.bjt.base  , list.head->node.bjt.emitter );
@@ -77,14 +77,13 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 
 	new->type = type;
 	if( type == NODE_RESISTANCE_TYPE){
-
 		memcpy( &(new->node.resistance) , element , size );
 	}
 	else if( type == NODE_CAPACITY_TYPE){
-
+		
 		memcpy( &(new->node.capacity) , element , size );
 	}
-	if( type == NODE_INDUCTANCE_TYPE){
+	else if( type == NODE_INDUCTANCE_TYPE){
 
 		memcpy( &(new->node.inductance) , element , size );
 	}
@@ -96,7 +95,6 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 	}
 	else if( type == NODE_MOSFET_TYPE ){
 		memcpy( &(new->node.mosfet) , element , size );
-
 	}
 	else if( type == NODE_BJT_TYPE ){
 		memcpy( &(new->node.bjt) , element , size );
@@ -110,7 +108,6 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 	if( list->len == 0 ){
 		/* the list is empty */
 		list->len = 1 ;
-
 		list->head = new;
 		new->next = NULL;
 		
@@ -118,8 +115,10 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 	else{
 		/* non empty list */
 		list->len = list->len + 1 ;
-		new->next = list->head->next;
-		list->head->next = new;
+		//new->next = list->head->next;
+		new->next = list->head;
+		//list->head->next = new;
+		list->head = new;
 	}
 
 	/* success */

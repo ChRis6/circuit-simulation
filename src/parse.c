@@ -40,12 +40,12 @@ int check_netlist_file(FILE *input_file , LIST* list){
       first_letter=line[0];
       if((first_letter=='V')||(first_letter=='v'))
       {
- 	      printf("To %do stoixeio Einai Phgh tashs\n", line_number);     
+ 	      //printf("To %do stoixeio Einai Phgh tashs\n", line_number);     
         
         SOURCE_V_T voltage;
 
         /* get name */
-        next_field = strtok(line, " \n");
+        next_field = strtok(line, " ");
         strcpy( voltage.name , next_field);
         //must implement field number testing for invalid entries in netlist file (more or less fields than expected)
         while ((next_field != NULL) && (first_letter!='*')) {
@@ -86,14 +86,14 @@ int check_netlist_file(FILE *input_file , LIST* list){
       }
       else if((first_letter=='I')||(first_letter=='i'))
       {
- 	      printf("To %do stoixeio Einai Phgh revmatos\n", line_number);     
+ 	      //printf("To %do stoixeio Einai Phgh revmatos\n", line_number);     
         SOURCE_I_T source_i;
 
         /* get name */
         next_field = strtok(line, " \n");
         strcpy( source_i.name , next_field);
 
-        printf("line: %d next_field: %s\n",line_number,next_field);
+        //printf("line: %d next_field: %s\n",line_number,next_field);
         while ((next_field != NULL) && (first_letter!='*')) {
 
           next_field = strtok(NULL, " \n");
@@ -108,14 +108,14 @@ int check_netlist_file(FILE *input_file , LIST* list){
           else if( counter == 2){
             int node2 = atoi( next_field);
             source_i.node2 = node2;
-            printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
 
             if( node2 == 0)
               found_zero = 1;
           }
           else if( counter == 3){
             sscanf(next_field , "%lf",&(source_i.value));
-            printf("line: %d next_field: %s\n",line_number,next_field);
+            //printf("line: %d next_field: %s\n",line_number,next_field);
           }
           else if( counter > 4 ) {
             /* INPUT FILE has errors*/
@@ -128,15 +128,15 @@ int check_netlist_file(FILE *input_file , LIST* list){
         add_to_list( list , NODE_SOURCE_I_TYPE , &source_i , sizeof(SOURCE_I_T));
   
       }
-      else if((first_letter=='C')||(first_letter=='c') )
+      else if((first_letter == 'C') || (first_letter=='c') )
       {
- 	      //printf("To %do stoixeio Einai antistash\n", line_number);     
-        
-        CAPACITY_T capacity ;
+ 	      //printf("To %do stoixeio Einai puknwths\n", line_number);     
+        //printf("capacity found\n");
+        CAPACITY_T cap ;
 
         /* get name */
         next_field = strtok(line, " \n");
-        strcpy( capacity.name , next_field);
+        strcpy( cap.name , next_field);
 
         while ((next_field != NULL) && (first_letter!='*')) {
           
@@ -144,21 +144,22 @@ int check_netlist_file(FILE *input_file , LIST* list){
           counter++;
           if( counter == 1 ){
             int node1 = atoi( next_field);
-            capacity.node1 = node1;
+            cap.node1 = node1;
 
+            //printf("line: %d next_field: %s node1: %d\n",line_number,next_field,cap.node1);
             if( node1 == 0)
               found_zero = 1;
           }
           else if( counter == 2){
             int node2 = atoi( next_field);
-            capacity.node2 = node2;
-            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+            cap.node2 = node2;
+            //printf("line: %d next_field: %s node2: %d\n",line_number,next_field,cap.node2);
 
             if( node2 == 0)
               found_zero = 1;
           }
           else if( counter == 3){
-            sscanf(next_field , "%lf",&(capacity.value));
+            sscanf(next_field , "%lf",&(cap.value));
             //printf("line: %d next_field: %s\n",line_number,next_field);
           }
           else if( counter > 4 ) {
@@ -167,7 +168,45 @@ int check_netlist_file(FILE *input_file , LIST* list){
             exit(1);
           }
         }
-        add_to_list( list , NODE_CAPACITY_TYPE , &capacity , sizeof(CAPACITY_T));
+        add_to_list( list , NODE_CAPACITY_TYPE , &cap , sizeof(CAPACITY_T));
+      }
+     else if((first_letter =='R') || ( first_letter =='r') )
+      {
+
+        RESISTANCE_T resistor;
+        /* get name */
+        next_field = strtok(line, " \n");
+        strcpy( resistor.name , next_field);
+
+        while( (next_field != NULL) && ( first_letter != '*')){
+
+          next_field = strtok(NULL , " \n");
+          counter++;
+          if(counter == 1 ){
+            int node1 = atoi(next_field);
+            resistor.node1 = node1;
+
+            if( node1 == 0)
+              found_zero = 1;
+          }
+          else if( counter == 2){
+
+            int node2 = atoi(next_field);
+            resistor.node2 = node2;
+
+            if( node2 == 0 )
+              found_zero =1;
+          }
+          else if( counter == 3 ){
+            sscanf(next_field,"%lf",&(resistor.value));
+          }
+          else if( counter > 4){
+            printf("Error while parsing input file\n");
+            exit(1);
+          }
+        }
+        add_to_list( list , NODE_RESISTANCE_TYPE , &resistor , sizeof(RESISTANCE_T));
+      
       }
      else if((first_letter=='L')||(first_letter=='l') )
       {
@@ -246,9 +285,11 @@ int check_netlist_file(FILE *input_file , LIST* list){
           }
           else if(counter == 5){
           	sscanf(next_field , "%lf",&(mosfet.l));
+          
           }
           else if(counter == 6){
           	sscanf(next_field , "%lf",&(mosfet.w));
+            
           }
           else if( counter > 7 ) {
             /* INPUT FILE has errors*/
@@ -311,7 +352,7 @@ int check_netlist_file(FILE *input_file , LIST* list){
 	     return(0);
       }
       // initialize next_field to point to the first field on the line
-      next_field = strtok(line, " \n");
+      //next_field = strtok(line, " \n");
       
       // iterate through the fields on the line until we have exhausted them. strtok
       // will return NULL when there are no more fields to be read
@@ -326,7 +367,7 @@ int check_netlist_file(FILE *input_file , LIST* list){
         // to line
         next_field = strtok(NULL, " \n");
       }*/
-   }
+  }
    
   /* ground found ? */
   if( found_zero )
