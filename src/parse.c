@@ -128,15 +128,15 @@ int check_netlist_file(FILE *input_file , LIST* list){
         add_to_list( list , NODE_SOURCE_I_TYPE , &source_i , sizeof(SOURCE_I_T));
   
       }
-      else if((first_letter=='R')||(first_letter=='r') || (first_letter=='C')||(first_letter=='c') || (first_letter=='L')||(first_letter=='l') )
+      else if((first_letter=='C')||(first_letter=='c') )
       {
  	      //printf("To %do stoixeio Einai antistash\n", line_number);     
         
-        RCL_T rcl;
+        CAPACITY_T capacity ;
 
         /* get name */
         next_field = strtok(line, " \n");
-        strcpy( rcl.name , next_field);
+        strcpy( capacity.name , next_field);
 
         while ((next_field != NULL) && (first_letter!='*')) {
           
@@ -144,21 +144,21 @@ int check_netlist_file(FILE *input_file , LIST* list){
           counter++;
           if( counter == 1 ){
             int node1 = atoi( next_field);
-            rcl.node1 = node1;
+            capacity.node1 = node1;
 
             if( node1 == 0)
               found_zero = 1;
           }
           else if( counter == 2){
             int node2 = atoi( next_field);
-            rcl.node2 = node2;
+            capacity.node2 = node2;
             //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
 
             if( node2 == 0)
               found_zero = 1;
           }
           else if( counter == 3){
-            sscanf(next_field , "%lf",&(rcl.value));
+            sscanf(next_field , "%lf",&(capacity.value));
             //printf("line: %d next_field: %s\n",line_number,next_field);
           }
           else if( counter > 4 ) {
@@ -167,7 +167,48 @@ int check_netlist_file(FILE *input_file , LIST* list){
             exit(1);
           }
         }
-        add_to_list( list , NODE_RCL_TYPE , &rcl , sizeof(RCL_T));
+        add_to_list( list , NODE_CAPACITY_TYPE , &capacity , sizeof(CAPACITY_T));
+      }
+     else if((first_letter=='L')||(first_letter=='l') )
+      {
+        //printf("To %do stoixeio Einai antistash\n", line_number);     
+        
+        INDUCTANCE_T inductance ;
+
+        /* get name */
+        next_field = strtok(line, " \n");
+        strcpy( inductance.name , next_field);
+
+        while ((next_field != NULL) && (first_letter!='*')) {
+          
+          next_field = strtok(NULL, " \n");
+          counter++;
+          if( counter == 1 ){
+            int node1 = atoi( next_field);
+            inductance.node1 = node1;
+
+            if( node1 == 0)
+              found_zero = 1;
+          }
+          else if( counter == 2){
+            int node2 = atoi( next_field);
+            inductance.node2 = node2;
+            //printf("line: %d next_field: %s\n node2: %d",line_number,next_field,source_i.node2);
+
+            if( node2 == 0)
+              found_zero = 1;
+          }
+          else if( counter == 3){
+            sscanf(next_field , "%lf",&(inductance.value));
+            //printf("line: %d next_field: %s\n",line_number,next_field);
+          }
+          else if( counter > 4 ) {
+            /* INPUT FILE has errors*/
+            printf("Error while parsing input file...\n");
+            exit(1);
+          }
+        }
+        add_to_list( list , NODE_INDUCTANCE_TYPE , &inductance , sizeof(INDUCTANCE_T));
       }
       else if((first_letter=='M')||(first_letter=='m'))
       {
@@ -176,7 +217,7 @@ int check_netlist_file(FILE *input_file , LIST* list){
         next_field = strtok(line, " \n");
         strcpy( mosfet.name , next_field);
  	  	//printf("To %do stoixeio Einai pyknwths\n", line_number);     
-		while ((next_field != NULL) && (first_letter!='*')) {
+		    while ((next_field != NULL) && (first_letter!='*')) {
           
           next_field = strtok(NULL, " \n");
           counter++;
@@ -186,7 +227,7 @@ int check_netlist_file(FILE *input_file , LIST* list){
 
             if( drain == 0)
               found_zero = 1;
-            }
+          }
           else if( counter == 2){
             int gate = atoi( next_field);
             mosfet.gate = gate;
@@ -196,7 +237,7 @@ int check_netlist_file(FILE *input_file , LIST* list){
               found_zero = 1;
           }
           else if( counter == 3){
-            int source =atoi(source);
+            int source =atoi(next_field);
             mosfet.source=source;
           }
           else if(counter == 4){
@@ -262,20 +303,16 @@ int check_netlist_file(FILE *input_file , LIST* list){
       
       else if(first_letter=='*')
       {
-        printf("H %d grammh einai sxolio", line_number);
+        printf("H %d grammh einai sxolio\n", line_number);
       }
       else
       {
-        printf("Your netlist file is invalid, please try again");
-	return(0);
+        printf("Your netlist file is invalid, please try again\n");
+	     return(0);
       }
       // initialize next_field to point to the first field on the line
       next_field = strtok(line, " \n");
       
-
-
-
-    
       // iterate through the fields on the line until we have exhausted them. strtok
       // will return NULL when there are no more fields to be read
       
