@@ -16,29 +16,29 @@ enum{
  */
 typedef struct rcl{
 
-	char* name;
-	char* node1;
-	char* node2;
+	char name[10]; // these should be arrays
+	char node1[10];
+	char node2[10];
 
 	double value; 
 }RCL_T;
 
 /* Voltage source.DC for now */
 typedef struct source_v {
-	char* name;
-	char* node1;
-	char* node2;
+	char name[10];
+	char node1[10];
+	char node2[10];
 
 	double value;
 }SOURCE_V_T;
 
 /* MOSFET transistor*/
 typedef struct mos{
-	char* name;
-	char* drain;
-	char* gate;
-	char* source;
-	char* body;
+	char name[10];
+	char drain[10];
+	char gate[10];
+	char source[10];
+	char body[10];
 
 	/* model name */
 
@@ -50,10 +50,10 @@ typedef struct mos{
 /* bipolar junction transistor*/
 typedef struct bjt{
 
-	char* name;
-	char* collector;
-	char* base;
-	char* emitter;
+	char name[10];
+	char collector[10];
+	char base[10];
+	char emitter[10];
 
 	/* model name */
 

@@ -37,4 +37,10 @@ void print_list(LIST list);
  * dealocate a list
  */
 void free_list(LIST list);
+
+/*
+ *
+ * add element to list
+ */
+int add_to_list(LIST* list,int type,void* element,int size);
 #endif
