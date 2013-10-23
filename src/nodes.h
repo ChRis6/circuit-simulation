@@ -17,8 +17,8 @@ enum{
 typedef struct rcl{
 
 	char name[10]; // these should be arrays
-	char node1[10];
-	char node2[10];
+	int node1;
+	int node2;
 
 	double value; 
 }RCL_T;
@@ -26,19 +26,26 @@ typedef struct rcl{
 /* Voltage source.DC for now */
 typedef struct source_v {
 	char name[10];
-	char node1[10];
-	char node2[10];
+	int node1;
+	int node2;
 
 	double value;
 }SOURCE_V_T;
 
+typedef struct source_i{
+	char name[10];
+	int node1;
+	int node2;
+
+	double value;
+}SOURCE_I_T;
 /* MOSFET transistor*/
 typedef struct mos{
 	char name[10];
-	char drain[10];
-	char gate[10];
-	char source[10];
-	char body[10];
+	int drain;
+	int gate;
+	int source;
+	int body;
 
 	/* model name */
 
@@ -51,15 +58,26 @@ typedef struct mos{
 typedef struct bjt{
 
 	char name[10];
-	char collector[10];
-	char base[10];
-	char emitter[10];
+	int collector;
+	int base;
+	int emitter;
 
 	/* model name */
 
 	/* area*/
 }BJT_T;
 
+/* diode */
+typedef struct diode{
+	char name[10];
+	int node1;
+	int node2;
+
+	/* area */
+
+	/* model name */
+
+}DIODE_T;
 
 /*
  * Higher level base node */
@@ -67,6 +85,8 @@ typedef union node{
 	BJT_T bjt;
 	MOSFET_T mosfet;
 	SOURCE_V_T source_v;
+	SOURCE_I_T source_i;
 	RCL_T rcl;
+	DIODE_T diode;
 }NODE;
 #endif
