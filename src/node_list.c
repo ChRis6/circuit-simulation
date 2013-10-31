@@ -125,3 +125,38 @@ int add_to_list( LIST* list, int type, void* element, int size ){
 	return 1;
 
 }
+
+
+/*
+ * Simply add circuit node to list
+ */
+int add_node_to_list( LIST* list, NODE* circuit_node , int type){
+
+	if( !list || !circuit_node)
+		return 0 ;
+
+	LIST_NODE* new = NULL;
+	new = malloc( sizeof(LIST_NODE));
+	if( !new )
+		return 0;
+
+	/* fill new  LIST_NODE */
+	new->type = type;
+	memcpy( &(new->node) , circuit_node , sizeof(NODE) );
+
+	/* link to list */
+	if( list->len > 0 ){
+		list->len = list->len + 1;
+		new->next = list->head;
+		list->head = new;
+
+	}
+	else{
+
+		list->len = 1;
+		new->next = NULL;
+		list->head = new;
+	}
+
+	return 1;
+}

@@ -1,6 +1,8 @@
 #ifndef NODES_H
 #define NODES_H
 
+#define MAX_NAME_LENGTH 10
+
 enum{
 	//NODE_RCL_TYPE = 0,
 	NODE_RESISTANCE_TYPE = 0 ,
@@ -19,7 +21,7 @@ enum{
  */
 typedef struct resistance{
 
-	char name[10]; // these should be arrays
+	char name[MAX_NAME_LENGTH]; // these should be arrays
 	int node1;
 	int node2;
 
@@ -29,7 +31,7 @@ typedef struct resistance{
 
 typedef struct capacity{
 
-	char name[10]; // these should be arrays
+	char name[MAX_NAME_LENGTH]; // these should be arrays
 	int node1;
 	int node2;
 
@@ -38,7 +40,7 @@ typedef struct capacity{
 
 typedef struct inductance{
 
-	char name[10]; // these should be arrays
+	char name[MAX_NAME_LENGTH]; // these should be arrays
 	int node1;
 	int node2;
 
@@ -47,7 +49,7 @@ typedef struct inductance{
 
 /* Voltage source.DC for now */
 typedef struct source_v {
-	char name[10];
+	char name[MAX_NAME_LENGTH];
 	int node1;
 	int node2;
 
@@ -55,15 +57,16 @@ typedef struct source_v {
 }SOURCE_V_T;
 
 typedef struct source_i{
-	char name[10];
+	char name[MAX_NAME_LENGTH];
 	int node1;
 	int node2;
 
 	double value;
 }SOURCE_I_T;
+
 /* MOSFET transistor*/
 typedef struct mos{
-	char name[10];
+	char name[MAX_NAME_LENGTH];
 	int drain;
 	int gate;
 	int source;
@@ -79,7 +82,7 @@ typedef struct mos{
 /* bipolar junction transistor*/
 typedef struct bjt{
 
-	char name[10];
+	char name[MAX_NAME_LENGTH];
 	int collector;
 	int base;
 	int emitter;
@@ -91,7 +94,7 @@ typedef struct bjt{
 
 /* diode */
 typedef struct diode{
-	char name[10];
+	char name[MAX_NAME_LENGTH];
 	int node1;
 	int node2;
 

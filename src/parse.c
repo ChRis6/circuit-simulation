@@ -1,8 +1,6 @@
 /*Small code for reading the netlist file line by line,
  extracting string tokens from each line,
  and recognizing the type of element described on each line.
- 
- Outputs each string token on the results.txt file.
 */
 
 
@@ -12,6 +10,15 @@
 #include <string.h>
 
 #include "parse.h"
+
+
+#define	RESISTANCE_NUM_PARSE_ELEMENTS  4
+#define	CAPACITY_NUM_PARSE_ELEMENTS    4
+#define INDUCTANCE_NUM_PARSE_ELEMENTS  4
+#define MOSFET_NUM_PARSE_ELEMENTS      6 
+
+
+static int get_node_from_line( char* line , NODE* node , int* type);
 
 int check_netlist_file(FILE *input_file , LIST* list){
 
@@ -379,26 +386,429 @@ int check_netlist_file(FILE *input_file , LIST* list){
 
 
 /*
-int main (int argc, char **argv)
-{
-	
-  FILE *output_file;
-  int netlist_integrity=0;  
-  if(argc<3)
-  {
-   printf("No file name");
-  }
-  else
-  {
-    FILE *input_file=fopen(argv[1], "r");
-    FILE *output_file=fopen(argv[2], "w");
-   
-    netlist_integrity=check_netlist_file(input_file,output_file);
-	
-    // remember to close all files when we are done
-    fclose(input_file);
-    fclose(output_file);
-  }
-}
-*/
+ * Parse netlist
+ */
+int parse_netlist(char* filename , LIST* list){
 
+	char line[ MAX_LINE_SIZE + 1];
+	NODE element_node;
+	int element_type;
+	int line_number;
+	int res;
+
+	if( !filename || !list  )
+		return 0;
+
+	FILE* file;
+	file = fopen(filename,"r");
+	if( !file )
+		return 0;
+
+	line_number = 1 ;
+	/*Read until EOF */
+	while( !feof(file)){
+
+		/* Get a single line */
+		if( fgets( line , MAX_LINE_SIZE , file) != NULL ) {
+
+			/* check for comment,else process */
+			if( line[0] != '*'){
+				res = get_node_from_line( line , &element_node , &element_type);
+				if( res ){
+
+					/* add node read and store at list */
+					//printf("NODE READ: %s , %d , %d , %g \n",element_node.resistance.name , element_node.resistance.node1 , element_node.resistance.node2 , element_node.resistance.value);
+					res = add_node_to_list(list , &element_node , element_type);
+					if( !res ){
+						printf("NO MEMORY\n");
+						return 0;
+					}
+				}
+				else{
+
+					/* Error while parsing line */
+					fclose(file);
+					printf("Error while parsing.Line %d : %s\n",line_number , line);
+					return 0;
+				}
+			}
+
+		}
+		line_number++;
+	}
+
+	return 1;
+}
+
+
+/* 
+ * Proccess a single line
+ *
+ * 1) Identify circuit element
+ * 2) Check for errors
+ * 3) Build circuit node
+ *
+ * Retuns: 1 when a node was identified correctly.Variables -node-  and -type- contain a circuit node
+ *         0 when a parsing error occurs.Variables -node- and -type- values are not predicted
+ */
+
+static int get_node_from_line( char* line , NODE* node , int* type){
+
+	char c;
+	char* token;
+
+	if( line == NULL || node == NULL  || type == NULL )
+		return 0;
+
+	c = line[0];
+
+	switch(c){
+		case 'R':
+		case 'r':{
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+
+				return 0 ;
+			}
+			strcpy( node->resistance.name , token);
+
+			/* read <+> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->resistance.node1 = atoi(token);
+			/* read <-> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->resistance.node2 = atoi(token);
+
+			/* read value node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->resistance.value = atof(token);
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_RESISTANCE_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s , garbage token : %s\n" , line , token);
+				return 0;
+			}
+
+		}
+		case 'C':
+		case 'c':{
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->capacity.name , token);			
+
+			/* read <+> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->capacity.node1 = atoi(token);
+			
+			/* read <-> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->capacity.node2 = atoi(token);
+
+			/* read value node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->capacity.value = atof(token);
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_CAPACITY_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s , garbage token : %s\n" , line , token);
+				return 0;
+			}
+		}
+		case 'L':
+		case 'l':{
+
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->inductance.name , token);
+			
+			/* read <+> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->inductance.node1 = atoi(token);
+			
+			/* read <-> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->inductance.node2 = atoi(token);
+
+			/* read value node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->inductance.value = atof(token);
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_INDUCTANCE_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s , garbage token: %s\n" , line , token);
+				return 0;
+			}			
+		}
+
+		/*
+		 * VOLTAGE SOURCE
+		 */
+		case 'v':
+		case 'V':{
+
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->source_v.name , token);
+
+			/* read <+> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_v.node1 = atoi(token);
+
+			/* read <-> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_v.node2 = atoi(token);
+
+			/* read value node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_v.value = atof(token);
+
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_SOURCE_V_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s , garbage token : %s\n" , line , token);
+				return 0;
+			}
+
+		}
+
+		/*
+		 * CURRENT SOURCE
+		 */
+		case 'i':
+		case 'I':{
+
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->source_i.name , token);
+
+			/* read <+> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_i.node1 = atoi(token);
+
+			/* read <-> node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_i.node2 = atoi(token);
+
+			/* read value node */
+			token = strtok(NULL," ");
+			if( token == NULL){
+				return 0;
+			}
+			node->source_i.value = atof(token);
+
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_SOURCE_I_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s  garbage token : %s\n" , line , token);
+				return 0;
+			}
+
+		}
+
+		/*
+		 * MOSFET transistor
+		 */
+		case 'M':
+		case 'm':{
+
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->mosfet.name , token);
+
+			/* read drain */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.drain = atoi(token);
+
+			/* read gate */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.gate = atoi(token);
+
+			/* read source */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.source = atoi(token);
+
+			/* read body */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.body = atoi(token);
+
+			/* read length */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.l = atof(token);
+
+			/* read width */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->mosfet.w = atof(token);
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_MOSFET_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s  garbage token : %s\n" , line , token);
+				return 0;
+			}
+		}
+
+		/*
+		 * Bipolar junction transistor
+		 */
+		case 'Q':
+		case 'q':{
+			/* read name */
+			token = strtok(line," ");
+			if( token == NULL ){
+				return 0 ;
+			}
+			strcpy( node->bjt.name , token);
+
+			/* read collector */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->bjt.collector = atoi(token);
+
+			/* read base */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->bjt.base  = atoi(token);
+
+			/* read emitter */
+			token = strtok(NULL," ");
+			if( token == NULL )
+				return 0;
+			node->bjt.emitter = atoi(token);
+
+			/* more will be added later */
+			//
+			//			HERE
+			//
+
+
+			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			token = strtok(NULL," \n");
+			if( token == NULL ){
+				*type = NODE_BJT_TYPE;
+				return 1;
+			}
+			else{
+				/* tokens were found.print for debugging...*/
+				printf("LINE: %s  garbage token : %s\n" , line , token);
+				return 0;
+			}
+
+		}
+
+		/*
+		 * DIODE
+		 */
+
+	}
+
+
+
+	return 0;
+}

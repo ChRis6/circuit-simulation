@@ -40,7 +40,15 @@ void free_list(LIST* list);
 
 /*
  *
- * add element to list
+ * add circuit element to list
  */
 int add_to_list(LIST* list,int type,void* element,int size);
+
+/*
+ * add node element to list 
+ * 
+ * returns: 1 success
+ *          0 fail
+ */
+int add_node_to_list( LIST* list, NODE* circuit_node , int type);
 #endif
