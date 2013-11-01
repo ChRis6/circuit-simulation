@@ -24,7 +24,7 @@ typedef struct hashtable_s hashtable_t;
  * Init hash table
  *
  */
-int ht_init(hashtable_t* hashtable,int size);
+hashtable_t* ht_init( int size );
 
 /*
  * Hash function
@@ -39,6 +39,10 @@ entry_t* ht_create_pair(char* key,int value);
 
 /*
  * add pair
+ *
+ * return:  > 0 success
+ *		   == 0 no memory
+ *          < 0 key already exists( no value replacement )
  */
 int ht_insert_pair(hashtable_t *hashtable, char* key, int value );
 
