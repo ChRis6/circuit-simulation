@@ -1,6 +1,8 @@
-#include "circuit_hash.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "circuit_hash.h"
 
 /*
  * Init hash table
@@ -112,16 +114,18 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 		hashtable->table[index] = newpair;
 		newpair->next = NULL;
 
+		/* success */
 		return 1;
 	}
 	else{
 
 		/* there are elements here */
-		for( curr = head ; curr ; curr = curr->next){
+		for( curr = hashtable->table[index] ; curr ; curr = curr->next){
 			if( strcmp(curr->key , key ) == 0 )
 				/* key already exists.DONT REPLACE */
 				free(newpair->key);
 				free(newpair);
+				//printf("key : \"%s\" already exits at index: %d\n",key,index);
 				return -1;
 		}
 		/* no matching key found on the list.*/
@@ -159,4 +163,29 @@ int ht_get(hashtable_t* hashtable , char* key , int *ret){
 
 	/* key not found */
 	return 0;
+}
+
+
+/*
+ * print all pairs
+ */
+void ht_print(hashtable_t* hashtable){
+
+	int i;
+	entry_t* curr;
+
+	if( !hashtable )
+		return;
+
+	for( i = 0 ; i < hashtable->size ; i++){
+		if( hashtable->table[i] != NULL ){
+			printf("Hash Table index: %d \n",i);
+
+			for( curr = hashtable->table[i] ; curr ; curr = curr->next){
+				printf("Pair : key = \"%s\" value = %d\n",curr->key,curr->value);
+			}
+
+		}
+	}
+
 }

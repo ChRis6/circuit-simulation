@@ -59,4 +59,8 @@ int ht_get(hashtable_t* hashtable , char* key , int *ret);
  */
 void ht_free(hashtable_t *hashtable);
 
+/*
+ * print all pairs
+ */
+void ht_print(hashtable_t* hashtable);
 #endif

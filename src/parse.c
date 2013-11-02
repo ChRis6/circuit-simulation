@@ -18,7 +18,7 @@
 #define MOSFET_NUM_PARSE_ELEMENTS      6 
 
 
-static int get_node_from_line( char* line , NODE* node , int* type);
+static int get_node_from_line( LIST* list,char* line , NODE* node , int* type);
 
 int check_netlist_file(FILE *input_file , LIST* list){
 
@@ -413,7 +413,7 @@ int parse_netlist(char* filename , LIST* list){
 
 			/* check for comment,else process */
 			if( line[0] != '*'){
-				res = get_node_from_line( line , &element_node , &element_type);
+				res = get_node_from_line( list, line , &element_node , &element_type);
 				if( res ){
 
 					/* add node read and store at list */
@@ -452,15 +452,20 @@ int parse_netlist(char* filename , LIST* list){
  *         0 when a parsing error occurs.Variables -node- and -type- values are not predicted
  */
 
-static int get_node_from_line( char* line , NODE* node , int* type){
+static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
 	char c;
 	char* token;
+  int flag;
+  static int node_count = 1;
+
 
 	if( line == NULL || node == NULL  || type == NULL )
 		return 0;
 
+  //printf("\nParsing line: %s\n",line);
 	c = line[0];
+
 
 	switch(c){
 		case 'R':
@@ -473,25 +478,95 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			}
 			strcpy( node->resistance.name , token);
 
-			/* read <+> node */
+			/* 
+       *Read <+> node
+       */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->resistance.node1 = atoi(token);
-			/* read <-> node */
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->resistance.node1 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->resistance.node1 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->resistance.node1 = n;
+        }
+      }
+			
+
+      /* 
+       * Read <-> node
+       */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->resistance.node2 = atoi(token);
+
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->resistance.node2 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->resistance.node2 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->resistance.node2 = n;
+        }
+      }      	
+
+      //node->resistance.node2 = atoi(token);
 
 			/* read value node */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->resistance.value = atof(token);
+    			
+      node->resistance.value = atof(token);
 
 			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
 			token = strtok(NULL," \n");
@@ -520,14 +595,74 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			if( token == NULL){
 				return 0;
 			}
-			node->capacity.node1 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->capacity.node1 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->capacity.node1 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->capacity.node1 = n;
+        }
+      } 
+
+//			node->capacity.node1 = atoi(token);
 			
 			/* read <-> node */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->capacity.node2 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->capacity.node2 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->capacity.node2 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->capacity.node2 = n;
+        }
+      } 
 
 			/* read value node */
 			token = strtok(NULL," ");
@@ -563,14 +698,77 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			if( token == NULL){
 				return 0;
 			}
-			node->inductance.node1 = atoi(token);
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->inductance.node1 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->inductance.node1 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->inductance.node1 = n;
+        }
+      } 
+
+
+//			node->inductance.node1 = atoi(token);
 			
 			/* read <-> node */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->inductance.node2 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->inductance.node2 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->inductance.node2 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->inductance.node2 = n;
+        }
+      } 
+
+
+			//node->inductance.node2 = atoi(token);
 
 			/* read value node */
 			token = strtok(NULL," ");
@@ -610,14 +808,77 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			if( token == NULL){
 				return 0;
 			}
-			node->source_v.node1 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->source_v.node1 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->source_v.node1 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->source_v.node1 = n;
+        }
+      } 
+
+
+			//node->source_v.node1 = atoi(token);
 
 			/* read <-> node */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->source_v.node2 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->source_v.node2 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->source_v.node2 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->source_v.node2 = n;
+        }
+      } 
+
+			//node->source_v.node2 = atoi(token);
 
 			/* read value node */
 			token = strtok(NULL," ");
@@ -659,14 +920,79 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			if( token == NULL){
 				return 0;
 			}
-			node->source_i.node1 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->source_i.node1 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->source_i.node1 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->source_i.node1 = n;
+        }
+      }
+
+
+			//node->source_i.node1 = atoi(token);
 
 			/* read <-> node */
 			token = strtok(NULL," ");
 			if( token == NULL){
 				return 0;
 			}
-			node->source_i.node2 = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->source_i.node2 = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->source_i.node2 = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->source_i.node2 = n;
+        }
+      }
+
+			//node->source_i.node2 = atoi(token);
 
 			/* read value node */
 			token = strtok(NULL," ");
@@ -707,25 +1033,154 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->mosfet.drain = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->mosfet.drain = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->mosfet.drain = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->mosfet.drain = n;
+        }
+      }
+
+			//node->mosfet.drain = atoi(token);
 
 			/* read gate */
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->mosfet.gate = atoi(token);
+			
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->mosfet.gate = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->mosfet.gate = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->mosfet.gate = n;
+        }
+      }      
+
+
+      //node->mosfet.gate = atoi(token);
 
 			/* read source */
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->mosfet.source = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->mosfet.source = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->mosfet.source = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->mosfet.source = n;
+        }
+      }
+
+      //node->mosfet.source = atoi(token);
 
 			/* read body */
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->mosfet.body = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->mosfet.body = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->mosfet.body = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->mosfet.body = n;
+        }
+      }
+
+      //node->mosfet.body = atoi(token);
 
 			/* read length */
 			token = strtok(NULL," ");
@@ -768,19 +1223,116 @@ static int get_node_from_line( char* line , NODE* node , int* type){
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->bjt.collector = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->bjt.collector = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->bjt.collector = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->bjt.collector = n;
+        }
+      }
+
+      //node->bjt.collector = atoi(token);
 
 			/* read base */
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->bjt.base  = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->bjt.base = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->bjt.base = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->bjt.base = n;
+        }
+      }
+
+      //node->bjt.base  = atoi(token);
 
 			/* read emitter */
 			token = strtok(NULL," ");
 			if( token == NULL )
 				return 0;
-			node->bjt.emitter = atoi(token);
+
+      /* check for reference node (ground) */
+      if( strcmp(token,"0") == 0 ){
+        node->bjt.emitter = 0;
+        list->has_reference = 1;
+      }
+      else{
+        /*
+         * this is not a reference node.Add string to
+         * hash table
+         */
+        flag = ht_insert_pair(list->hashtable, token , node_count);
+        if( flag == 1 ){
+          /* successfull insertion */
+          node->bjt.emitter = node_count;
+          node_count++;    // get ready for the next node
+        }
+        else if( flag == 0 ){
+          /* NULL pointer or out of memory */
+          printf("Error at inserting pair to hash table..\n");
+          //free_list(list);
+          exit(1);
+        }
+        else if( flag == -1 ){
+
+          int n;
+          printf("Node : \"%s\" already on hash table \n",token);
+          ht_get(list->hashtable,token,&n);
+          node->bjt.emitter = n;
+        }
+      }			
+
+
+      //node->bjt.emitter = atoi(token);
 
 			/* more will be added later */
 			//

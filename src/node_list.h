@@ -2,11 +2,12 @@
 #define NODE_LIST_H
 
 #include "nodes.h"
+#include "circuit_hash.h"
 
 /* a single node  list*/
 typedef struct list_node{
 
-	int type;
+	char type;
 	NODE node;
 
 	struct list_node* next;
@@ -16,6 +17,9 @@ typedef struct list_node{
 typedef struct list{
 	int len;
 	LIST_NODE* head;
+
+	hashtable_t *hashtable;
+	char has_reference;
 }LIST;
 
 

@@ -3,12 +3,21 @@
 #include <string.h>
 #include "node_list.h"
 
+#define HASH_SIZE 10000
+
 /*
  *Initiliaze a list
  */
 void init_list(LIST* list){
 	list->len = 0;
 	list->head = NULL;
+
+	list->hashtable = ht_init( HASH_SIZE );
+	if( !(list->hashtable)){
+		printf("No memory for hash table...\n");
+		exit(1);
+	}
+	list->has_reference = 0;
 }
 
 /*
