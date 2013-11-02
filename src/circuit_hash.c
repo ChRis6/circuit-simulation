@@ -177,6 +177,7 @@ void ht_print(hashtable_t* hashtable){
 	if( !hashtable )
 		return;
 
+	printf("------ PRINTING HASH TABLE -----------\n");
 	for( i = 0 ; i < hashtable->size ; i++){
 		if( hashtable->table[i] != NULL ){
 			printf("Hash Table index: %d \n",i);
@@ -188,4 +189,30 @@ void ht_print(hashtable_t* hashtable){
 		}
 	}
 
+}
+
+
+/*
+ * Deallocate
+ */
+void ht_free(hashtable_t *hashtable){
+
+	entry_t* dummy;
+	int i;
+	
+	if( !hashtable )
+		return;
+
+	for( i = 0 ; i < hashtable->size ; i++){
+
+		while( hashtable->table[i] ){
+			dummy = hashtable->table[i]->next;
+			free(hashtable->table[i]->key);
+			free(hashtable->table[i]);
+			hashtable->table[i] = dummy;
+		}
+	}
+
+	free( hashtable->table );
+	free(hashtable);
 }

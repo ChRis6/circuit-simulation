@@ -69,6 +69,7 @@ void free_list(LIST* list){
 	}
 
 	list->len = 0; 
+	ht_free(list->hashtable);
 }
 /*
  *
