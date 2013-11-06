@@ -16,10 +16,12 @@ typedef struct list_node{
 /* List */
 typedef struct list{
 	int len;
+
 	LIST_NODE* head;
 
 	hashtable_t *hashtable;
 	char has_reference;
+	int m2;
 }LIST;
 
 

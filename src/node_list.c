@@ -18,6 +18,7 @@ void init_list(LIST* list){
 		exit(1);
 	}
 	list->has_reference = 0;
+	list->m2 = 0;
 }
 
 /*
@@ -166,6 +167,10 @@ int add_node_to_list( LIST* list, NODE* circuit_node , int type){
 		list->len = 1;
 		new->next = NULL;
 		list->head = new;
+	}
+
+	if( type == NODE_SOURCE_V_TYPE || type == NODE_INDUCTANCE_TYPE ){
+		list->m2 = list->m2 + 1 ;
 	}
 
 	return 1;

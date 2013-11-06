@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include <gsl/gsl_sf_bessel.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
 
-
+#include "circuit_sim.h"
 #include "node_list.h"
 
 #include "parse.h"
@@ -10,7 +11,9 @@
 
 int main( int argc , char* argv[]){
 	int flag;
- 	
+	int i,j;
+	gsl_matrix *matrix;
+	gsl_vector *vector;
 
 	if( argc < 2 ){
 		printf("Usage: %s <netlist>\n",argv[0]);
@@ -28,9 +31,27 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
+ 	flag = create_mna(&list, &matrix, &vector );
+ 	if(!flag ){
+ 		printf("Error creating mna system\n");
+ 		return -1;
+ 	}
+
  	print_list(list);
  	printf("List length = %d \n",list.len);
- 	
+ 	printf("List m2     = %d \n",list.m2);
+ 	printf("MATRIX ROWS : %d , COLUMNS : %d\n",matrix->size1 , matrix->size2);
+ 	printf("------------- PRINTING MATRIX ----------\n");
+ 	for( i = 0 ; i < matrix->size1 ; i++){
+ 		for( j = 0; j < matrix->size2 ; j++){
+ 			printf("%f ",gsl_matrix_get(matrix, i , j  )  );
+ 		}
+ 		printf("\n");
+ 	}
+ 	printf("--------PRINTING VECTOR --------- \n");
+ 	for( i = 0 ; i < vector->size ; i++)
+ 		printf("%f\n", gsl_vector_get(vector,i));
+
  	ht_print(list.hashtable);
  	free_list(&list);
  

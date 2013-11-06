@@ -28,8 +28,10 @@ hashtable_t* ht_init( int size ){
 
 	for( i = 0; i < size ; i++ )
 		hashtable->table[i] = NULL;
-	hashtable->size = size;
 
+	hashtable->size = size;
+	hashtable->num_nodes = 0;
+	
 	return hashtable;
 
 }
@@ -114,6 +116,7 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 		hashtable->table[index] = newpair;
 		newpair->next = NULL;
 
+		hashtable->num_nodes = hashtable->num_nodes + 1;
 		/* success */
 		return 1;
 	}
@@ -132,6 +135,7 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 		newpair->next = hashtable->table[index];
 		hashtable->table[index] = newpair;
 
+		hashtable->num_nodes = hashtable->num_nodes + 1;
 		/* success */
 		return 1;
 	}
@@ -189,6 +193,7 @@ void ht_print(hashtable_t* hashtable){
 		}
 	}
 
+	printf("NUM NODES: %d\n",  hashtable->num_nodes);
 }
 
 
