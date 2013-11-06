@@ -12,7 +12,7 @@ OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 DEBUG    = -g
 INCLUDES = -I.
 CFLAGS   = -Wall -pedantic -ansi -c $(DEBUG) $(INCLUDES)
-LDFLAGS  = 
+LDFLAGS  = -lgsl -lgslcblas -lm 
 
 ifeq ($(SRCEXT), cpp)
 CC       = $(CXX)

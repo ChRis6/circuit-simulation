@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <gsl/gsl_sf_bessel.h>
+
+
 #include "node_list.h"
 
 #include "parse.h"
@@ -7,7 +10,7 @@
 
 int main( int argc , char* argv[]){
 	int flag;
-
+ 	
 
 	if( argc < 2 ){
 		printf("Usage: %s <netlist>\n",argv[0]);
