@@ -107,6 +107,7 @@ int main( int argc , char* argv[]){
 
 	*/
 
+<<<<<<< HEAD
  	/* We are going to perform a decomposition on the matrix in order to solve
  	 * the system. We have the gaussian LU decomposition (option = GAUSS_DECOMPOSITION) 
  	 * and the cholesky decompostion (option = CHOLESKY_DECOMPOSITION).
@@ -117,6 +118,8 @@ int main( int argc , char* argv[]){
  		/*TODO: create a proper error checking */
  		exit(-1);
  	
+=======
+>>>>>>> e2de32dea2bbefbcc4b2cbb134bfb3bcfd3b0fbe
  	ht_print(list.hashtable);
  	free_list(&list);
  
