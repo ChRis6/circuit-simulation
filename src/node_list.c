@@ -19,6 +19,16 @@ void init_list(LIST* list){
 	}
 	list->has_reference = 0;
 	list->m2 = 0;
+	list->solving_method = METHOD_LU;
+
+	/* init dc sweep */
+	list->dc_sweep.name = NULL;
+	list->dc_sweep.node = NULL;
+	list->dc_sweep.start_v = 0.0;
+	list->dc_sweep.end_v   = 0.0;
+	list->dc_sweep.inc     = 0.0;
+
+	list->dc_sweep.oldval  = 0.0;
 }
 
 /*
@@ -174,4 +184,23 @@ int add_node_to_list( LIST* list, NODE* circuit_node , int type){
 	}
 
 	return 1;
+}
+
+/*
+ * search the list for the name specified
+ *	Returns: node when found
+ *			 NULL otherwise
+ */
+LIST_NODE* list_search_by_name( LIST* list , char *name){
+
+	LIST_NODE* curr;
+
+	if( !list || !name )
+		return NULL;
+
+	for( curr = list->head ; curr ; curr = curr->next){
+		if( strcmp( curr->node.bjt.name , name ) == 0 )
+			return curr;
+	}
+	return NULL;
 }

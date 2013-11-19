@@ -4,6 +4,9 @@
 #include "nodes.h"
 #include "circuit_hash.h"
 
+#define METHOD_LU       1
+#define METHOD_CHOLESKY 2
+
 /* a single node  list*/
 typedef struct list_node{
 
@@ -12,6 +15,20 @@ typedef struct list_node{
 
 	struct list_node* next;
 }LIST_NODE;
+
+typedef struct dc_sweep{
+
+	char *name;
+
+	LIST_NODE* node;
+	double start_v;
+	double end_v;
+	double inc;
+
+	double oldval;
+
+}DC_SWEEP_T;
+
 
 /* List */
 typedef struct list{
@@ -22,7 +39,11 @@ typedef struct list{
 	hashtable_t *hashtable;
 	char has_reference;
 	int m2;
+
+	char solving_method;
+	DC_SWEEP_T dc_sweep;
 }LIST;
+
 
 
 
@@ -57,4 +78,11 @@ int add_to_list(LIST* list,int type,void* element,int size);
  *          0 fail
  */
 int add_node_to_list( LIST* list, NODE* circuit_node , int type);
+
+/*
+ * search the list for the name specified
+ *	Returns: 1 when found
+ *			 0 otherwise
+ */
+LIST_NODE* list_search_by_name( LIST* list , char *name);
 #endif

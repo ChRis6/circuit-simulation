@@ -50,7 +50,7 @@ int parse_netlist(char* filename , LIST* list){
 			/* check for comment,else process */
 			if( line[0] != '*'){
 				res = get_node_from_line( list, line , &element_node , &element_type);
-				if( res ){
+				if( res == 1 ){
 
 					/* add node read and store at list */
 					//printf("NODE READ: %s , %d , %d , %g \n",element_node.resistance.name , element_node.resistance.node1 , element_node.resistance.node2 , element_node.resistance.value);
@@ -60,7 +60,7 @@ int parse_netlist(char* filename , LIST* list){
 						return 0;
 					}
 				}
-				else{
+				else if( res == 0 ){
 
 					/* Error while parsing line */
 					fclose(file);
@@ -1000,9 +1000,89 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 		 * DIODE
 		 */
 
+
+		/*
+		 * Commands
+		 */
+		case '.':{
+
+			/* solving method */
+			if( line[1] == 'o' || line[1] == 'O'){
+				token = strtok(line," ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+				token = strtok(NULL," ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+				if( strcmp(token , "SPD") == 0 || strcmp(token,"spd") == 0 ){
+					printf("Cholesky method found during parsing\n");
+					list->solving_method = METHOD_CHOLESKY;
+				}
+
+				return 2;
+			}
+			else if( line[1] == 'D' || line[1] == 'd' ){  // check for .DC
+
+				token = strtok(line," ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+
+				token = strtok(NULL , " ");
+				if( !token ){
+					//printf("Error while parsing...\n");
+					//printf("Line : %s\n", line );
+					return 2;
+				}
+				list->dc_sweep.name = strdup(token);
+				printf("DC: name = %s \n",list->dc_sweep.name);
+
+				token = strtok(NULL , " ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+				list->dc_sweep.start_v = atof( token );
+
+				token = strtok(NULL , " ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+				list->dc_sweep.end_v = atof(token);
+
+				token = strtok(NULL , " ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+				list->dc_sweep.inc = atof(token);
+
+
+				// check if node already declared 
+				list->dc_sweep.node = list_search_by_name(list , list->dc_sweep.name );
+				if( !(list->dc_sweep.node)){
+					printf(".DC Error: %s element not found\n",list->dc_sweep.name);
+					exit(1);
+				}
+				list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
+
+			}
+			
+		}
 	}
 
 
-
-	return 0;
+	return 2;
 }

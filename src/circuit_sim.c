@@ -4,7 +4,7 @@
 /*
  * Create the matrix and vector for the circuit elements
  */
-int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector){
+int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
 
 	LIST_NODE* curr;
 	gsl_matrix* tmp_matrix;
@@ -119,7 +119,7 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector){
  		/*
  		 * VOLTAGE SOURCE
  		 */
- 		else if ( curr->type == NODE_SOURCE_V_TYPE ){
+ 		else if ( curr->type == NODE_SOURCE_V_TYPE &&  list->solving_method != METHOD_CHOLESKY  ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
 
@@ -153,23 +153,18 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector){
  				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , value);
 
  				value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
- 				value++;
+ 				value--;
  				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , value);
  			}
  		}
  		/*
  		 * Inductance
  		 */
- 		else if ( curr->type == NODE_INDUCTANCE_TYPE ){
+ 		else if ( curr->type == NODE_INDUCTANCE_TYPE &&  list->solving_method != METHOD_CHOLESKY ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
-
- 			double value;
- 			/* set vector value */
- 			//value = gsl_vector_get(tmp_vector , matrix_row  );
- 			///value += curr->node.source_v.value;
- 			//gsl_vector_set(tmp_vector, matrix_row , value);
-
+			double value;
+ 		
  			/* Change the matrix */
  			int plus_node  = curr->node.inductance.node1 - 1 ;
  			int minus_node = curr->node.inductance.node2 - 1;
@@ -194,7 +189,7 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector){
  				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , value);
 
  				value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
- 				value++;
+ 				value--;
  				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , value);
  			}
  		}
