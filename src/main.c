@@ -2,6 +2,9 @@
 #include <string.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
+#include <gsl/gsl_permutation.h>
+#include <gsl/gsl_linalg.h>
+
 
 #include "circuit_sim.h"
 #include "node_list.h"
@@ -14,6 +17,10 @@ int main( int argc , char* argv[]){
 	int i,j;
 	gsl_matrix *matrix;
 	gsl_vector *vector;
+	gsl_vector *x;
+	gsl_permutation* permutation;
+
+	int sign;
 
 	if( argc < 2 ){
 		printf("Usage: %s <netlist>\n",argv[0]);
@@ -37,6 +44,48 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
+ 	int permutation_len = matrix->size1;
+ 	permutation = gsl_permutation_alloc(permutation_len);
+ 	if( !permutation ){
+ 		printf("(No memory for permutation)\n" );
+ 		exit(1);
+ 	}
+
+ 	x = gsl_vector_alloc(permutation_len);
+ 	if( !x ){
+ 		printf("X vector : no memory\n");
+ 		exit(1);
+ 	}
+
+
+
+ 	if( list.solving_method == METHOD_LU ){
+ 		if( gsl_linalg_LU_decomp(matrix , permutation , &sign ) ){
+ 			printf("LU returned 0\n");
+ 			exit(1);
+ 		}
+
+ 		gsl_linalg_LU_solve(matrix , permutation , vector , x );
+ 	}
+ 	else if( list.solving_method == METHOD_CHOLESKY ){
+ 		printf("CHOLESKY...\n");
+ 		gsl_linalg_cholesky_decomp(matrix);
+
+ 		gsl_linalg_cholesky_solve(matrix,vector,x);
+
+ 	}
+ 	else {
+ 		printf("No solving method specicified\n");
+ 		exit(1);
+ 	}
+
+ 	printf("Priting vector X :\n");
+ 	for( i = 0 ; i < x->size ; i++){
+ 		printf("\t%f\n", gsl_vector_get(x , i) );
+ 	}
+
+
+ 	/*
  	print_list(list);
  	printf("List length = %d \n",list.len);
  	printf("List m2     = %d \n",list.m2);
@@ -51,6 +100,10 @@ int main( int argc , char* argv[]){
  	printf("--------PRINTING VECTOR --------- \n");
  	for( i = 0 ; i < vector->size ; i++)
  		printf("%f\n", gsl_vector_get(vector,i));
+
+
+
+	*/
 
  	ht_print(list.hashtable);
  	free_list(&list);
