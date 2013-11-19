@@ -9,6 +9,8 @@
 #include "parse.h"
 #include "circuit_hash.h"
 
+#include "decomposition.h"
+
 int main( int argc , char* argv[]){
 	int flag;
 	int i,j;
@@ -52,6 +54,16 @@ int main( int argc , char* argv[]){
  	for( i = 0 ; i < vector->size ; i++)
  		printf("%f\n", gsl_vector_get(vector,i));
 
+ 	/* We are going to perform a decomposition on the matrix in order to solve
+ 	 * the system. We have the gaussian LU decomposition (option = GAUSS_DECOMPOSITION) 
+ 	 * and the cholesky decompostion (option = CHOLESKY_DECOMPOSITION).
+ 	 * Cholesky can be performed in every array so there is a big possibility that it
+ 	 * will return with an error
+ 	 */
+ 	if( decomposition(matrix,NULL,NULL,CHOLESKY_DECOMPOSITION) == -1)
+ 		/*TODO: create a proper error checking */
+ 		exit(-1);
+ 	
  	ht_print(list.hashtable);
  	free_list(&list);
  
