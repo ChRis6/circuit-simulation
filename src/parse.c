@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "parse.h"
+#include "plot.h"
 
 
 #define	RESISTANCE_NUM_PARSE_ELEMENTS  4
@@ -1092,6 +1093,9 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 0;
 				}
 
+        plot_init();
+
+
         while(1){
 				  //reading the source type for plotting
 				  token = strtok(NULL," (\n");
@@ -1113,6 +1117,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					 printf("Line : %s\n", line );
 					 return 0;
 				  }
+          plot_add_node(token);
           plot_num++;
 
         }
