@@ -52,7 +52,7 @@ int main( int argc , char* argv[]){
  	
  	if(list.dc_sweep.node != NULL)
  	{
- 	 	dc_sweep(list,matrix,vector,x,permutation);
+ 	 	dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
  	}else
  	{
  		int array_size = 1;
