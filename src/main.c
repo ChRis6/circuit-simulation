@@ -56,7 +56,7 @@ int main( int argc , char* argv[]){
  	}else
  	{
  		int array_size = 1;
- 		solve(matrix,vector,x,permutation);
+ 		solve(matrix,vector,x,permutation,list.solving_method);
  		if(list.plot == PLOT_ON)
 		{
  			gsl_vector ** plot_array;
