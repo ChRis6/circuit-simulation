@@ -1015,13 +1015,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				token = strtok(NULL," ");
+				token = strtok(NULL,"\n");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				if( strcmp(token , "SPD\n") == 0 || strcmp(token,"spd\n") == 0 ){
+				if( strcmp(token , "SPD") == 0 || strcmp(token,"spd") == 0 ){
 					printf("Cholesky method found during parsing\n");
 					list->solving_method = METHOD_CHOLESKY;
 				}
@@ -1039,6 +1039,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
 				token = strtok(NULL , " ");
 				if( !token ){
+				//	list->solving_method = METHOD_LU;
+
 					//printf("Error while parsing...\n");
 					//printf("Line : %s\n", line );
 					return 2;
@@ -1080,8 +1082,36 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
 
 			}
-			
-		}
+			else if( line[1] == 'P' || line[1] == 'p' ){
+
+				//reading the PLOT command keyword
+				token = strtok(temp," ");
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+
+				//reading the source type for plotting
+				token = strtok(NULL,"(");
+				printf("Source type %s selected for plotting\n",token);
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+
+				//reading the node number
+				token = strtok(NULL,")");
+				printf("Going to plot results for node: %s \n", token);
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+			}
+	
+		}	
 	}
 
 
