@@ -119,7 +119,7 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  		/*
  		 * VOLTAGE SOURCE
  		 */
- 		else if ( curr->type == NODE_SOURCE_V_TYPE &&  list->solving_method != METHOD_CHOLESKY  ){
+ 		else if ( curr->type == NODE_SOURCE_V_TYPE  ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
  			curr->node.source_v.mna_row = matrix_row;
@@ -161,7 +161,7 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  		/*
  		 * Inductance
  		 */
- 		else if ( curr->type == NODE_INDUCTANCE_TYPE &&  list->solving_method != METHOD_CHOLESKY ){
+ 		else if ( curr->type == NODE_INDUCTANCE_TYPE  ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
 			double value;

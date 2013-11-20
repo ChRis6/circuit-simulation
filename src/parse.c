@@ -1006,6 +1006,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 		 */
 		case '.':{
 
+			//char* temp = line;
 			/* solving method */
 			if( line[1] == 'o' || line[1] == 'O'){
 				token = strtok(line," ");
@@ -1014,7 +1015,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				token = strtok(NULL," ");
+				token = strtok(NULL," \n");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
