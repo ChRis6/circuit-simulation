@@ -250,5 +250,22 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 		return -1;
 	}
 	return 0;
+}
 
+void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation)
+{
+	int i,j;
+	printf("%f %f\n",list.dc_sweep.start_v,list.dc_sweep.end_v);
+ 	for (j = list.dc_sweep.start_v; j <= list.dc_sweep.end_v ; j += list.dc_sweep.inc)
+ 	{
+ 		dc_sweep_increment(vector,list.dc_sweep);
+
+ 		solve(matrix,vector,x,permutation);
+	 	
+ 		
+ 		printf("Priting vector X :\n");
+	 	for( i = 0 ; i < x->size ; i++){
+	 		printf("\t%f\n", gsl_vector_get(x , i) );
+	 	}
+ 	}
 }

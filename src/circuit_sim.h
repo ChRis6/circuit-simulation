@@ -1,7 +1,7 @@
 #ifndef CIRCUIT_SIM_H
 #define CIRCUIT_SIM_H
 
-#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_linalg.h>
 #include "node_list.h"
 
 /*
@@ -17,5 +17,6 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector);
  */
 double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T list);
 
+void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation);
 
 #endif
