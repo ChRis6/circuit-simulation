@@ -1,6 +1,6 @@
 #include "circuit_sim.h"
 #include "decomposition.h"
-
+#include "plot.h"
 /*
  * Create the matrix and vector for the circuit elements
  */
@@ -254,18 +254,38 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 
 void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation)
 {
-	int i,j;
+	int j,k;
+	int plot_array_init = 0;
+	int array_size;
+	gsl_vector ** plot_array;
+	if(list.plot == PLOT_ON)
+	{
+		array_size = plot_find_size( list.dc_sweep.start_v, list.dc_sweep.end_v , list.dc_sweep.inc );
+
+		plot_array = plot_create_vector( array_size , x->size);
+		if(plot_array == NULL)
+		{
+			perror("Error while allocating the ploting array\n");
+			exit(0);
+		}
+		plot_array_init = 1;
+	}
 	printf("%f %f\n",list.dc_sweep.start_v,list.dc_sweep.end_v);
- 	for (j = list.dc_sweep.start_v; j <= list.dc_sweep.end_v ; j += list.dc_sweep.inc)
+ 	for (k = 0, j = list.dc_sweep.start_v; j <= list.dc_sweep.end_v ; j += list.dc_sweep.inc,k++)
  	{
  		dc_sweep_increment(vector,list.dc_sweep);
 
  		solve(matrix,vector,x,permutation);
 	 	
- 		
- 		printf("Priting vector X :\n");
-	 	for( i = 0 ; i < x->size ; i++){
-	 		printf("\t%f\n", gsl_vector_get(x , i) );
-	 	}
+ 		if(plot_array_init)
+ 		{
+ 			plot_set_vector_index(plot_array ,x ,k);
+ 		}
  	}
+ 	
+ 	if(plot_array_init)
+ 	{
+ 		plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
+ 	}
+ 	
 }
