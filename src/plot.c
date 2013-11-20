@@ -93,7 +93,7 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 	int node_id;
 
 	char final_file_name[100];
-/*
+
 	FILE* file;
 	file = fopen( filename , "w");
 	if( !file ){
@@ -114,7 +114,8 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 		}
 		fprintf(file, "\n");
 	}
-*/
+	fclose(file);
+	/*
 	for( i = 0 ; i < num_node_names ; i++ ){
 		
 
@@ -142,7 +143,7 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 			}
 			fclose(file);
 	}
-
+*/
 	return ;
 }
 
