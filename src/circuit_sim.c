@@ -207,17 +207,24 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 {
 	char node_type = dc_sweep_node.node->type;
 	int vector_row;
+	static int first_time = 0;
 
 	if (  node_type == NODE_SOURCE_V_TYPE )
 	{
 		vector_row = dc_sweep_node.node->node.source_v.mna_row;
-		/*Error check*/
-		printf("V element for the dc sweep in row: %d\n",vector_row);
-
-		double value;
+		/* Error check
+			printf("V element for the dc sweep in row: %d\n",vector_row);
+		 */
+		double value = 0;
 		/* set vector value */
 		value = gsl_vector_get(vector, vector_row );
 		value += dc_sweep_node.inc;
+		if(!first_time){
+			value = dc_sweep_node.start_v;
+			first_time = 1;
+		}
+		printf("Previous value: %f  ",value);
+		printf("New value: %f\n",value);
 		gsl_vector_set(vector, vector_row , value);
 		return abs(value);
 	}
@@ -233,6 +240,9 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 			/* ste <+> */
 			value  = gsl_vector_get(vector , node1 - 1  );
 			value -= current;
+			if(!first_time){
+				value = dc_sweep_node.start_v;
+			}
 			gsl_vector_set(vector , node1 - 1  , value );
 		}
 
@@ -240,8 +250,14 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 			/* <-> */
 			value  = gsl_vector_get(vector , node2 - 1 );
 			value += current;
+			if(!first_time){
+				value = dc_sweep_node.start_v;
+			}
 			gsl_vector_set(vector , node2 - 1 , value);
 		}
+		if(!first_time)
+			first_time = 1;
+		
 		return abs(value);
 	}
 	else
@@ -252,7 +268,7 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 	return 0;
 }
 
-void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation)
+void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation,int decomposition_choice)
 {
 	int j,k;
 	int plot_array_init = 0;
@@ -275,7 +291,7 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
  	{
  		dc_sweep_increment(vector,list.dc_sweep);
 
- 		solve(matrix,vector,x,permutation);
+ 		solve(matrix,vector,x,permutation,decomposition_choice);
 	 	
  		if(plot_array_init)
  		{
