@@ -201,3 +201,54 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  	/* return */
  	return 1;
 }
+
+
+double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
+{
+	char node_type = dc_sweep_node.node->type;
+	int vector_row;
+
+	if (  node_type == NODE_SOURCE_V_TYPE )
+	{
+		vector_row = dc_sweep_node.node->node.source_v.mna_row;
+		/*Error check*/
+		printf("V element for the dc sweep in row: %d\n",vector_row);
+
+		double value;
+		/* set vector value */
+		value = gsl_vector_get(vector, vector_row );
+		value += dc_sweep_node.inc;
+		gsl_vector_set(vector, vector_row , value);
+		return abs(value);
+	}
+	else if( node_type == NODE_SOURCE_I_TYPE )
+	{
+		/* change only the vector */
+		double current = dc_sweep_node.inc;
+		double value;
+		int node1 = dc_sweep_node.node->node.source_v.node1;
+		int node2 = dc_sweep_node.node->node.source_v.node2;
+		
+		if( node1 != 0 ){
+			/* ste <+> */
+			value  = gsl_vector_get(vector , node1 - 1  );
+			value -= current;
+			gsl_vector_set(vector , node1 - 1  , value );
+		}
+
+		if( node2 != 0 ){
+			/* <-> */
+			value  = gsl_vector_get(vector , node2 - 1 );
+			value += current;
+			gsl_vector_set(vector , node2 - 1 , value);
+		}
+		return abs(value);
+	}
+	else
+	{
+		perror("Error found: Couldnt find a valid I or V source to do a DC sweep\n");
+		return -1;
+	}
+	return 0;
+
+}
