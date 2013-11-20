@@ -25,6 +25,6 @@ int gauss_decomposition(gsl_matrix *A,gsl_permutation * p, int * signum);
  * @param *x : x		
  * @param permutation:	Gauss decomposition 	->	pemutation matrix
  * 						Cholesky decomposition	->	NULL*/
-int solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation);
+void solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation);
 
 #endif /*ELIMINATION_H_*/

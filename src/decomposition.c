@@ -54,7 +54,7 @@ int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , i
 	return 0;
 }
 
-int solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation)
+void solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation)
 {
 	if(permutation == NULL)
 		gsl_linalg_cholesky_solve(matrix,vector,x);

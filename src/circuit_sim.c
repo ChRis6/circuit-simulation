@@ -1,5 +1,5 @@
 #include "circuit_sim.h"
-
+#include "decomposition.h"
 
 /*
  * Create the matrix and vector for the circuit elements
