@@ -10,21 +10,47 @@ int check_decomp_error(int error_code);
  * 					Cholesky decomposition 	-> 	NULL
  * @param d_choice:	Gauss decomposition 	->	GAUSS_DECOMPOSITION
  * 					Cholesky decomposition	->	CHOLESKY DECOMPOSITION*/
-int decomposition(gsl_matrix * A, gsl_permutation * p, int * signum,int decomposition_choice)
+int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , int * signum,int decomposition_choice)
 {
+	int permutation_len;
+	
+	if(matrix != NULL)
+		permutation_len = matrix->size1;
+	*x = gsl_vector_alloc(permutation_len);
+ 	if( !x ){
+ 		printf("X vector : no memory\n");
+ 		exit(1);
+ 	}
 	if (decomposition_choice == GAUSS_DECOMPOSITION)
 	{
-		/*Place gauss decomposition code here */
+		permutation_len = matrix->size1;
+	 	*p = gsl_permutation_alloc(permutation_len);
+	 	if( !p ){
+	 		printf("(No memory for permutation)\n" );
+	 		exit(1);
+	 	}
+
+	 	if( gsl_linalg_LU_decomp(matrix , *p , signum ) ){
+	 		printf("LU returned 0\n");
+	 		exit(1);
+	 	}
 		return 1;
 	}else if(decomposition_choice == CHOLESKY_DECOMPOSITION)
 	{
+		permutation_len = matrix->size1;
+		p = NULL;
 		/* We are setting of the handler just to do a proper checking and
 		 * handle the error by our own
 		 */
 		gsl_set_error_handler_off();
  		printf("CHOLESKY...\n");
- 		return check_decomp_error(gsl_linalg_cholesky_decomp(A));		
+ 		return check_decomp_error(gsl_linalg_cholesky_decomp(matrix));		
+	}else
+	{
+		perror("Not a valid decomposition asked\n");
 	}
+			
+	
 	return 0;
 }
 
@@ -37,7 +63,6 @@ int solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation
 
 }
 
-int cholesky_decomposition(gsl_matrix * A);
 
 
 
