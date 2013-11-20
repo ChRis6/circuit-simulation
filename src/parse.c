@@ -1046,7 +1046,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 2;
 				}
 				list->dc_sweep.name = strdup(token);
-				printf("DC: name = %s \n",list->dc_sweep.name);
+				//printf("DC: name = %s \n",list->dc_sweep.name);
 
 				token = strtok(NULL , " ");
 				if( !token ){
@@ -1083,7 +1083,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
 			}
 			else if( line[1] == 'P' || line[1] == 'p' ){
-
+        int plot_num=0;
 				//reading the PLOT command keyword
 				token = strtok(temp," ");
 				if( !token ){
@@ -1092,23 +1092,30 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 0;
 				}
 
-				//reading the source type for plotting
-				token = strtok(NULL,"(");
-				printf("Source type %s selected for plotting\n",token);
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
+        while(1){
+				  //reading the source type for plotting
+				  token = strtok(NULL," (\n");
+				  if( !token && plot_num == 0 ){
+           printf("Error while parsing...\n");
+					 printf("Line : %s\n", line );
+					 return 0;
+				  }
+          else if(!token && plot_num>0)
+            break;
+          
 
-				//reading the node number
-				token = strtok(NULL,")");
-				printf("Going to plot results for node: %s \n", token);
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
+
+				  //reading the node name
+				  token = strtok(NULL,")");
+				  printf("Going to plot results for node: %s \n", token);
+				  if( !token ){
+					 printf("Error while parsing...\n");
+					 printf("Line : %s\n", line );
+					 return 0;
+				  }
+          plot_num++;
+
+        }
 			}
 	
 		}	
