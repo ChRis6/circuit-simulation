@@ -52,6 +52,7 @@ typedef struct source_v {
 	char name[MAX_NAME_LENGTH];
 	int node1;
 	int node2;
+	int mna_row;
 
 	double value;
 }SOURCE_V_T;

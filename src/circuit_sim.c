@@ -34,7 +34,7 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  	tmp_vector = gsl_vector_calloc( rows);
  	if( !tmp_vector )
  		return 0;	
-
+ 	
 	/* compute mna */
  	for( curr = list->head ; curr ; curr = curr->next){
 
@@ -122,7 +122,8 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  		else if ( curr->type == NODE_SOURCE_V_TYPE &&  list->solving_method != METHOD_CHOLESKY  ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
-
+ 			curr->node.source_v.mna_row = matrix_row;
+ 			
  			double value;
  			/* set vector value */
  			value = gsl_vector_get(tmp_vector , matrix_row  );
