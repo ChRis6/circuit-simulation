@@ -92,7 +92,7 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 	//int vector_size;
 	int node_id;
 
-	char final_file_name[100];
+	//char final_file_name[100];
 
 	FILE* file;
 	file = fopen( filename , "w");
