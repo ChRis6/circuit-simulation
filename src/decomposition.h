@@ -13,7 +13,7 @@
  * 					Cholesky decomposition 	-> 	NULL
  * @param d_choice:	Gauss decomposition 	->	GAUSS_DECOMPOSITION
  * 					Cholesky decomposition	->	CHOLESKY DECOMPOSITION*/
-int decomposition(gsl_matrix * A, gsl_permutation * p, int * signum,int decomposition_choice);
+int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , int * signum,int decomposition_choice);
 
 int cholesky_decomposition(gsl_matrix * A);
 
