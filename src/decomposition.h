@@ -18,4 +18,13 @@ int decomposition(gsl_matrix * A, gsl_permutation * p, int * signum,int decompos
 int cholesky_decomposition(gsl_matrix * A);
 
 int gauss_decomposition(gsl_matrix *A,gsl_permutation * p, int * signum);
+
+/* This is the function that solves the system Ax=b
+ * @param *matrix :	A
+ * @param *vector :	b
+ * @param *x : x		
+ * @param permutation:	Gauss decomposition 	->	pemutation matrix
+ * 						Cholesky decomposition	->	NULL*/
+int solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation);
+
 #endif /*ELIMINATION_H_*/

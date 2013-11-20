@@ -22,13 +22,20 @@ int decomposition(gsl_matrix * A, gsl_permutation * p, int * signum,int decompos
 		 * handle the error by our own
 		 */
 		gsl_set_error_handler_off();
-		return check_decomp_error(gsl_linalg_cholesky_decomp(A));
-		
+ 		printf("CHOLESKY...\n");
+ 		return check_decomp_error(gsl_linalg_cholesky_decomp(A));		
 	}
 	return 0;
 }
 
+int solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation)
+{
+	if(permutation == NULL)
+		gsl_linalg_cholesky_solve(matrix,vector,x);
+	else
+ 		gsl_linalg_LU_solve(matrix , permutation , vector , x );
 
+}
 
 int cholesky_decomposition(gsl_matrix * A);
 
