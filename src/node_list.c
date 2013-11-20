@@ -29,6 +29,7 @@ void init_list(LIST* list){
 	list->dc_sweep.inc     = 0.0;
 
 	list->dc_sweep.oldval  = 0.0;
+	list->plot = PLOT_OFF;
 }
 
 /*

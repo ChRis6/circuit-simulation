@@ -1094,6 +1094,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				}
 
         plot_init();
+        list->plot = PLOT_ON;
 
 
         while(1){
