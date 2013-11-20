@@ -1006,22 +1006,22 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 		 */
 		case '.':{
 
-			//char* temp = line;
+			char* temp = line;
 			/* solving method */
 			if( line[1] == 'o' || line[1] == 'O'){
-				token = strtok(line," ");
+				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				token = strtok(NULL," \n");
+				token = strtok(NULL," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				if( strcmp(token , "SPD") == 0 || strcmp(token,"spd") == 0 ){
+				if( strcmp(token , "SPD\n") == 0 || strcmp(token,"spd\n") == 0 ){
 					printf("Cholesky method found during parsing\n");
 					list->solving_method = METHOD_CHOLESKY;
 				}
@@ -1030,7 +1030,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 			}
 			else if( line[1] == 'D' || line[1] == 'd' ){  // check for .DC
 
-				token = strtok(line," ");
+				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
