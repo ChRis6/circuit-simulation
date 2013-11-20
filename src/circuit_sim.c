@@ -223,8 +223,6 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 			value = dc_sweep_node.start_v;
 			first_time = 1;
 		}
-		printf("Previous value: %f  ",value);
-		printf("New value: %f\n",value);
 		gsl_vector_set(vector, vector_row , value);
 		return abs(value);
 	}
