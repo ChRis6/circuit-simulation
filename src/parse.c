@@ -1005,22 +1005,25 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 		 * Commands
 		 */
 		case '.':{
-
+      char* temp=line;
+      printf("Command found :%s",line);
 			/* solving method */
 			if( line[1] == 'o' || line[1] == 'O'){
-				token = strtok(line," ");
+
+				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
 				token = strtok(NULL," ");
+        printf("Current token is %s",token);
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				if( strcmp(token , "SPD") == 0 || strcmp(token,"spd") == 0 ){
+				if( strcmp(token , "SPD\n") == 0 || strcmp(token,"spd\n") == 0 ){
 					printf("Cholesky method found during parsing\n");
 					list->solving_method = METHOD_CHOLESKY;
 				}
@@ -1029,7 +1032,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 			}
 			else if( line[1] == 'D' || line[1] == 'd' ){  // check for .DC
 
-				token = strtok(line," ");
+				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
@@ -1038,12 +1041,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
 				token = strtok(NULL , " ");
 				if( !token ){
-					//printf("Error while parsing...\n");
-					//printf("Line : %s\n", line );
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
 					return 2;
 				}
 				list->dc_sweep.name = strdup(token);
-				printf("DC: name = %s \n",list->dc_sweep.name);
+				list->solving_method = METHOD_LU;
+
 
 				token = strtok(NULL , " ");
 				if( !token ){
@@ -1052,6 +1056,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 0;
 				}
 				list->dc_sweep.start_v = atof( token );
+        
 
 				token = strtok(NULL , " ");
 				if( !token ){
@@ -1060,17 +1065,17 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 0;
 				}
 				list->dc_sweep.end_v = atof(token);
-
-				token = strtok(NULL , " ");
+        
+        
+        token = strtok(NULL , " ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
 				list->dc_sweep.inc = atof(token);
-
-
-				// check if node already declared 
+        
+        // check if node already declared 
 				list->dc_sweep.node = list_search_by_name(list , list->dc_sweep.name );
 				if( !(list->dc_sweep.node)){
 					printf(".DC Error: %s element not found\n",list->dc_sweep.name);
@@ -1079,6 +1084,38 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
 
 			}
+      else if( line[1] == 'P' || line[1] == 'p' ){ //PLOT COMMAND
+        
+        //reading the PLOT keyword
+        token = strtok(temp," ");
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+
+        //Reading source type
+        token = strtok(NULL,"(");
+        //printf("Source type %s found\n", token);
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+
+        //reading node number
+        token = strtok(NULL,")");
+        //printf("Plotting for node %s\n", token);
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+
+        
+
+
+      }
 			
 		}
 	}
