@@ -194,8 +194,49 @@ void plot_to_screen( hashtable_t* hashtable, gsl_vector** array , int array_size
 		}
 		
 	}
-	
 }
+
+/*
+ * Create files named after their representative node name and print the results
+ */
+void plot_by_node_name(hashtable_t* hashtable , gsl_vector** array , int array_size){
+
+	char final_file_name[100];
+	char filename_prefix[]    = "node_";
+	char filename_extension[] = ".txt";
+
+	int i,j;
+	int node_id;
+	int legit_node;
+
+	for( i = 0 ; i < num_node_names ; i++ ){
+		legit_node = ht_get(hashtable , node_names[i] , &node_id);
+		
+		if( legit_node ){
+			FILE* file;
+			
+			memset(final_file_name , 0 , 100);
+
+			strcpy(final_file_name , filename_prefix);
+			strcat(final_file_name , node_names[i]);
+			strcat(final_file_name , filename_extension );
+
+			file = fopen( final_file_name , "w" );
+			
+			if( !file )
+				continue;		// do not print this node
+			fprintf(file, "RESULTS:\n\n" );
+			for( j = 0 ; j < array_size ; j++){
+				fprintf(file, "%f\n", gsl_vector_get( array[j] , node_id - 1 ) );
+			}
+			fclose(file);
+		}
+
+	} 
+
+}
+
+
 
 /*
  * Deallocate all memory used by the plot module

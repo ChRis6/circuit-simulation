@@ -33,6 +33,11 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 void plot_to_screen( hashtable_t* hashtable, gsl_vector** array , int array_size);
 
 /*
+ * Create files named after their representative node name and print the results
+ */
+void plot_by_node_name(hashtable_t* hashtable , gsl_vector** array , int array_size);
+
+/*
  * Copies vector b at array[index]
  */
 int plot_set_vector_index(gsl_vector** array , gsl_vector* b , int index);

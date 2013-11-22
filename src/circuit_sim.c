@@ -296,7 +296,9 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
  	
  	if(list.plot == PLOT_ON)
  	{
- 		plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
+ 		//plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
+ 		plot_by_node_name(list.hashtable , plot_array , array_size);
  	}
+
  	
 }
