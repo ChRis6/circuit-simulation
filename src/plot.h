@@ -28,6 +28,11 @@ gsl_vector** plot_create_vector( int array_size , int vector_size );
 void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, char* filename);
 
 /*
+ * prints an array of vectors to a stderr 
+ */
+void plot_to_screen( hashtable_t* hashtable, gsl_vector** array , int array_size);
+
+/*
  * Copies vector b at array[index]
  */
 int plot_set_vector_index(gsl_vector** array , gsl_vector* b , int index);

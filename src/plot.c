@@ -173,6 +173,31 @@ void plot_free_array(gsl_vector** array , int array_size){
 }
 
 /*
+ * prints an array of vectors to a stderr 
+ */
+void plot_to_screen( hashtable_t* hashtable, gsl_vector** array , int array_size){
+
+
+	int i,j;
+	int node_id;
+
+	printf("##### SOLUTIONS ######\n");
+
+	for( i = 0 ; i < array_size ; i++ ){
+		printf("Solution: %d\n",(i+1) );
+		//vector_size = array[i]->size;
+				
+		for( j = 0 ; j < num_node_names ; j++){
+			ht_get(hashtable , node_names[j] , &node_id);
+			printf("\t%s : %f\n", node_names[j] , gsl_vector_get( array[i] , node_id - 1 ) );
+
+		}
+		
+	}
+	
+}
+
+/*
  * Deallocate all memory used by the plot module
  */
 void plot_destroy(){
