@@ -17,6 +17,6 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector);
  */
 double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T list);
 
-void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation);
+void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation,int decomposition_choice);
 
 #endif

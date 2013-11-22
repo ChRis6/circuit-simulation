@@ -66,7 +66,7 @@ gsl_vector** plot_create_vector( int array_size  ,  int vector_size ){
 	gsl_vector **vector_array = NULL;
 	if( array_size < 1 )
 		return NULL;
-
+	array_size++;
 	vector_array = ( gsl_vector**) malloc( sizeof(gsl_vector*) * array_size );
 	if( !vector_array )
 		return NULL;
@@ -92,8 +92,8 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 	//int vector_size;
 	int node_id;
 
-	char final_file_name[100];
-/*
+	//char final_file_name[100];
+
 	FILE* file;
 	file = fopen( filename , "w");
 	if( !file ){
@@ -114,7 +114,8 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 		}
 		fprintf(file, "\n");
 	}
-*/
+	fclose(file);
+	/*
 	for( i = 0 ; i < num_node_names ; i++ ){
 		
 
@@ -142,7 +143,7 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 			}
 			fclose(file);
 	}
-
+*/
 	return ;
 }
 

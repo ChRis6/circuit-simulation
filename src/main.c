@@ -14,6 +14,8 @@
 
 #include "decomposition.h"
 
+#include "plot.h"
+
 int main( int argc , char* argv[]){
 	int flag;
 
@@ -50,10 +52,26 @@ int main( int argc , char* argv[]){
  	
  	if(list.dc_sweep.node != NULL)
  	{
- 	 	dc_sweep(list,matrix,vector,x,permutation);
+ 	 	dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
  	}else
  	{
- 		solve(matrix,vector,x,permutation);
+ 		int array_size = 1;
+ 		solve(matrix,vector,x,permutation,list.solving_method);
+ 		if(list.plot == PLOT_ON)
+		{
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( array_size , x->size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		
+			plot_set_vector_index(plot_array ,x ,0);
+			 		 	
+			plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
+		}
  	}
 
  	

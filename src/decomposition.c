@@ -42,7 +42,7 @@ int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , i
 		/* We are setting of the handler just to do a proper checking and
 		 * handle the error by our own
 		 */
-		gsl_set_error_handler_off();
+		//gsl_set_error_handler_off();
  		printf("CHOLESKY...\n");
  		return check_decomp_error(gsl_linalg_cholesky_decomp(matrix));		
 	}else
@@ -54,9 +54,9 @@ int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , i
 	return 0;
 }
 
-void solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation)
+void solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation,int decomposition_choice)
 {
-	if(permutation == NULL)
+	if (decomposition_choice == CHOLESKY_DECOMPOSITION)
 		gsl_linalg_cholesky_solve(matrix,vector,x);
 	else
  		gsl_linalg_LU_solve(matrix , permutation , vector , x );
