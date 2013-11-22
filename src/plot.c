@@ -66,7 +66,7 @@ gsl_vector** plot_create_vector( int array_size  ,  int vector_size ){
 	gsl_vector **vector_array = NULL;
 	if( array_size < 1 )
 		return NULL;
-
+	array_size++;
 	vector_array = ( gsl_vector**) malloc( sizeof(gsl_vector*) * array_size );
 	if( !vector_array )
 		return NULL;

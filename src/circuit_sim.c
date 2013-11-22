@@ -272,32 +272,29 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
 	int plot_array_init = 0;
 	int array_size;
 	gsl_vector ** plot_array;
-	if(list.plot == PLOT_ON)
-	{
-		array_size = plot_find_size( list.dc_sweep.start_v, list.dc_sweep.end_v , list.dc_sweep.inc );
+	
+	array_size = plot_find_size( list.dc_sweep.start_v, list.dc_sweep.end_v , list.dc_sweep.inc);
+	printf("Array Size for the plot: %d\n",array_size);
 
-		plot_array = plot_create_vector( array_size , x->size);
-		if(plot_array == NULL)
-		{
-			perror("Error while allocating the ploting array\n");
-			exit(0);
-		}
-		plot_array_init = 1;
+	plot_array = plot_create_vector( array_size , x->size);
+	if(plot_array == NULL)
+	{
+		perror("Error while allocating the ploting array\n");
+		exit(0);
 	}
+	
 	printf("%f %f\n",list.dc_sweep.start_v,list.dc_sweep.end_v);
- 	for (k = 0, j = list.dc_sweep.start_v; j <= list.dc_sweep.end_v ; j += list.dc_sweep.inc,k++)
+	
+ 	for (k = 0; k < array_size ; k++)
  	{
  		dc_sweep_increment(vector,list.dc_sweep);
 
  		solve(matrix,vector,x,permutation,decomposition_choice);
 	 	
- 		if(plot_array_init)
- 		{
- 			plot_set_vector_index(plot_array ,x ,k);
- 		}
+ 		plot_set_vector_index(plot_array ,x ,k);
  	}
  	
- 	if(plot_array_init)
+ 	if(list.plot == PLOT_ON)
  	{
  		plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
  	}
