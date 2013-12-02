@@ -30,7 +30,10 @@ void init_list(LIST* list){
 
 	list->dc_sweep.oldval  = 0.0;
 	list->plot = PLOT_OFF;
+
+	list->itol = 1e-3;
 }
+
 
 /*
  * Prints list

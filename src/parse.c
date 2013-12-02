@@ -1008,36 +1008,91 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 		case '.':{
 
 			char* temp = line;
+			token = strtok(temp," ");
+				
+			if( !token )
+				return 0;
+
 			/* solving method */
-			if( line[1] == 'o' || line[1] == 'O'){
-				token = strtok(temp," ");
+			if( strcmp(token,".OPTIONS") == 0 || strcmp(token,".options") == 0 ){
+
+				token = strtok(NULL," \n");
+				printf("Token after .options :%s\n",token);
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-				token = strtok(NULL,"\n");
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
-				if( strcmp(token , "SPD") == 0 || strcmp(token,"spd") == 0 ){
+
+				printf("TOKEN AFTER .OPTIONS :%s\n",token);
+				if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
 					printf("Cholesky method found during parsing\n");
 					list->solving_method = METHOD_CHOLESKY;
+				}
+				else if( strcmp(token,"ITER") == 0 || strcmp(token,"iter") == 0 ){
+					token = strtok(NULL," \n");
+					if( !token ){					
+						list->solving_method = METHOD_BICG;
+						return 2;
+					}
+						
+
+					if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0){
+						list->solving_method = METHOD_CG ;
+					}
+				}
+				else if( strcmp(token,"ITOL") == 0 || strcmp(token,"itol") == 0){
+					/* tolerance */
+					token = strtok(NULL," \n");
+					if ( !token ){
+						printf("Error while parsin...\n");
+						printf("Line: %s\n",line);
+						return 0;
+					}
+
+
+					if( strcmp(token,"=") ==  0 ){
+						/* now read the tolerance value */
+						token = strtok(NULL," \n");
+
+						if( !token ){
+							printf("Error while parsing..\n");
+							printf("Line: %s\n",line);
+							return 0;
+
+						}
+						else{
+							double val;
+							val = atof(token);
+							printf("ITOL = %f\n",val);
+							list->itol = val;
+							return 2;
+						}  
+					}
+					else{
+						printf("Error while parsing...\n");
+						printf("Line: %s\n",line);
+						return 0;
+					}
+
+				}
+				else{
+					printf("No token after .OPTIONS \n");
+					return 0;
 				}
 
 				return 2;
 			}
-			else if( line[1] == 'D' || line[1] == 'd' ){  // check for .DC
+			else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
 
+/*
 				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
-
+*/
 				token = strtok(NULL , " ");
 				if( !token ){
 				//	list->solving_method = METHOD_LU;
@@ -1083,9 +1138,11 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
 
 			}
-			else if( line[1] == 'P' || line[1] == 'p' ){
-        int plot_num=0;
+			else if( strcmp(token,".PLOT") == 0 || strcmp(token,".plot") == 0 ){
+  			
+  			    int plot_num=0;
 				//reading the PLOT command keyword
+/*
 				token = strtok(temp," ");
 				if( !token ){
 					printf("Error while parsing...\n");
@@ -1093,36 +1150,36 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					return 0;
 				}
 
-        plot_init();
-        list->plot = PLOT_ON;
+*/
+
+			plot_init();
+        	list->plot = PLOT_ON;
 
 
-        while(1){
-				  //reading the source type for plotting
-				  token = strtok(NULL," (\n");
-				  if( !token && plot_num == 0 ){
-           printf("Error while parsing...\n");
-					 printf("Line : %s\n", line );
-					 return 0;
+        	while(1){
+				//reading the source type for plotting
+				token = strtok(NULL," (\n");
+				if( !token && plot_num == 0 ){
+           		printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
 				  }
-          else if(!token && plot_num>0)
-            break;
+          		else if(!token && plot_num>0)
+            		break;
           
 
-
-				  //reading the node name
-				  token = strtok(NULL,")");
-				  printf("Going to plot results for node: %s \n", token);
-				  if( !token ){
-					 printf("Error while parsing...\n");
-					 printf("Line : %s\n", line );
-					 return 0;
-				  }
-          plot_add_node(token);
-          plot_num++;
-
-        }
-			}
+				//reading the node name
+				token = strtok(NULL,")");
+				printf("Going to plot results for node: %s \n", token);
+				if( !token ){
+					printf("Error while parsing...\n");
+					printf("Line : %s\n", line );
+					return 0;
+				}
+          		plot_add_node(token);
+          		plot_num++;
+        	}
+		}
 	
 		}	
 	}

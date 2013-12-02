@@ -6,6 +6,9 @@
 
 #define METHOD_LU       1
 #define METHOD_CHOLESKY 2
+#define METHOD_CG       3
+#define METHOD_BICG     4
+
 
 #define PLOT_ON  1
 #define PLOT_OFF 0
@@ -46,6 +49,8 @@ typedef struct list{
 	char solving_method;
 	DC_SWEEP_T dc_sweep;
 	char plot;
+
+	double itol;
 
 }LIST;
 
