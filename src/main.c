@@ -30,6 +30,9 @@ int main( int argc , char* argv[]){
 		printf("Usage: %s <netlist>\n",argv[0]);
 		return -1;
 	}
+
+	printf("Starting simulation....\n");
+
  	LIST list;
  	init_list(&list);
  	
