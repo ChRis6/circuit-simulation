@@ -1,5 +1,5 @@
 #include "linear_helper.h"
-
+#include <math.h>
 
 double lh_norm( gsl_vector* v){
 	double res = gsl_blas_dnrm2(v)
