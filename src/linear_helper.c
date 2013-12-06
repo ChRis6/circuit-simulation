@@ -2,8 +2,8 @@
 
 
 double lh_norm( gsl_vector* v){
-
-	return 0.0;
+	double res = gsl_blas_dnrm2(v)
+	return res;
 }
 
 gsl_vector* lh_diag_mul(gsl_vector** v , gsl_matrix* A){
