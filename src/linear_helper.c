@@ -1,12 +1,13 @@
 #include "linear_helper.h"
+#include <gsl/gsl_blas.h>
 #include <math.h>
 
 double lh_norm( gsl_vector* v){
-	double res = gsl_blas_dnrm2(v)
+	double res = gsl_blas_dnrm2(v);
 	return res;
 }
 
-gsl_vector* lh_diag_mul(gsl_vector** v , gsl_matrix* A){
+gsl_vector* lh_diag_mul(gsl_vector** v , gsl_vector* A){
 	return NULL;
 }
 
