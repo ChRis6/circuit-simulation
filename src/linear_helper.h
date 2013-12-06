@@ -26,7 +26,7 @@ gsl_vector* lh_matrix_vector_mul( gsl_vector** v , gsl_matrix* A);
  * Vector - scalar multiplication
  * writes result to v
  */
-gsl_vector* lh_scalar_vector_mul(double s , gsl_vector** v);
+void lh_scalar_vector_mul(double s , gsl_vector* v);
 
 /*
  * dot product
