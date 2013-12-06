@@ -20,7 +20,7 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m);
  * matrix-vector multiplication
  * Writes result to v
  */
-gsl_vector* lh_matrix_vector_mul( gsl_vector** v , gsl_matrix* A);
+void lh_matrix_vector_mul( gsl_vector* v , gsl_matrix* A,gsl_vector* rhs,int transp);
 
 /*
  * Vector - scalar multiplication

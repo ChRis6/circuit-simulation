@@ -2,6 +2,9 @@
 #include <gsl/gsl_blas.h>
 #include <math.h>
 
+#define TRANSP 1
+#define NON_TRANSP 2
+
 double lh_norm( gsl_vector* v){
 	double res = gsl_blas_dnrm2(v);
 	return res;
@@ -12,9 +15,12 @@ gsl_vector* lh_diag_mul(gsl_vector** v , gsl_vector* A){
 }
 
 
-gsl_vector* lh_matrix_vector_mul( gsl_vector** v , gsl_matrix* A){
-
-	return NULL;
+void lh_matrix_vector_mul( gsl_vector* v , gsl_matrix* A,gsl_vector* rhs,int transp){
+	
+	if (transp == TRANSP)
+		gsl_blas_dgemv(CblasTrans,1,A,v,0,rhs);
+	else if (transp == NON_TRANSP)
+		gsl_blas_dgemv(CblasNoTrans,1,A,v,0,rhs);
 }
 
 
