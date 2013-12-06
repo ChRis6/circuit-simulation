@@ -10,17 +10,13 @@ int check_decomp_error(int error_code);
  * 					Cholesky decomposition 	-> 	NULL
  * @param d_choice:	Gauss decomposition 	->	GAUSS_DECOMPOSITION
  * 					Cholesky decomposition	->	CHOLESKY DECOMPOSITION*/
-int decomposition(gsl_matrix * matrix, gsl_permutation ** p, gsl_vector ** x , int * signum,int decomposition_choice)
+int decomposition(gsl_matrix * matrix, gsl_permutation ** p, int * signum,int decomposition_choice)
 {
 	int permutation_len;
 	
 	if(matrix != NULL)
 		permutation_len = matrix->size1;
-	*x = gsl_vector_alloc(permutation_len);
- 	if( !x ){
- 		printf("X vector : no memory\n");
- 		exit(1);
- 	}
+
 	if (decomposition_choice == GAUSS_DECOMPOSITION)
 	{
 		permutation_len = matrix->size1;

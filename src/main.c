@@ -47,8 +47,14 @@ int main( int argc , char* argv[]){
  		printf("Error creating mna system\n");
  		return -1;
  	}
+ 	
+	x = gsl_vector_alloc(matrix->size1);
+ 	if( !x ){
+ 		printf("X vector : no memory\n");
+ 		exit(1);
+ 	}
 		
- 	decomposition(matrix,&permutation,&x,&sign,list.solving_method);
+ 	decomposition(matrix,&permutation,&sign,list.solving_method);
  	
  	if(list.dc_sweep.node != NULL)
  	{
