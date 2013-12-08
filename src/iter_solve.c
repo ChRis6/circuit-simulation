@@ -5,7 +5,7 @@
 
 static int iter = 10;
 static double tolerance = 1e-3;
-static double eps = 1e-4;
+static double eps = 1e-14;
 
 
 void iter_set_options( int iterations , double itol ){
