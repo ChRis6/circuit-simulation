@@ -66,3 +66,13 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m){
 
 	return res;
 }
+
+void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v){
+
+	int i;
+	for ( i = 0 ; i < v->size; i++){
+		double temp;
+		temp = gsl_vector_get(v , i);
+		gsl_vector_set(res , i , s * temp);
+	}
+}
