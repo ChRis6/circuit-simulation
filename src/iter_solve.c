@@ -91,21 +91,27 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	double omega = 0;
 
 	gsl_vector* x;
-	gsl_vector* r;
-	gsl_vector* r_t;
-	gsl_vector* z;
-	gsl_vector* temp_z;
-	gsl_vector* z_t;
-	gsl_vector* temp_z_t;
+	gsl_vector* r , *r_t;
+	gsl_vector* z , *z_t , *temp_z , *temp_z_t;
 	gsl_vector* m;
-	gsl_vector* p;
-	gsl_vector* p_t;
-	gsl_vector* q;
-	gsl_vector* q_t;
+	gsl_vector* p , *p_t;
+	gsl_vector* q , *q_t;
 
+	/* x = initial guess x0 */
 	x = gsl_vector_alloc(A->size1);
+	gsl_vector_memcpy(x,x0);
+
+	/* r = r~ = b - Ax */
 	r = gsl_vector_alloc(A->size1);
 	r_t = gsl_vector_alloc(A->size1);
+
+	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1,1);
+	gsl_vector_memcpy(r,b);
+	gsl_vector_memcpy(r_t,b);
+	
+	/* 	Allocate all the vectors that we need in order for the algorithm
+		to be functional 
+	*/
 	z = gsl_vector_alloc(A->size1);
 	temp_z = gsl_vector_alloc(A->size1);
 	temp_z_t = gsl_vector_alloc(A->size1);
@@ -115,19 +121,16 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
  	q = gsl_vector_alloc(A->size1);
 	q_t = gsl_vector_alloc(A->size1);
 
-	gsl_vector_memcpy(x,x0);
-
+	/* Get and save the 1/diag(A) in the vector m */
 	m = lh_get_inv_diag(A);
-	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1,1);
-	gsl_vector_memcpy(r,b);
-	gsl_vector_memcpy(r_t,b);
 
+	/* get the euclidian norms of r and b vectors */
 	norm_r = lh_norm(r);
 	norm_b = lh_norm(b);
 
 	while((norm_r / norm_b) > tolerance && i < iter)
 	{
-		iter++;
+		i++;
 		lh_diag_mul(z,r,m); 	/* Preconditioner solve*/
 		lh_diag_mul(z_t,r_t,m);	/*Transpose prec-solve */
 
@@ -141,23 +144,23 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		if (iter == 1)
 		{
-			gsl_vector_memcpy(p,z);
-			gsl_vector_memcpy(p_t,z_t);
+			gsl_vector_memcpy(p,z); 	/* p = z */
+			gsl_vector_memcpy(p_t,z_t); /* p~ = z~ */
 		}
 		else
 		{
 			beta = rho / rho_1;
 			
-			gsl_vector_memcpy(temp_z,z);
-			gsl_vector_memcpy(temp_z_t, z_t);
+			gsl_vector_memcpy(temp_z,z); 		/* 	temp_z = z */
+			gsl_vector_memcpy(temp_z_t, z_t);	/*	temp_z_t = z_t */
 			
-			lh_scalar_vector_mul(p,beta,p);
-			lh_scalar_vector_mul(p_t,beta,p_t);
-			gsl_vector_add (temp_z,p);
-			gsl_vector_add(temp_z_t,p_t);
+			lh_scalar_vector_mul(p,beta,p);		/* p = beta * p where beta scalar and p vector*/
+			lh_scalar_vector_mul(p_t,beta,p_t);	/* p~ = beta * p~ where beta scalar and p vector*/
+			gsl_vector_add (temp_z,p);			/* temp_z = temp_z + p */
+			gsl_vector_add(temp_z_t,p_t);		/* temp_z~ = temp_z~ + p~ */
 			
-			gsl_vector_memcpy(p,temp_z);
-			gsl_vector_memcpy(p_t,temp_z);
+			gsl_vector_memcpy(p,temp_z);		/* p = z + beta * p */
+			gsl_vector_memcpy(p_t,temp_z);		/* p~ = z~ + beta * p~ */
 		}
 		rho_1 = rho;
 
