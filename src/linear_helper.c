@@ -38,12 +38,6 @@ void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,in
 		gsl_blas_dgemv(CblasNoTrans,alpha,A,x,beta,y);
 }
 
-
-void lh_scalar_vector_mul(double s , gsl_vector* v){
-	gsl_blas_dscal(s , v);
-}
-
-
 double lh_dot_product(gsl_vector* v1 , gsl_vector* v2){
 
 	double dot;
