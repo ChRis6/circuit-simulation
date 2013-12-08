@@ -33,6 +33,14 @@ void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp
 		gsl_blas_dgemv(CblasNoTrans,1,A,x,0,y);
 }
 
+void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp,double alpha,double,beta){
+	
+	if (transp == TRANSP)
+		gsl_blas_dgemv(CblasTrans,alpha,A,x,beta,y);
+	else if (transp == NON_TRANSP)
+		gsl_blas_dgemv(CblasNoTrans,alpha,A,x,beta,y);
+}
+
 
 void lh_scalar_vector_mul(double s , gsl_vector* v){
 	gsl_blas_dscal(s , v);

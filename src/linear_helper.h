@@ -28,6 +28,12 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m);
 */
 void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp);
 
+/*
+	This function computes the matrix-vector product and sum y = \alpha op(A) x + \beta y,
+	where op(A) = A, A^T, A^H for TransA = CblasNoTrans, CblasTrans, CblasConjTrans.
+
+*/
+void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp,double alpha,double,beta);
 
 
 /*
