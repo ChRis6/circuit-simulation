@@ -4,6 +4,9 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
+#define TRANSP 1
+#define NON_TRANSP 2
+
 double lh_norm( gsl_vector* v);
 
 /*

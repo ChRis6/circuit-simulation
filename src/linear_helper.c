@@ -2,8 +2,7 @@
 #include <gsl/gsl_blas.h>
 #include <math.h>
 
-#define TRANSP 1
-#define NON_TRANSP 2
+
 
 double lh_norm( gsl_vector* v){
 	double res = gsl_blas_dnrm2(v);
