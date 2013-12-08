@@ -23,6 +23,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	if( !r )
 		return NULL;
 
+
 	gsl_vector* b1;
 	b1 = gsl_vector_calloc(b->size);
 	if( !b1)
@@ -38,12 +39,19 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	if( !p )
 		return NULL;
 
+	gsl_vector* q;
+	q = gsl_vector_calloc(b->size);
+	if( !q )
+		return NULL;
+
 	gsl_vector* M = lh_get_inv_diag(A);
 	if( !M ){
 		gsl_vector_free(r);
 		gsl_vector_free(b1);
 		gsl_vector_free(z);
 		gsl_vector_free(p);
+		
+		gsl_vector_free(q);
 		return NULL;
 	}
 
@@ -57,6 +65,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	double rho,rho1;
 	double beta;
+	double alpha;
 
 	while ( iteration < iter && ( (lh_norm(r) / lh_norm(b)) > tolerance ) ){
 
@@ -71,13 +80,42 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		else{
 			beta = rho / rho1;
 
+			//gsl_vector* temp_v = gsl_vector_calloc(p->size);
+			
+			/* p = z + beta*p */
+			lh_scalar_vector_mul(p, beta,p); //  p = beta* p
+			gsl_vector_add( p , z);			 //  p = z + p
 		}
 
+		rho1 = rho;
 
+		/* q = Ap */
+		lh_matrix_vector_mul( p,A,q,NON_TRANSP);
+		alpha = rho / lh_dot_product( p , q);
+
+		/* x = x + alpha * p */
+		gsl_vector* temp_v = gsl_vector_calloc(p->size);
+		if( !temp_v ){
+			gsl_vector_free(r);
+			gsl_vector_free(b1);
+			gsl_vector_free(z);
+			gsl_vector_free(p);
+		
+			gsl_vector_free(q);
+			return NULL;
+		}
+		lh_scalar_vector_mul(temp_v , alpha , p); // temp_v = alha * p
+		gsl_vector_add( x0 , temp_v);			  // x = x + temp_v
+		
+		/* r = r - alpha * q */
+		//gsl_vector_memcpy(temp_v , q);
+		lh_scalar_vector_mul( temp_v , alpha , q); // temp_v = alpha* p
+		gsl_vector_sub(r,temp_v);				   // r = r - temp_v
+		gsl_vector_free(temp_v);
 	}
 
-
-	return NULL;
+	/* result written in x0 */
+	return x0;
 }
 
 gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
