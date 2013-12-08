@@ -44,7 +44,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	z_t = gsl_vector_alloc(A->size1);
 	p = gsl_vector_alloc(A->size1);
 	p_t = gsl_vector_alloc(A->size1);
-
+ 
 	m = lh_get_inv_diag(A);
 	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1,1);
 	gsl_vector_memcpy(r,b);
@@ -56,8 +56,8 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	while((norm_r / norm_b) > tolerance && i < iter)
 	{
 		iter++;
-		lh_diag_mul(z , m); 	/* Preconditioner solve*/
-		lh_diag_mul(z_t , m);	/*Transpose prec-solve */
+		lh_diag_mul(z,r,m); 	/* Preconditioner solve*/
+		lh_diag_mul(z_t,r_t,m);	/*Transpose prec-solve */
 
 		rho = lh_dot_product(z,r_t);
 
@@ -98,6 +98,8 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 			exit(0);
 		}
 		alpha = rho / omega;
+		gsl_vector_add (x,lh_scalar_vector_mul(alpha,p));
+
 
 	}
 
