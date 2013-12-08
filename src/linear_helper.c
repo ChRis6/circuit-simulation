@@ -40,9 +40,14 @@ void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,in
 
 double lh_dot_product(gsl_vector* v1 , gsl_vector* v2){
 
-	double dot;
-	gsl_blas_ddot( v1 , v2 , &dot);
-
+	int i;
+	double dot = 0.0;
+	printf("ddot = %d\n",gsl_blas_ddot( v1 , v2 , &dot) ) ;
+	
+	/*
+	for( i = 0 ; i < v1->size; i++)
+		dot += gsl_vector_get(v1,i) * gsl_vector_get(v2,i);
+*/
 	return dot;
 }
 
