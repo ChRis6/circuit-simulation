@@ -137,7 +137,11 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	/* r = r~ = b - Ax */
 	r = gsl_vector_alloc(A->size1);
 	r_t = gsl_vector_alloc(A->size1);
-
+	if(r == NULL || r_t == NULL)
+	{
+		perror("Allocation failed... I am going to exit now");
+		exit (1);
+	}
 	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1,1);
 	gsl_vector_memcpy(r,b);
 	gsl_vector_memcpy(r_t,b);
@@ -151,15 +155,25 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	z_t = gsl_vector_alloc(A->size1);
 	if ( z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL)
 	{
+		gsl_vector_free(r);
+		gsl_vector_free(r_t);
+
 		perror("Allocation failed... I am going to exit now");
-		exit (0);
+		exit (1);
 	}
 	p = gsl_vector_alloc(A->size1);
 	p_t = gsl_vector_alloc(A->size1);
 	if(p == NULL || p_t == NULL)
 	{
+		gsl_vector_free(r);
+		gsl_vector_free(r_t);
+		gsl_vector_free(z);
+		gsl_vector_free(z_t);
+		gsl_vector_free(temp_z);
+		gsl_vector_free(temp_z_t);
+
 		perror("Allocation failed... I am going to exit now");
-		exit (0);
+		exit (1);
 	}
  	q = gsl_vector_alloc(A->size1);
 	q_t = gsl_vector_alloc(A->size1);
@@ -174,15 +188,15 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	while((norm_r / norm_b) > tolerance && i < iter)
 	{
 		i++;
-		lh_diag_mul(z,r,m); 	/* Preconditioner solve*/
-		lh_diag_mul(z_t,r_t,m);	/*Transpose prec-solve */
+		lh_diag_mul(z,r,m); 	/* 	Preconditioner solve*/
+		lh_diag_mul(z_t,r_t,m);	/*	Transpose prec-solve */
 
 		rho = lh_dot_product(z,r_t);
 
 		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
-			exit(0);
+			exit(1);
 		}
 
 		if (iter == 1)
@@ -215,7 +229,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		if(abs(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
-			exit(0);
+			exit(1);
 		}
 		alpha = rho / omega;
 		lh_scalar_vector_mul(p,alpha,p);
