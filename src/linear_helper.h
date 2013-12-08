@@ -10,7 +10,7 @@ double lh_norm( gsl_vector* v);
  * Diagonal matrix-vector multiplication
  * Writes the result to v
  */
-gsl_vector* lh_diag_mul(gsl_vector** v , gsl_vector* A);
+gsl_vector* lh_diag_mul(gsl_vector* v , gsl_vector* A);
 
 /*
  * Returns a vector of the inversed diagonal elements of matrix m
@@ -27,6 +27,7 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m);
 		y = op(A) * x
 */
 void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp);
+
 
 
 /*
