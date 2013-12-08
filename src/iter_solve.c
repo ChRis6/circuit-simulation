@@ -128,16 +128,11 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	double norm_b = 0;
 	double omega = 0;
 
-	gsl_vector* x;
 	gsl_vector* r , *r_t;
 	gsl_vector* z , *z_t , *temp_z , *temp_z_t;
 	gsl_vector* m;
 	gsl_vector* p , *p_t;
 	gsl_vector* q , *q_t;
-
-	/* x = initial guess x0 */
-	x = gsl_vector_alloc(A->size1);
-	gsl_vector_memcpy(x,x0);
 
 	/* r = r~ = b - Ax */
 	r = gsl_vector_alloc(A->size1);
@@ -214,7 +209,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		}
 		alpha = rho / omega;
 		lh_scalar_vector_mul(p,alpha,p);
-		gsl_vector_add (x,p);
+		gsl_vector_add (x0,p);
 		lh_scalar_vector_mul(q,alpha,q);
 		gsl_vector_sub (r,q);
 		lh_scalar_vector_mul(q_t,alpha,q_t);
@@ -222,5 +217,5 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	}
 
 
-	return NULL;
+	return x0;
 }
