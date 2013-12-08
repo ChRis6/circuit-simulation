@@ -149,8 +149,18 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	temp_z = gsl_vector_alloc(A->size1);
 	temp_z_t = gsl_vector_alloc(A->size1);
 	z_t = gsl_vector_alloc(A->size1);
+	if ( z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL)
+	{
+		perror("Allocation failed... I am going to exit now");
+		exit (0);
+	}
 	p = gsl_vector_alloc(A->size1);
 	p_t = gsl_vector_alloc(A->size1);
+	if(p == NULL || p_t == NULL)
+	{
+		perror("Allocation failed... I am going to exit now");
+		exit (0);
+	}
  	q = gsl_vector_alloc(A->size1);
 	q_t = gsl_vector_alloc(A->size1);
 
@@ -171,7 +181,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
-			perror("Algorithm failed in iter_solve_bicg.");
+			perror("Algorithm failed in iter_solve_bicg ---> rho");
 			exit(0);
 		}
 
@@ -204,7 +214,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		if(abs(omega) < eps)
 		{
-			perror("Algorithm failed in iter_solve_bicg.");
+			perror("Algorithm failed in iter_solve_bicg ----> omega");
 			exit(0);
 		}
 		alpha = rho / omega;
