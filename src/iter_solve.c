@@ -114,6 +114,15 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		gsl_vector_free(temp_v);
 	}
 
+
+	/* clean up */
+	//gsl_vector_free(r);
+	//gsl_vector_free(b1);
+	//gsl_vector_free(z);
+	//gsl_vector_free(p);
+		
+	//gsl_vector_free(q);
+
 	/* result written in x0 */
 	return x0;
 }
@@ -135,6 +144,12 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	gsl_vector* q , *q_t;
 
 	/* r = r~ = b - Ax */
+
+	r = gsl_vector_alloc(b->size);
+	r_t = gsl_vector_alloc(b->size);
+	
+	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1.0,1.0);
+	
 	r = gsl_vector_alloc(A->size1);
 	r_t = gsl_vector_alloc(A->size1);
 	if(r == NULL || r_t == NULL)
@@ -142,17 +157,19 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		perror("Allocation failed... I am going to exit now");
 		exit (1);
 	}
-	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1,1);
+
 	gsl_vector_memcpy(r,b);
 	gsl_vector_memcpy(r_t,b);
 	
+
+
 	/* 	Allocate all the vectors that we need in order for the algorithm
 		to be functional 
 	*/
-	z = gsl_vector_alloc(A->size1);
-	temp_z = gsl_vector_alloc(A->size1);
-	temp_z_t = gsl_vector_alloc(A->size1);
-	z_t = gsl_vector_alloc(A->size1);
+	z = gsl_vector_alloc(b->size);
+	temp_z = gsl_vector_alloc(b->size);
+	temp_z_t = gsl_vector_alloc(b->size);
+	z_t = gsl_vector_alloc(b->size);
 	if ( z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL)
 	{
 		gsl_vector_free(r);
@@ -161,8 +178,8 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		perror("Allocation failed... I am going to exit now");
 		exit (1);
 	}
-	p = gsl_vector_alloc(A->size1);
-	p_t = gsl_vector_alloc(A->size1);
+	p = gsl_vector_alloc(b->size);
+	p_t = gsl_vector_alloc(b->size);
 	if(p == NULL || p_t == NULL)
 	{
 		gsl_vector_free(r);
@@ -175,8 +192,8 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		perror("Allocation failed... I am going to exit now");
 		exit (1);
 	}
- 	q = gsl_vector_alloc(A->size1);
-	q_t = gsl_vector_alloc(A->size1);
+ 	q = gsl_vector_alloc(b->size);
+	q_t = gsl_vector_alloc(b->size);
 
 	/* Get and save the 1/diag(A) in the vector m */
 	m = lh_get_inv_diag(A);
@@ -187,13 +204,16 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	while(( abs(norm_r) / abs(norm_b) ) > tolerance && i < iter)
 	{
+
+	
 		i++;
 		lh_diag_mul(z,r,m); 	/* 	Preconditioner solve*/
 		lh_diag_mul(z_t,r_t,m);	/*	Transpose prec-solve */
 
+
 		rho = lh_dot_product(z,r_t);
 
-		printf("rho =  %f \n",rho);
+		printf("rho =  %lf \n",rho);
 		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
