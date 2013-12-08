@@ -144,18 +144,20 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	gsl_vector* q , *q_t;
 
 	/* r = r~ = b - Ax */
+
 	r = gsl_vector_alloc(b->size);
 	r_t = gsl_vector_alloc(b->size);
 	
-
-	int j;
-	for( j = 0 ; j < b->size ; j++){
-		printf("%lf\n\n", gsl_vector_get(b,i) );
-	}
-
 	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1.0,1.0);
 	
-//	lh_matrix_vector_mul_and_sum( x0,A,b1,NON_TRANSP,-1.0,1.0);
+	r = gsl_vector_alloc(A->size1);
+	r_t = gsl_vector_alloc(A->size1);
+	if(r == NULL || r_t == NULL)
+	{
+		perror("Allocation failed... I am going to exit now");
+		exit (1);
+	}
+
 	gsl_vector_memcpy(r,b);
 	gsl_vector_memcpy(r_t,b);
 	
@@ -170,15 +172,25 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	z_t = gsl_vector_alloc(b->size);
 	if ( z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL)
 	{
+		gsl_vector_free(r);
+		gsl_vector_free(r_t);
+
 		perror("Allocation failed... I am going to exit now");
-		exit (0);
+		exit (1);
 	}
 	p = gsl_vector_alloc(b->size);
 	p_t = gsl_vector_alloc(b->size);
 	if(p == NULL || p_t == NULL)
 	{
+		gsl_vector_free(r);
+		gsl_vector_free(r_t);
+		gsl_vector_free(z);
+		gsl_vector_free(z_t);
+		gsl_vector_free(temp_z);
+		gsl_vector_free(temp_z_t);
+
 		perror("Allocation failed... I am going to exit now");
-		exit (0);
+		exit (1);
 	}
  	q = gsl_vector_alloc(b->size);
 	q_t = gsl_vector_alloc(b->size);
@@ -195,8 +207,8 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	
 		i++;
-		lh_diag_mul(z,r,m); 	/* Preconditioner solve*/
-		lh_diag_mul(z_t,r_t,m);	/*Transpose prec-solve */
+		lh_diag_mul(z,r,m); 	/* 	Preconditioner solve*/
+		lh_diag_mul(z_t,r_t,m);	/*	Transpose prec-solve */
 
 
 		rho = lh_dot_product(z,r_t);
@@ -205,7 +217,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
-			exit(0);
+			exit(1);
 		}
 
 		if (iter == 1)
@@ -238,7 +250,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		if(abs(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
-			exit(0);
+			exit(1);
 		}
 		alpha = rho / omega;
 		lh_scalar_vector_mul(p,alpha,p);
