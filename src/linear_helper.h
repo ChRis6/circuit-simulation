@@ -41,9 +41,8 @@ void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,in
 
 /*
  * Vector - scalar multiplication
- * writes result to v
  */
-void lh_scalar_vector_mul(double s , gsl_vector* v);
+void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v);
 
 /*
  * dot product
