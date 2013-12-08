@@ -9,7 +9,7 @@ double lh_norm( gsl_vector* v){
 	return res;
 }
 
-gsl_vector* lh_diag_mul(gsl_vector* v , gsl_vector* A){
+void lh_diag_mul(gsl_vector* res, gsl_vector* v , gsl_vector* A){
 	
 	int i;
 	double temp1,temp2;
@@ -18,10 +18,8 @@ gsl_vector* lh_diag_mul(gsl_vector* v , gsl_vector* A){
 		temp1 = gsl_vector_get(v , i);
 		temp2 = gsl_vector_get(A , i);
 
-		gsl_vector_set(v , i , temp1 * temp2);
+		gsl_vector_set(res , i , temp1 * temp2);
 	}
-
-	return v;
 }
 
 void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp){
