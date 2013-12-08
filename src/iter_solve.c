@@ -171,7 +171,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	norm_r = lh_norm(r);
 	norm_b = lh_norm(b);
 
-	while((norm_r / norm_b) > tolerance && i < iter)
+	while(( abs(norm_r) / abs(norm_b) ) > tolerance && i < iter)
 	{
 		i++;
 		lh_diag_mul(z,r,m); 	/* Preconditioner solve*/
@@ -179,6 +179,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		rho = lh_dot_product(z,r_t);
 
+		printf("rho =  %f \n",rho);
 		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
