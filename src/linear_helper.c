@@ -15,12 +15,12 @@ gsl_vector* lh_diag_mul(gsl_vector** v , gsl_vector* A){
 }
 
 
-void lh_matrix_vector_mul( gsl_vector* v , gsl_matrix* A,gsl_vector* rhs,int transp){
+void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp){
 	
 	if (transp == TRANSP)
-		gsl_blas_dgemv(CblasTrans,1,A,v,0,rhs);
+		gsl_blas_dgemv(CblasTrans,1,A,x,0,y);
 	else if (transp == NON_TRANSP)
-		gsl_blas_dgemv(CblasNoTrans,1,A,v,0,rhs);
+		gsl_blas_dgemv(CblasNoTrans,1,A,x,0,y);
 }
 
 

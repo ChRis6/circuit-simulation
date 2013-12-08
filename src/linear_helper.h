@@ -16,11 +16,18 @@ gsl_vector* lh_diag_mul(gsl_vector** v , gsl_vector* A);
  * Returns a vector of the inversed diagonal elements of matrix m
  */
 gsl_vector* lh_get_inv_diag(gsl_matrix* m);
+
 /*
- * matrix-vector multiplication
- * Writes result to v
- */
-void lh_matrix_vector_mul( gsl_vector* v , gsl_matrix* A,gsl_vector* rhs,int transp);
+	This function computes the matrix-vector product and sum y = \alpha op(A) x + \beta y,
+	where op(A) = A, A^T, A^H for TransA = CblasNoTrans, CblasTrans, CblasConjTrans.
+	We set 
+		alpha = 1
+		beta = 0
+	so we have 
+		y = op(A) * x
+*/
+void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp);
+
 
 /*
  * Vector - scalar multiplication
