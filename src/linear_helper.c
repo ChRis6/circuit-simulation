@@ -9,7 +9,7 @@ double lh_norm( gsl_vector* v){
 	return res;
 }
 
-gsl_vector* lh_diag_mul(gsl_vector* v , gsl_vector* A){
+void lh_diag_mul(gsl_vector* res, gsl_vector* v , gsl_vector* A){
 	
 	int i;
 	double temp1,temp2;
@@ -18,10 +18,8 @@ gsl_vector* lh_diag_mul(gsl_vector* v , gsl_vector* A){
 		temp1 = gsl_vector_get(v , i);
 		temp2 = gsl_vector_get(A , i);
 
-		gsl_vector_set(v , i , temp1 * temp2);
+		gsl_vector_set(res , i , temp1 * temp2);
 	}
-
-	return v;
 }
 
 void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp){
@@ -32,7 +30,7 @@ void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp
 		gsl_blas_dgemv(CblasNoTrans,1,A,x,0,y);
 }
 
-void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp,double alpha,double,beta){
+void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp,double alpha,double beta){
 	
 	if (transp == TRANSP)
 		gsl_blas_dgemv(CblasTrans,alpha,A,x,beta,y);
@@ -52,4 +50,19 @@ double lh_dot_product(gsl_vector* v1 , gsl_vector* v2){
 	gsl_blas_ddot( v1 , v2 , &dot);
 
 	return dot;
+}
+
+
+gsl_vector* lh_get_inv_diag(gsl_matrix* m){
+	gsl_vector* res;
+	res = gsl_vector_calloc(m->size1);
+	if( !res )
+		return NULL;
+
+	int i;
+	for( i = 0 ; i < m->size1; i++){
+		gsl_vector_set(res , i ,  1 / (double) gsl_matrix_get(m,i,i));
+	}
+
+	return res;
 }
