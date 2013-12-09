@@ -5,7 +5,7 @@
 
 static int iter = 10;
 static double tolerance = 1e-3;
-static double eps = 1e-14;
+static long double eps = 1e-14;
 
 
 void iter_set_options( int iterations , double itol ){
@@ -143,6 +143,10 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	gsl_vector* p , *p_t;
 	gsl_vector* q , *q_t;
 
+	for ( i = 0; i < b->size ; i++)
+	{
+		printf("%g\n",gsl_vector_get(b,i));
+	}
 	/* r = r~ = b - Ax */
 
 	r = gsl_vector_alloc(b->size);
@@ -214,11 +218,12 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		rho = lh_dot_product(z,r_t);
 
 		printf("rho =  %lf \n",rho);
-		if(abs(rho) < eps) 		/* Algorithm failure */
+		/*if(abs(rho) < eps) 		/* Algorithm failure 
 		{
+			printf("rho =  %lf \n",rho);
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
 			exit(1);
-		}
+		}*/
 
 		if (iter == 1)
 		{
@@ -242,16 +247,28 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		}
 		rho_1 = rho;
 
-		lh_matrix_vector_mul( q, A, q ,NON_TRANSP); /* q = Ap */
-		lh_matrix_vector_mul( q_t, A, p_t ,TRANSP); /* q~ = transposed(A)p~*/
+		int j;
+		for (j = 0; j < p->size; j++)
+		{
+			printf("P: %lf\n",gsl_vector_get(p,j));
+		}
 
+
+		lh_matrix_vector_mul( p, A, q ,NON_TRANSP); /* q = Ap */
+		lh_matrix_vector_mul( p_t, A, q_t ,TRANSP); /* q~ = transposed(A)p~*/
+		for (j = 0; j < p->size; j++)
+		{
+			printf("Q: %lf\n",gsl_vector_get(q_t,j));
+		}
+		
 		omega = lh_dot_product(p_t,q);
+		printf("omega =  %lf \n",omega);
 
-		if(abs(omega) < eps)
+		/*if(abs(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
 			exit(1);
-		}
+		}*/
 		alpha = rho / omega;
 		lh_scalar_vector_mul(p,alpha,p);
 		gsl_vector_add (x0,p);
