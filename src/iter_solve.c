@@ -117,12 +117,11 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 
 	/* clean up */
-	//gsl_vector_free(r);
-	//gsl_vector_free(b1);
-	//gsl_vector_free(z);
-	//gsl_vector_free(p);
-		
-	//gsl_vector_free(q);
+	gsl_vector_free(r);
+	gsl_vector_free(z);
+	gsl_vector_free(p);
+	gsl_vector_free(M);	
+	gsl_vector_free(q);
 
 	/* result written in x0 */
 	return x0;

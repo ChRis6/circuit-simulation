@@ -1,6 +1,8 @@
 #include "circuit_sim.h"
 #include "decomposition.h"
 #include "plot.h"
+#include "iter_solve.h"
+
 /*
  * Create the matrix and vector for the circuit elements
  */
@@ -268,11 +270,17 @@ double dc_sweep_increment(gsl_vector *vector,DC_SWEEP_T dc_sweep_node)
 
 void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,gsl_permutation* permutation,int decomposition_choice)
 {
-	int j,k;
-	int plot_array_init = 0;
+	int k;
 	int array_size;
 	gsl_vector ** plot_array;
-	
+	gsl_vector* zero_vector;
+
+	zero_vector = gsl_vector_calloc(vector->size);
+	if(!zero_vector){
+		printf("NO memory !\n");
+		exit(1);
+	}
+
 	array_size = plot_find_size( list.dc_sweep.start_v, list.dc_sweep.end_v , list.dc_sweep.inc);
 	printf("Array Size for the plot: %d\n",array_size);
 
@@ -289,8 +297,17 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
  	{
  		dc_sweep_increment(vector,list.dc_sweep);
 
- 		solve(matrix,vector,x,permutation,decomposition_choice);
-	 	
+ 		if( decomposition_choice == METHOD_CG ){
+ 			
+ 			gsl_vector_memcpy(x,zero_vector);
+
+ 			iter_solve_cg(matrix,vector,x);
+
+ 		}
+ 		else{ 
+ 			solve(matrix,vector,x,permutation,decomposition_choice);
+	 	}
+
  		plot_set_vector_index(plot_array ,x ,k);
  	}
  	
@@ -299,6 +316,6 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
  		//plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
  		plot_by_node_name(list.hashtable , plot_array , array_size);
  	}
-
  	
+ 	gsl_vector_free(zero_vector);
 }
