@@ -5,7 +5,6 @@
 
 static int iter = 10;
 static double tolerance = 1e-3;
-static long double eps = 1e-14;
 
 
 void iter_set_options( int iterations , double itol ){
@@ -136,6 +135,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	double norm_r = 0;
 	double norm_b = 0;
 	double omega = 0;
+	static long double eps = 10^(-14);
 
 	gsl_vector* r , *r_t;
 	gsl_vector* z , *z_t , *temp_z , *temp_z_t;
@@ -218,12 +218,12 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		rho = lh_dot_product(z,r_t);
 
 		printf("rho =  %lf \n",rho);
-		/*if(abs(rho) < eps) 		/* Algorithm failure 
+		if(abs(rho) < eps) 		/* Algorithm failure */
 		{
-			printf("rho =  %lf \n",rho);
+			printf("rho =  %lf eps: %g\n",rho,eps);
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
 			exit(1);
-		}*/
+		}
 
 		if (iter == 1)
 		{
@@ -264,11 +264,11 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		omega = lh_dot_product(p_t,q);
 		printf("omega =  %lf \n",omega);
 
-		/*if(abs(omega) < eps)
+		if(abs(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
 			exit(1);
-		}*/
+		}
 		alpha = rho / omega;
 		lh_scalar_vector_mul(p,alpha,p);
 		gsl_vector_add (x0,p);
