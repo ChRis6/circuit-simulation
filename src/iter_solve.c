@@ -1,7 +1,9 @@
 #include "iter_solve.h"
 #include "linear_helper.h"
 
-#include "math.h"
+#include <math.h>
+
+#define ABS(value)  ( (value) >=0 ? (value) : -(value) )
 
 static int iter = 10;
 static double tolerance = 1e-3;
@@ -135,7 +137,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	double norm_r = 0;
 	double norm_b = 0;
 	double omega = 0;
-	static long double eps = 10^(-14);
+	double eps = pow(10,-14);
 
 	gsl_vector* r , *r_t;
 	gsl_vector* z , *z_t , *temp_z , *temp_z_t;
@@ -206,7 +208,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	norm_r = lh_norm(r);
 	norm_b = lh_norm(b);
 
-	while(( abs(norm_r) / abs(norm_b) ) > tolerance && i < iter)
+	while(( norm_r / norm_b ) > tolerance && i < iter)
 	{
 
 	
@@ -217,10 +219,9 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		rho = lh_dot_product(z,r_t);
 
-		printf("rho =  %lf \n",rho);
-		if(abs(rho) < eps) 		/* Algorithm failure */
+		if(ABS(rho) < eps) 		/* Algorithm failure */
 		{
-			printf("rho =  %lf eps: %g\n",rho,eps);
+			printf("rho =  %lf eps: %f\n",rho,eps);
 			perror("Algorithm failed in iter_solve_bicg ---> rho");
 			exit(1);
 		}
@@ -264,7 +265,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		omega = lh_dot_product(p_t,q);
 		printf("omega =  %lf \n",omega);
 
-		if(abs(omega) < eps)
+		if(ABS(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
 			exit(1);
