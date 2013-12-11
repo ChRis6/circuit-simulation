@@ -119,27 +119,29 @@ int main( int argc , char* argv[]){
 	}
 	else if( list.solving_method == METHOD_BICG){
 		printf("Solving using BICG...\n");
-
-		iter_solve_bicg( matrix , vector , x);
-
-		 gsl_vector ** plot_array;
-
-		plot_array = plot_create_vector( 1 , x->size);
-		if(plot_array == NULL)
-		{
-			perror("Error while allocating the ploting array\n");
-			exit(0);
+		if( list.dc_sweep.node != NULL ){
+			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
 		}
+		else {
+			iter_solve_bicg( matrix , vector , x);
+
+
+			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , x->size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
 	 		
-		plot_set_vector_index(plot_array ,x ,0);
+			plot_set_vector_index(plot_array ,x ,0);
 			 		 	
-		plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
+		}
 
 	}
  	 	
-
-
-
  
 /*
  * Printing options after the simulation is over
