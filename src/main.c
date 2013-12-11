@@ -54,7 +54,7 @@ int main( int argc , char* argv[]){
  	/*
  	 * Print mna matrix
  	 */
- 	gsl_matrix_fprintf(stderr,matrix,"%f");
+ 	//gsl_matrix_fprintf(stderr,matrix,"%f");
 
 
 
@@ -167,6 +167,6 @@ int main( int argc , char* argv[]){
  	free_list(&list);
  	gsl_vector_free(vector);
  	gsl_matrix_free(matrix);
- 	
+
 	return 0;
 }
