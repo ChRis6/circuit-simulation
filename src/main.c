@@ -18,7 +18,7 @@
 
 int main( int argc , char* argv[]){
 	int flag;
-
+	
 	gsl_matrix *matrix;
 	gsl_vector *vector;
 	gsl_vector *x;
@@ -51,12 +51,6 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
  	
- 	/*
- 	 * Print mna matrix
- 	 */
- 	//gsl_matrix_fprintf(stderr,matrix,"%f");
-
-
 
 	x = gsl_vector_calloc(matrix->size1);
  	if( !x ){
@@ -169,6 +163,7 @@ int main( int argc , char* argv[]){
  	free_list(&list);
  	gsl_vector_free(vector);
  	gsl_matrix_free(matrix);
+ 	gsl_permutation_free(permutation);
 
 	return 0;
 }
