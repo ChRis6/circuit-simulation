@@ -115,35 +115,7 @@ void plot_to_file( hashtable_t* hashtable, gsl_vector** array , int array_size, 
 		fprintf(file, "\n");
 	}
 	fclose(file);
-	/*
-	for( i = 0 ; i < num_node_names ; i++ ){
-		
 
-
-		strcpy(final_file_name,filename);
-		strcat(final_file_name, "_");
-		strcat(final_file_name, node_names[i]);
-		strcat(final_file_name,".txt");
-
-			FILE* file;
-			file = fopen( final_file_name , "w");
-			if( !file ){
-				printf("Plot Failed\n");
-				return;
-			}
-
-			int flag = ht_get(hashtable , node_names[i] , &node_id);
-			if( !flag ){
-				printf("PLOT ERROR:%s node does not exist..\n",node_names[i]);
-				continue;
-			}
-			for( j = 0 ; i < array_size ; j++){
-				fprintf(file, "###### SOLUTIONS ###### " );
-				fprintf(file, "iteration: (%d) %f\n", (j+1) , gsl_vector_get(array[j] , node_id - 1 ) );
-			}
-			fclose(file);
-	}
-*/
 	return ;
 }
 
