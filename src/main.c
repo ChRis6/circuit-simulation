@@ -51,6 +51,13 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
  	
+ 	/*
+ 	 * Print mna matrix
+ 	 */
+ 	gsl_matrix_fprintf(stderr,matrix,"%f");
+
+
+
 	x = gsl_vector_calloc(matrix->size1);
  	if( !x ){
  		printf("X vector : no memory\n");
@@ -130,8 +137,36 @@ int main( int argc , char* argv[]){
 
 	}
  	 	
- 	ht_print(list.hashtable);
- 	free_list(&list);
+
+
+
  
+/*
+ * Printing options after the simulation is over
+ */
+	int choice;
+	fprintf(stderr, "Choose of the available options\n");
+	while (1){
+		fprintf(stderr, "1) Print MNA matrix\n" );
+		fprintf(stderr, "2) Quit\n");
+		scanf("%d",&choice);
+		if( choice == 2 )
+			break;
+
+
+		gsl_matrix_fprintf(stderr,matrix,"%f");
+		fprintf(stderr, "\n");
+	}
+
+
+
+
+/*
+ * Clean up
+ */
+ 	free_list(&list);
+ 	gsl_vector_free(vector);
+ 	gsl_matrix_free(matrix);
+ 	
 	return 0;
 }

@@ -304,6 +304,12 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
  			iter_solve_cg(matrix,vector,x);
 
  		}
+ 		else if ( decomposition_choice == METHOD_BICG){
+
+ 			gsl_vector_memcpy(x,zero_vector);
+ 			iter_solve_bicg(matrix,vector,x);
+
+ 		}
  		else{ 
  			solve(matrix,vector,x,permutation,decomposition_choice);
 	 	}
