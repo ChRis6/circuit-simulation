@@ -1026,8 +1026,20 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
 				//printf("TOKEN AFTER .OPTIONS :%s\n",token);
 				if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
-					
-					list->solving_method = METHOD_CHOLESKY;
+					token = strtok(NULL," \n");
+					if(!token){
+						list->solving_method = METHOD_CHOLESKY;
+						return 2;
+					}
+
+					/*------  .OPTIONS SPD ITER----------------*/
+					if( strcmp(token,"ITER") == 0 || strcmp(token,"ITER") == 0){
+						list->solving_method = METHOD_CG;
+						return 2;
+					}
+					else if (strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+						/* cholesky solution with sparce arrays   */
+					}
 				}
 				else if( strcmp(token,"ITER") == 0 || strcmp(token,"iter") == 0 ){
 					token = strtok(NULL," \n");
@@ -1036,16 +1048,27 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 						return 2;
 					}
 						
-
-					if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0){
-						list->solving_method = METHOD_CG ;
+					
+					if( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+						/*   Bi-CG with sparce arrays  */
 					}
+					else if( strcmp(token, "SPD") == 0 || strcmp(token, "spd") == 0){
+						token = strtok(NULL," \n");
+						if( !token ){					
+							list->solving_method = METHOD_CG;
+							return 2;
+						}
+						else if ( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+							/*   CG solving method with sparce arrays   */
+						}
+					}
+					
 				}
 				else if( strcmp(token,"ITOL") == 0 || strcmp(token,"itol") == 0){
 					/* tolerance */
 					token = strtok(NULL," \n");
 					if ( !token ){
-						printf("Error while parsin...\n");
+						printf("Error while parsing...\n");
 						printf("Line: %s\n",line);
 						return 0;
 					}
@@ -1076,6 +1099,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					}
 
 				}
+				else if(strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+					/*LU with sparce arrays*/
+				}
+				
 				else{
 					printf("No token after .OPTIONS \n");
 					return 0;
