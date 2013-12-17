@@ -1,6 +1,7 @@
 #ifndef CIRCUIT_SIM_SPARSE_H
 #define CIRCUIT_SIM_SPARSE_H
 
+#include "node_list.h"
 #include "sparse_interface.h"
 
 /*

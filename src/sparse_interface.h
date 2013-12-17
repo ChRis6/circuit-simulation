@@ -4,8 +4,8 @@
 #include "csparse.h"
 
 
-typedef sparse_matrix cs;
-typedef sparse_vector double;
+typedef cs sparse_matrix;
+typedef double sparse_vector;
 
 
 #endif
