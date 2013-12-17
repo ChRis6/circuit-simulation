@@ -1037,6 +1037,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 						list->solving_method = METHOD_CG;
 						return 2;
 					}
+
+          /*------------ .OPTIONS SPD SPARSE--------------*/
 					else if (strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 						/* cholesky solution with sparce arrays   */
 					}
@@ -1048,10 +1050,11 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 						return 2;
 					}
 						
-					
+					/*----------- .OPTIONS ITER SPARCE ---------------*/
 					if( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 						/*   Bi-CG with sparce arrays  */
 					}
+          /*----------- .OPTIONS ITER SPD || ITER SPD SPARCE-------*/
 					else if( strcmp(token, "SPD") == 0 || strcmp(token, "spd") == 0){
 						token = strtok(NULL," \n");
 						if( !token ){					
