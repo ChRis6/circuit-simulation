@@ -1020,6 +1020,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				//printf("Token after .options :%s\n",token);
 				if( !token ){
 					printf("Error while parsing...\n");
+          printf("Must define an option \n");
 					printf("Line : %s\n", line );
 					return 0;
 				}
@@ -1041,6 +1042,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*------------ .OPTIONS SPD SPARSE--------------*/
 					else if (strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 						/* cholesky solution with sparce arrays   */
+            list->solving_method = METHOD_CHOLESKY_SPARSE;
 					}
 				}
 				else if( strcmp(token,"ITER") == 0 || strcmp(token,"iter") == 0 ){
@@ -1053,6 +1055,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					/*----------- .OPTIONS ITER SPARCE ---------------*/
 					if( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 						/*   Bi-CG with sparce arrays  */
+            list->solving_method = METHOD_BICG_SPARSE;
 					}
           /*----------- .OPTIONS ITER SPD || ITER SPD SPARCE-------*/
 					else if( strcmp(token, "SPD") == 0 || strcmp(token, "spd") == 0){
@@ -1063,6 +1066,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 						}
 						else if ( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 							/*   CG solving method with sparce arrays   */
+              list->solving_method = METHOD_CG_SPARSE;
 						}
 					}
 					
@@ -1104,6 +1108,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				}
 				else if(strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
 					/*LU with sparce arrays*/
+          list->solving_method = METHOD_LU_SPARSE;
 				}
 				
 				else{
