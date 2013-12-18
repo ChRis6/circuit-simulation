@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <string.h>
 #include "circuit_sim_sparse.h"
 
 #define DEFAULT_NZ 15
@@ -76,7 +76,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
  				}
 
  				/* <+> <-> */
- 				if( !cs_entry(matrix, plus_node , minus_node , conductance) ){
+ 				if( !cs_entry(matrix, plus_node , minus_node , -conductance) ){
  					fprintf(stderr, "Error while inserting element in sparse matrix\n");
  					free(vector);
  					cs_spfree(matrix);
@@ -84,7 +84,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
  				}
 
  				/* <-> <+> */
- 				if( !cs_entry(matrix, minus_node , plus_node , conductance) ){
+ 				if( !cs_entry(matrix, minus_node , plus_node , -conductance) ){
  					fprintf(stderr, "Error while inserting element in sparse matrix\n");
  					free(vector);
  					cs_spfree(matrix);
@@ -258,26 +258,22 @@ int sparse_LU_decomp(sparse_matrix* matrix, css* S, csn* N ){
 	return 1;
 }
 
-int sparce_solve_LU(css* S, csn* N, sparse_vector* b, sparse_vector* x, int n){
-	if(!S || !N || !b)
+int sparse_solve_LU(sparse_matrix* matrix, sparse_vector* b, sparse_vector* x, int n){
+
+	if( n < 1 )
 		return 0;
 
-	if(!cs_ipvec(N->pinv,b,x,n)){
+	memcpy(x,b ,n * sizeof(double));
+
+	return cs_lusol(0 , matrix , x , 1 );
+
+}
+
+int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector* x, int n){
 		
-		return 0;
-	}
-	if(!cs_lsolve(N->L,x)){
-		return 0;
-	}
-	if(!cs_usolve(N->U,x)){
-		return 0;
-	}
-	if(!cs_ipvec(S->q,x,b,n)){
-		return 0;
-	}
+		if( n < 1)
+			return 0;
+	memcpy(x,b,n*sizeof(double));
 
-	cs_sfree(S);
-	cs_nfree(N);
-	
-	return 1;
+	return cs_cholsol(0 , matrix , x);
 }

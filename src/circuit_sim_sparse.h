@@ -19,13 +19,12 @@ void dc_sweep_sparse();
 /* S and N might need allocation*/
 int sparse_LU_decomp(sparse_matrix* matrix, css* S, csn* N );
 
-int sparse_solve_LU(css* S, csn* N, sparse_vector* b);
+int sparse_solve_LU(sparse_matrix* matrix, sparse_vector* b, sparse_vector* x, int n);
 
 /*S and N might need allocation*/
 int sparse_cholesky_decomp(sparse_matrix** matrix, css* S, csn* N);
 
-int sparse_solve_cholesky(css* S, csn* N );
-
+int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector* x, int n);
 
 
 #endif

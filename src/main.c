@@ -14,7 +14,7 @@
 #include "iter_solve.h"
 #include "decomposition.h"
 #include "sparse_interface.h"
-
+#include "circuit_sim_sparse.h"
 #include "plot.h"
 
 int main( int argc , char* argv[]){
@@ -45,6 +45,24 @@ int main( int argc , char* argv[]){
  		free_list(&list);
  		return -1;
  	}
+
+ 	int i,j;
+ 	sparse_matrix* s_matrix;
+ 	sparse_vector* s_vector;
+ 	int size;
+ 	create_mna(&list,&matrix,&vector);
+
+ 	s_matrix = create_mna_sparse(&list,&s_vector,&size);
+ 	printf("Printing vectors: \n");
+ 	for( i = 0 ; i < size ; i++)
+ 		printf("vector = %f s_vector = %f \n", gsl_vector_get(vector,i) , s_vector[i] );
+
+ 	cs_print(s_matrix , "MATRIX_SPARSE.txt",0);
+ 	for( i = 0 ; i < matrix->size1 ; i++)
+ 		for( j = 0 ; j < matrix->size2; j++)
+ 			if( gsl_matrix_get(matrix,i,j) != 0)
+ 				fprintf(stderr, "(%d,%d) = %f\n", i , j , gsl_matrix_get(matrix,i,j) );
+
 
  	printf("Solving Method = %d\n",list.solving_method);
  	if ( !list.sparse ){
@@ -145,47 +163,70 @@ int main( int argc , char* argv[]){
  	else {			//  sparse simulation
  		sparse_matrix* matrix;
  		sparse_vector* vector;
+ 		sparse_vector* x;
  		int vector_size;
+ 		char method;
+ 		int i;
 
+ 		method = list.solving_method;
  		matrix = (sparse_matrix*)create_mna_sparse( &list , &vector , &vector_size);
  		if( !matrix ){
  			fprintf(stderr, "Error creating MNA matrix \n");
  			exit(1);
  		}
 
+ 		x = (sparse_vector*) malloc( vector_size * sizeof(sparse_vector));
 
 
+ 		if( method == METHOD_LU_SPARSE ){
+ 			if( !sparse_solve_LU( matrix,vector,x,vector_size) ){
+ 				fprintf(stderr, "Solving Method Sparse LU failed\n" );
+ 			}
+
+ 		}
+ 		else if( method == METHOD_CHOLESKY_SPARSE ){
+			if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
+ 				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
+ 			}
+
+ 		}
+ 		else if ( method == METHOD_CG_SPARSE ){
+
+
+ 		}
+ 		else if( method == METHOD_BICG_SPARSE ){
+
+
+ 		}
+ 		else{
+ 			fprintf(stderr, "Solving method not specified\n");
+ 		}
+
+ 		fprintf(stderr, "PRINTING SOLUTION FOUND:\n");
+ 		for( i = 0 ; i < vector_size ; i++)
+ 			fprintf(stderr, "%f\n", x[i]);
+ 		fprintf(stderr, "\n");
+
+ 		/* clean up before exit */
+ 		cs_spfree(matrix);
+ 		free(vector);
+ 		free(x);
  	}
 
  	 	
  
-/*
- * Printing options after the simulation is over
- */
-	int choice;
-	fprintf(stderr, "Choose of the available options\n");
-	while (1){
-		fprintf(stderr, "1) Print MNA matrix\n" );
-		fprintf(stderr, "2) Quit\n");
-		scanf("%d",&choice);
-		if( choice == 2 )
-			break;
-
-
-		gsl_matrix_fprintf(stderr,matrix,"%f");
-		fprintf(stderr, "\n");
-	}
-
-
 
 
 /*
  * Clean up
  */
  	free_list(&list);
- 	gsl_vector_free(vector);
- 	gsl_matrix_free(matrix);
- 	gsl_permutation_free(permutation);
+
+ 	if( !list.sparse){
+ 		gsl_vector_free(vector);
+ 		gsl_matrix_free(matrix);
+ 		gsl_permutation_free(permutation);
+ 	}
 
 	return 0;
 }
