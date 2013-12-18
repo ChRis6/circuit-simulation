@@ -64,4 +64,9 @@ void ht_free(hashtable_t *hashtable);
  * print all pairs
  */
 void ht_print(hashtable_t* hashtable);
+
+/*
+ * get active table entries
+ */
+int ht_get_num_nodes(hashtable_t* hashtable);
 #endif

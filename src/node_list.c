@@ -5,9 +5,11 @@
 
 #define HASH_SIZE 10000
 
+
 /*
  *Initiliaze a list
  */
+
 void init_list(LIST* list){
 	list->len = 0;
 	list->head = NULL;
@@ -31,7 +33,9 @@ void init_list(LIST* list){
 	list->dc_sweep.oldval  = 0.0;
 	list->plot = PLOT_OFF;
 
-	list->itol = 1e-3;
+	list->itol   = 1e-3;
+	list->nz     = 0;
+	list->sparse = 0;
 }
 
 
@@ -208,3 +212,6 @@ LIST_NODE* list_search_by_name( LIST* list , char *name){
 	}
 	return NULL;
 }
+
+
+

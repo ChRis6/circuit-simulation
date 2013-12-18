@@ -221,3 +221,11 @@ void ht_free(hashtable_t *hashtable){
 	free( hashtable->table );
 	free(hashtable);
 }
+
+
+/*
+ * get active table entries
+ */
+int ht_get_num_nodes(hashtable_t* hashtable){
+	return hashtable->num_nodes;
+}

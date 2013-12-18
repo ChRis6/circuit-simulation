@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "circuit_sim.h"
 #include "decomposition.h"
 #include "plot.h"
@@ -142,12 +145,12 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector  ){
  				value = gsl_matrix_get(tmp_matrix , matrix_row , plus_node);
  				value++;
  				gsl_matrix_set(tmp_matrix , matrix_row , plus_node , value);
- 				printf("VOLTAGE SOURCE : (%d,%d) +1\n",matrix_row,plus_node);
+ 				//printf("VOLTAGE SOURCE : (%d,%d) +1\n",matrix_row,plus_node);
 
  				value = gsl_matrix_get(tmp_matrix , plus_node , matrix_row);
  				value++;
  				gsl_matrix_set(tmp_matrix , plus_node , matrix_row , value); 
- 				printf("VOLTAGE SOURCE : (%d,%d) + 1 \n",plus_node,matrix_row);				
+ 				//printf("VOLTAGE SOURCE : (%d,%d) + 1 \n",plus_node,matrix_row);				
  			} 
  			/* <->*/
  			if( minus_node != -1 ){

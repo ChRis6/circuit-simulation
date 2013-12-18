@@ -45,37 +45,41 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
- 	flag = create_mna(&list, &matrix, &vector );
- 	if(!flag ){
- 		printf("Error creating mna system\n");
- 		return -1;
- 	}
- 	
+ 	if ( !list.sparse ){
 
-	x = gsl_vector_calloc(matrix->size1);
- 	if( !x ){
- 		printf("X vector : no memory\n");
- 		exit(1);
- 	}
+
+ 		flag = create_mna(&list, &matrix, &vector );
+ 		if(!flag ){
+ 			printf("Error creating mna system\n");
+ 			return -1;
+ 		}
+
+
+		x = gsl_vector_calloc(matrix->size1);
+ 		if( !x ){
+ 			printf("X vector : no memory\n");
+ 			exit(1);
+ 		}
 	
-	/* Cholesky or LU */
-	if( list.solving_method == METHOD_LU || list.solving_method == METHOD_CHOLESKY ){
+		/* Cholesky or LU */
+		if( list.solving_method == METHOD_LU || list.solving_method == METHOD_CHOLESKY ){
 
- 		decomposition(matrix,&permutation,&sign,list.solving_method);
+ 			decomposition(matrix,&permutation,&sign,list.solving_method);
  	
- 		if(list.dc_sweep.node != NULL)
- 		{
- 	 		dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
- 		}else
- 		{
- 			int array_size = 1;
- 			solve(matrix,vector,x,permutation,list.solving_method);
- 			if(list.plot == PLOT_ON)
-			{
- 				gsl_vector ** plot_array;
+ 			if(list.dc_sweep.node != NULL)
+ 			{
+ 	 			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+ 			}
+ 			else
+ 			{
+ 				int array_size = 1;
+ 				solve(matrix,vector,x,permutation,list.solving_method);
+ 				if(list.plot == PLOT_ON)
+				{
+ 					gsl_vector ** plot_array;
 
-				plot_array = plot_create_vector( array_size , x->size);
-				if(plot_array == NULL)
+					plot_array = plot_create_vector( array_size , x->size);
+					if(plot_array == NULL)
 				{
 					perror("Error while allocating the ploting array\n");
 					exit(0);
@@ -84,57 +88,65 @@ int main( int argc , char* argv[]){
 				plot_set_vector_index(plot_array ,x ,0);
 			 		 	
 				plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
-			}
- 		}
-	}
-	else if ( list.solving_method == METHOD_CG ){
-		printf("Solving using CG...\n");
-
-		if( list.dc_sweep.node != NULL ){
-			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+				}
+ 			}
 		}
-		else {
-			iter_solve_cg( matrix , vector , x);
+		else if ( list.solving_method == METHOD_CG ){
+			printf("Solving using CG...\n");
 
-
-			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , x->size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
+			if( list.dc_sweep.node != NULL ){
+				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
 			}
+			else {
+				iter_solve_cg( matrix , vector , x);
+
+
+				gsl_vector ** plot_array;
+
+				plot_array = plot_create_vector( 1 , x->size);
+				if(plot_array == NULL)
+				{
+					perror("Error while allocating the ploting array\n");
+					exit(0);
+				}
 	 		
-			plot_set_vector_index(plot_array ,x ,0);
+				plot_set_vector_index(plot_array ,x ,0);
 			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cg.txt");
-		}
-	}
-	else if( list.solving_method == METHOD_BICG){
-		printf("Solving using BICG...\n");
-		if( list.dc_sweep.node != NULL ){
-			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
-		}
-		else {
-			iter_solve_bicg( matrix , vector , x);
-
-
-			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , x->size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cg.txt");
 			}
-	 		
-			plot_set_vector_index(plot_array ,x ,0);
-			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
 		}
+		else if( list.solving_method == METHOD_BICG){
+			printf("Solving using BICG...\n");
+			if( list.dc_sweep.node != NULL ){
+				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+			}
+			else {
+				iter_solve_bicg( matrix , vector , x);
 
-	}
+
+				gsl_vector ** plot_array;
+
+				plot_array = plot_create_vector( 1 , x->size);
+				if(plot_array == NULL)
+				{
+					perror("Error while allocating the ploting array\n");
+					exit(0);
+				}
+	 		
+				plot_set_vector_index(plot_array ,x ,0);
+			 		 	
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
+			}
+
+		}
+ 	}
+ 	else {			//  sparse simulation
+
+
+
+
+ 	}
+
  	 	
  
 /*

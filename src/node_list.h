@@ -57,7 +57,8 @@ typedef struct list{
 	char plot;
 
 	double itol;
-
+	unsigned int nz;
+	char sparse;
 }LIST;
 
 
@@ -101,4 +102,5 @@ int add_node_to_list( LIST* list, NODE* circuit_node , int type);
  *			 0 otherwise
  */
 LIST_NODE* list_search_by_name( LIST* list , char *name);
+
 #endif

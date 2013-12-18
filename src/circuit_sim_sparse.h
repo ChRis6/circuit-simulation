@@ -8,7 +8,7 @@
  * creates a sparse mna matrix  and rhs b vector
  * Returns 0 when failed
  */
-int create_mna_sparse(LIST *list, sparse_matrix**  matrix , sparse_vector* b );
+sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len );
 
 /*
  * dc_sweep for sparse matrices

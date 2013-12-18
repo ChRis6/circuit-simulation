@@ -17,7 +17,7 @@ void plot_init();
 int plot_find_size( double startv , double endv , double inc );
 
 /*
- * Gets an array of gsl_vectors.Starting values = 0.0
+ * returns an array of gsl_vectors.Starting values = 0.0
  * returns : NULL at failure
  */
 gsl_vector** plot_create_vector( int array_size , int vector_size );
