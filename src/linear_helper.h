@@ -1,6 +1,8 @@
 #ifndef LINEAR_HELPER_H
 #define LINEAR_HELPER_H
 
+#include "sparse_interface.h"
+
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
@@ -29,7 +31,19 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m);
 	so we have 
 		y = op(A) * x
 */
+
 void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp);
+
+/* This is a custom made function that does the multiplication between a sparse array and a vector
+ * 
+ * @param A: This is the sparse array
+ * @param x: This is the vector to be multiplied with the vector
+ * @param y: This is the vector result
+ * @param transp: This is a boolean variable that defines the nature of the sparse array and whether
+ * 				  we need the normal or the transposed form
+ * @return : The result will be in the y vector that will be given as a pointer
+ */
+void lh_matrix_vector_mul_sparse( gsl_vector* x, sparse_matrix* A,gsl_vector* y,int transp);
 
 /*
 	This function computes the matrix-vector product and sum y = \alpha op(A) x + \beta y,
@@ -38,6 +52,7 @@ void lh_matrix_vector_mul( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp
 */
 void lh_matrix_vector_mul_and_sum( gsl_vector* x, gsl_matrix* A,gsl_vector* y,int transp,double alpha,double beta);
 
+void lh_matrix_vector_mul_and_sum_sparse( gsl_vector* x, sparse_matrix* A,gsl_vector* y,int transp,double alpha,double beta);
 
 /*
  * Vector - scalar multiplication

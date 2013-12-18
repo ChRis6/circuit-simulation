@@ -1,5 +1,6 @@
 #include "circuit_sim_sparse.h"
 
+
 int sparse_LU_decomp(sparce_matrix* matrix, css* S, csn* N ){
 
 	if( !matrix)
@@ -36,3 +37,8 @@ int sparce_solve_LU(css* S, csn* N, sparse_vector* b, sparse_vector* x, int n){
 	cs_nfree(N);
 	
 }
+
+
+
+
+
