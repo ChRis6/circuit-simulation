@@ -6,7 +6,7 @@
 
 /*
  * creates a sparse mna matrix  and rhs b vector
- * Returns 0 when failed
+ * Returns NULL when failed
  */
 sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len );
 
@@ -16,10 +16,15 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
 void dc_sweep_sparse();
 
 
-int sparse_solve_LU();
+/* S and N might need allocation*/
+int sparse_LU_decomp(sparce_matrix* matrix, css* S, csn* N );
 
+int sparse_solve_LU(css* S, csn* N, sparse_vector* b);
 
-int sparse_solve_cholesky();
+/*S and N might need allocation*/
+int sparse_cholesky_decomp(sparce_matrix** matrix, css* S, csn* N);
+
+int sparse_solve_cholesky(css* S, csn* N );
 
 
 
