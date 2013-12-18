@@ -23,6 +23,11 @@ void lh_diag_mul(gsl_vector* res, gsl_vector* v , gsl_vector* A);
 gsl_vector* lh_get_inv_diag(gsl_matrix* m);
 
 /*
+ * Returns a vector of the inversed diagonal elements of sparse matrix m
+ */
+gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* A);
+
+/*
 	This function computes the matrix-vector product and sum y = \alpha op(A) x + \beta y,
 	where op(A) = A, A^T, A^H for TransA = CblasNoTrans, CblasTrans, CblasConjTrans.
 	We set 
