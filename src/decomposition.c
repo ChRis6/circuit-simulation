@@ -57,12 +57,13 @@ int decomposition(gsl_matrix * matrix, gsl_permutation ** p, int * signum,int de
 
 void solve(gsl_matrix * matrix,gsl_vector * vector,gsl_vector * x,gsl_permutation* permutation,int decomposition_choice)
 {
-	fprintf(stderr, "Solving... permutation = ");
-	gsl_permutation_fprintf (stderr, permutation, " %u");
+	
+	//gsl_permutation_fprintf (stderr, permutation, " %u");
 
 	if (decomposition_choice == CHOLESKY_DECOMPOSITION)
 		gsl_linalg_cholesky_solve(matrix,vector,x);
 	else{
+		
 		gsl_permute_vector(permutation,vector);
  		gsl_linalg_LU_solve(matrix , permutation , vector , x );
 	}

@@ -46,11 +46,13 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
+/*
  	int i,j;
  	sparse_matrix* s_matrix;
  	sparse_vector* s_vector;
  	int size;
  	create_mna(&list,&matrix,&vector);
+
 
  	s_matrix = create_mna_sparse(&list,&s_vector,&size);
  	printf("Printing vectors: \n");
@@ -63,6 +65,7 @@ int main( int argc , char* argv[]){
  			if( gsl_matrix_get(matrix,i,j) != 0)
  				fprintf(stderr, "(%d,%d) = %f\n", i , j , gsl_matrix_get(matrix,i,j) );
 
+*/
 
  	printf("Solving Method = %d\n",list.solving_method);
  	if ( !list.sparse ){
@@ -175,6 +178,9 @@ int main( int argc , char* argv[]){
  			exit(1);
  		}
 
+ 		/* print sparse matrix */
+ 		cs_print(matrix,"sparse_matrix.txt",0);
+
  		x = (sparse_vector*) malloc( vector_size * sizeof(sparse_vector));
 
 
@@ -216,7 +222,6 @@ int main( int argc , char* argv[]){
  	 	
  
 
-
 /*
  * Clean up
  */
@@ -225,7 +230,7 @@ int main( int argc , char* argv[]){
  	if( !list.sparse){
  		gsl_vector_free(vector);
  		gsl_matrix_free(matrix);
- 		gsl_permutation_free(permutation);
+ 		//gsl_permutation_free(permutation);
  	}
 
 	return 0;

@@ -222,20 +222,16 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
  		}
  	}
 
-	cs_print(matrix,"sparse_matrix.txt", 0 );
 	matrix = cs_compress(matrix);
  	/* remove duplicates */
  	
- 	/*if( !cs_dupl(matrix) ){
+ 	if( !cs_dupl(matrix) ){
  		fprintf(stderr, "Sparse matrix: duplicates not removed \n");
  		cs_spfree(matrix);
  		free(vector);
  		return NULL;
  	}
-	*/
- 	cs_dupl(matrix);
- 	cs_print(matrix,"sparse_matrix_non_dp.txt",0);
-
+	
  	*b = vector;
  	*vector_len = rows;
  	return matrix;
@@ -265,7 +261,7 @@ int sparse_solve_LU(sparse_matrix* matrix, sparse_vector* b, sparse_vector* x, i
 
 	memcpy(x,b ,n * sizeof(double));
 
-	return cs_lusol(0 , matrix , x , 1 );
+	return cs_lusol(2 , matrix , x , 1.0 );
 
 }
 
@@ -275,5 +271,5 @@ int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector
 			return 0;
 	memcpy(x,b,n*sizeof(double));
 
-	return cs_cholsol(0 , matrix , x);
+	return cs_cholsol(1 , matrix , x);
 }
