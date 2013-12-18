@@ -115,26 +115,57 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m){
 	for( i = 0 ; i < m->size1; i++){
 		gsl_vector_set(res , i ,  1 / (double) gsl_matrix_get(m,i,i));
 	}
-
+	/* debug
+	printf("The diagonial from the dense vector:\n");
+	for(i = 0 ; i < m->size1; i++)
+	{
+		printf("%f\n",gsl_vector_get(res,i));
+	}
+	*/
 	return res;
 }
 
-/*
-gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* m){
+
+gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* A){
 	gsl_vector* res;
-	res = gsl_vector_calloc(m->size1);
+	res = gsl_vector_calloc(A->n);
+	int found = 0;
+	double diag;
 	if( !res )
 		return NULL;
 
-	int i;
-	for( i = 0 ; i < m->size1; i++){
-		gsl_vector_set(res , i ,  1 / mi,i));
-	}
+	int i,j,col;
+	for( i = 0 ; i < A->n; i++){
 
+			col = A->p[i];
+			for(j = 0; j < A->n;j++)
+			{
+				if(A->i[col+j] == i)
+				{
+					found = 1;
+					break;
+				}
+				else if(A->i[col+j] > i)
+				{
+					found = 0;
+					break;
+				}
+			}
+			if (found)
+				diag = A->x[A->i[col+j]];
+			else /* error control in case one of the elements in the diagonial is 0 */
+				exit(0);
+			gsl_vector_set(res , i ,  1 / diag);
+			found = 0;
+	}
+	/* debug */
+	printf("The diagonial from the sparse vector:\n");
+	for(i = 0 ; i < A->n; i++)
+	{
+		printf("%f\n",gsl_vector_get(res,i));
+	}
 	return res;
 }
-
-*/
 
 void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v){
 
@@ -145,3 +176,4 @@ void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v){
 		gsl_vector_set(res , i , s * temp);
 	}
 }
+
