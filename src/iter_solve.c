@@ -248,22 +248,12 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		rho_1 = rho;
 
 		int j;
-		for (j = 0; j < p->size; j++)
-		{
-			printf("P: %lf\n",gsl_vector_get(p,j));
-		}
-
 
 		lh_matrix_vector_mul( p, A, q ,NON_TRANSP); /* q = Ap */
 		lh_matrix_vector_mul( p_t, A, q_t ,TRANSP); /* q~ = transposed(A)p~*/
-		for (j = 0; j < p->size; j++)
-		{
-			printf("Q: %lf\n",gsl_vector_get(q_t,j));
-		}
+
 		
 		omega = lh_dot_product(p_t,q);
-		printf("omega =  %lf \n",omega);
-
 		if(ABS(omega) < eps)
 		{
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
