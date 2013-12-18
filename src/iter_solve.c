@@ -138,54 +138,39 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	double omega = 0;
 	double eps = pow(10,-14);
 
-	gsl_vector* r , *r_t;
-	gsl_vector* z , *z_t , *temp_z , *temp_z_t;
-	gsl_vector* m;
-	gsl_vector* p , *p_t;
-	gsl_vector* q , *q_t;
+	gsl_vector* M;
 
-	for ( i = 0; i < b->size ; i++)
-	{
-		printf("%g\n",gsl_vector_get(b,i));
-	}
-	/* r = r~ = b - Ax */
-
-	r = gsl_vector_alloc(b->size);
-	r_t = gsl_vector_alloc(b->size);
-	
-	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1.0,1.0);
-	
+	gsl_vector* r;
 	r = gsl_vector_alloc(A->size1);
+
+	gsl_vector* r_t;
 	r_t = gsl_vector_alloc(A->size1);
-	if(r == NULL || r_t == NULL)
-	{
-		perror("Allocation failed... I am going to exit now");
-		exit (1);
-	}
 
-	gsl_vector_memcpy(r,b);
-	gsl_vector_memcpy(r_t,b);
-	
-
-
-	/* 	Allocate all the vectors that we need in order for the algorithm
-		to be functional 
-	*/
+	gsl_vector* z;
 	z = gsl_vector_alloc(b->size);
-	temp_z = gsl_vector_alloc(b->size);
-	temp_z_t = gsl_vector_alloc(b->size);
-	z_t = gsl_vector_alloc(b->size);
-	if ( z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL)
-	{
-		gsl_vector_free(r);
-		gsl_vector_free(r_t);
 
-		perror("Allocation failed... I am going to exit now");
-		exit (1);
-	}
+	gsl_vector *z_t;
+	z_t = gsl_vector_alloc(b->size);
+
+	gsl_vector *temp_z;
+	temp_z = gsl_vector_alloc(b->size);
+
+	gsl_vector *temp_z_t;
+	temp_z_t = gsl_vector_alloc(b->size);
+
+	gsl_vector* p;
 	p = gsl_vector_alloc(b->size);
+
+	gsl_vector *p_t;
 	p_t = gsl_vector_alloc(b->size);
-	if(p == NULL || p_t == NULL)
+
+	gsl_vector* q;
+	q = gsl_vector_alloc(b->size);
+
+	gsl_vector *q_t;
+	q_t = gsl_vector_alloc(b->size);
+
+	if(p == NULL || p_t == NULL || r == NULL || r_t == NULL || z == NULL || z_t == NULL || temp_z == NULL || temp_z_t == NULL || q == NULL || q_t == NULL)
 	{
 		gsl_vector_free(r);
 		gsl_vector_free(r_t);
@@ -197,11 +182,18 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		perror("Allocation failed... I am going to exit now");
 		exit (1);
 	}
- 	q = gsl_vector_alloc(b->size);
-	q_t = gsl_vector_alloc(b->size);
+	
+	/* r = r~ = b - Ax */
+	lh_matrix_vector_mul_and_sum(x0,A,b,NON_TRANSP,-1.0,1.0);
+
+	/* r = b */
+	gsl_vector_memcpy(r,b);
+	/* ~r = b */
+	gsl_vector_memcpy(r_t,b);
+
 
 	/* Get and save the 1/diag(A) in the vector m */
-	m = lh_get_inv_diag(A);
+	M = lh_get_inv_diag(A);
 
 	/* get the euclidian norms of r and b vectors */
 	norm_r = lh_norm(r);
@@ -209,11 +201,9 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	while(( norm_r / norm_b ) > tolerance && i < iter)
 	{
-
-	
 		i++;
-		lh_diag_mul(z,r,m); 	/* 	Preconditioner solve*/
-		lh_diag_mul(z_t,r_t,m);	/*	Transpose prec-solve */
+		lh_diag_mul(z,r,M); 	/* 	Preconditioner solve*/
+		lh_diag_mul(z_t,r_t,M);	/*	Transpose prec-solve */
 
 
 		rho = lh_dot_product(z,r_t);
@@ -259,7 +249,9 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 			perror("Algorithm failed in iter_solve_bicg ----> omega");
 			exit(1);
 		}
+
 		alpha = rho / omega;
+
 		lh_scalar_vector_mul(p,alpha,p);
 		gsl_vector_add (x0,p);
 		lh_scalar_vector_mul(q,alpha,q);
