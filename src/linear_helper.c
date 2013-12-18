@@ -9,12 +9,13 @@ double lh_norm( gsl_vector* v){
 	return res;
 }
 
+
 void lh_diag_mul(gsl_vector* res, gsl_vector* v , gsl_vector* A){
 	
 	int i;
 	double temp1,temp2;
 
-	temp_vec = gsl_vector_ptr(v,0);
+	//temp_vec = gsl_vector_ptr(v,0);
 	for( i = 0 ; i < A->size ; i++){
 		temp1 = gsl_vector_get(v , i);
 		temp2 = gsl_vector_get(A , i);
@@ -24,8 +25,9 @@ void lh_diag_mul(gsl_vector* res, gsl_vector* v , gsl_vector* A){
 }
 
 
+
 void lh_matrix_vector_mul_sparse( gsl_vector* x, sparse_matrix* A,gsl_vector* y,int transp){
-{
+
 	int i,j,p;
 	
 	if (transp == TRANSP)
@@ -117,6 +119,7 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m){
 	return res;
 }
 
+/*
 gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* m){
 	gsl_vector* res;
 	res = gsl_vector_calloc(m->size1);
@@ -131,6 +134,7 @@ gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* m){
 	return res;
 }
 
+*/
 
 void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v){
 

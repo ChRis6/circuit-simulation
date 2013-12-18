@@ -237,18 +237,20 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
 }
 
 
-int sparse_LU_decomp(sparce_matrix* matrix, css* S, csn* N ){
+int sparse_LU_decomp(sparse_matrix* matrix, css* S, csn* N ){
 
 	if( !matrix)
 		return 0;
 
 	S=cs_sqr(2,matrix,0);
-	N=cs_lu(C,matrix,1);
+	N=cs_lu(matrix,S,1);
 	
 	if(!S || !N)
 		return 0;
 
-	cs_spfree(C);
+	cs_spfree(matrix);
+
+	return 1;
 }
 
 int sparce_solve_LU(css* S, csn* N, sparse_vector* b, sparse_vector* x, int n){
@@ -262,7 +264,7 @@ int sparce_solve_LU(css* S, csn* N, sparse_vector* b, sparse_vector* x, int n){
 	if(!cs_lsolve(N->L,x)){
 		return 0;
 	}
-	if(!usolve(N->U,x)){
+	if(!cs_usolve(N->U,x)){
 		return 0;
 	}
 	if(!cs_ipvec(S->q,x,b,n)){
@@ -272,4 +274,5 @@ int sparce_solve_LU(css* S, csn* N, sparse_vector* b, sparse_vector* x, int n){
 	cs_sfree(S);
 	cs_nfree(N);
 	
+	return 1;
 }
