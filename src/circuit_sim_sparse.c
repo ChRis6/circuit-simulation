@@ -4,7 +4,7 @@
 
 #define DEFAULT_NZ 15
 
-sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len ){
+sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len){
 
 	int rows;
 	int columns;
@@ -220,20 +220,19 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
  				}
  			}
  		}
- 	}
+ 	} 	
 
 	matrix = cs_compress(matrix);
- 	/* remove duplicates */
  	
+ 	/* remove duplicates */
  	if( !cs_dupl(matrix) ){
  		fprintf(stderr, "Sparse matrix: duplicates not removed \n");
  		cs_spfree(matrix);
  		free(vector);
  		return NULL;
  	}
-	
+	*vector_len = matrix->n;
  	*b = vector;
- 	*vector_len = rows;
  	return matrix;
 }
 

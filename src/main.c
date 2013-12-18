@@ -17,6 +17,15 @@
 #include "circuit_sim_sparse.h"
 #include "plot.h"
 
+
+static void double_vector_to_gsl_vector(gsl_vector* gsl_v,double *doubl_vec,int size_n)
+{
+	int i;
+	for (i = 0; i < size_n; i++)
+	{
+		gsl_vector_set(gsl_v,i,doubl_vec[i]);
+	}
+}
 int main( int argc , char* argv[]){
 	int flag;
 	
@@ -167,6 +176,8 @@ int main( int argc , char* argv[]){
  		sparse_matrix* matrix;
  		sparse_vector* vector;
  		sparse_vector* x;
+ 		gsl_vector* x_sparse;
+		gsl_vector* vector_sparse;
  		int vector_size;
  		char method;
  		int i;
@@ -177,7 +188,11 @@ int main( int argc , char* argv[]){
  			fprintf(stderr, "Error creating MNA matrix \n");
  			exit(1);
  		}
-
+ 		printf("Non-zeros: %d\n",vector_size);
+ 		/* Added by hriskons */
+ 		x_sparse = gsl_vector_calloc(matrix->n);
+		vector_sparse = gsl_vector_calloc(matrix->n);
+ 		double_vector_to_gsl_vector(vector_sparse,vector,vector_size);
  		/* print sparse matrix */
  		cs_print(matrix,"sparse_matrix.txt",0);
 
@@ -197,6 +212,22 @@ int main( int argc , char* argv[]){
 
  		}
  		else if ( method == METHOD_CG_SPARSE ){
+ 			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
+ 				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
+ 			}
+ 			printf("Done\n");
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , x_sparse->size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		
+			plot_set_vector_index(plot_array ,x_sparse ,0);
+			 		 	
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_cg.txt");
 
 
  		}

@@ -13,7 +13,7 @@ void iter_set_options( int iterations , double itol );
  * Solve using the cg method
  * Returns NULL on error
  */
-gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0 );
+gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0);
 
 int sparse_solve_bicg();
 
