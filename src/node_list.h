@@ -13,7 +13,7 @@
 #define METHOD_LU_SPARSE       5
 #define METHOD_CHOLESKY_SPARSE 6
 #define METHOD_CG_SPARSE       7
-#define METHOD_BICG_SPARSE     4
+#define METHOD_BICG_SPARSE     8
 
 
 #define PLOT_ON  1

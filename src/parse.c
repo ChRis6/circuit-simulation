@@ -1024,9 +1024,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					printf("Line : %s\n", line );
 					return 0;
 				}
-
+        if( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0 ){
+          list->solving_method = METHOD_LU_SPARSE;
+          list->sparse = 1;
+          return 2;
+        }
 				//printf("TOKEN AFTER .OPTIONS :%s\n",token);
-				if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
+				else if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
 					token = strtok(NULL," \n");
 					if(!token){
 						list->solving_method = METHOD_CHOLESKY;
@@ -1040,7 +1044,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					}
 
           /*------------ .OPTIONS SPD SPARSE--------------*/
-					else if (strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+					else if (strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
 						/* cholesky solution with sparce arrays   */
             list->solving_method = METHOD_CHOLESKY_SPARSE;
             list->sparse=1;
@@ -1053,8 +1057,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 						return 2;
 					}
 						
-					/*----------- .OPTIONS ITER SPARCE ---------------*/
-					if( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+					/*----------- .OPTIONS ITER SPARSE ---------------*/
+					if( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
 						/*   Bi-CG with sparce arrays  */
             list->solving_method = METHOD_BICG_SPARSE;
             list->sparse=1;
@@ -1066,7 +1070,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 							list->solving_method = METHOD_CG;
 							return 2;
 						}
-						else if ( strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+						else if ( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
 							/*   CG solving method with sparce arrays   */
               list->solving_method = METHOD_CG_SPARSE;
               list->sparse=1;

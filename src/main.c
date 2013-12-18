@@ -13,6 +13,7 @@
 #include "circuit_hash.h"
 #include "iter_solve.h"
 #include "decomposition.h"
+#include "sparse_interface.h"
 
 #include "plot.h"
 
@@ -45,6 +46,7 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
+ 	printf("Solving Method = %d\n",list.solving_method);
  	if ( !list.sparse ){
 
 
@@ -141,7 +143,15 @@ int main( int argc , char* argv[]){
 		}
  	}
  	else {			//  sparse simulation
+ 		sparse_matrix* matrix;
+ 		sparse_vector* vector;
+ 		int vector_size;
 
+ 		matrix = (sparse_matrix*)create_mna_sparse( &list , &vector , &vector_size);
+ 		if( !matrix ){
+ 			fprintf(stderr, "Error creating MNA matrix \n");
+ 			exit(1);
+ 		}
 
 
 

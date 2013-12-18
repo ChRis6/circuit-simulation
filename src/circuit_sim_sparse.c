@@ -2,7 +2,7 @@
 
 #include "circuit_sim_sparse.h"
 
-#define DEFAULT_NZ 50
+#define DEFAULT_NZ 15
 
 sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len ){
 
@@ -222,14 +222,19 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len 
  		}
  	}
 
+	cs_print(matrix,"sparse_matrix.txt", 0 );
+	matrix = cs_compress(matrix);
  	/* remove duplicates */
- 	if( !cs_dupl(matrix) ){
+ 	
+ 	/*if( !cs_dupl(matrix) ){
  		fprintf(stderr, "Sparse matrix: duplicates not removed \n");
  		cs_spfree(matrix);
  		free(vector);
  		return NULL;
  	}
-
+	*/
+ 	cs_dupl(matrix);
+ 	cs_print(matrix,"sparse_matrix_non_dp.txt",0);
 
  	*b = vector;
  	*vector_len = rows;
