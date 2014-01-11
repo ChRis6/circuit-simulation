@@ -105,6 +105,8 @@ double lh_dot_product(gsl_vector* v1 , gsl_vector* v2){
 
 
 gsl_vector* lh_get_inv_diag(gsl_matrix* m){
+	double eps = 1e-14;
+
 	gsl_vector* res;
 	res = gsl_vector_calloc(m->size1);
 	
@@ -113,7 +115,13 @@ gsl_vector* lh_get_inv_diag(gsl_matrix* m){
 
 	int i;
 	for( i = 0 ; i < m->size1; i++){
-		gsl_vector_set(res , i ,  1 / (double) gsl_matrix_get(m,i,i));
+		if(gsl_matrix_get(m,i,i) >= eps){
+			gsl_vector_set(res , i ,  1 / (double) gsl_matrix_get(m,i,i));
+		}
+		else{
+			printf("0 has been found at (%d,%d) of A\n",i,i );
+			gsl_vector_set(res , i ,  1);
+		}
 	}
 	/* debug
 	printf("The diagonial from the dense vector:\n");
