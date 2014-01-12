@@ -34,14 +34,11 @@ static void print_matrix_gsl(gsl_matrix* A)
 
 gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 
-	printf("Entered\n");
-	//print_vector_gsl(b);
 	int iteration = 0 ;
 	gsl_vector* r;
 	r = gsl_vector_alloc(b->size);
 	if( !r )
 		return NULL;
-
 
 	gsl_vector* b1;
 	b1 = gsl_vector_calloc(b->size);
@@ -63,11 +60,7 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	if( !q )
 		return NULL;
 
-	printf("Memory allocation went well... continuing\n");
-
 	gsl_vector* M = lh_get_inv_diag_sparse(A);
-	printf("Printing diagonial\n");
-	//print_vector_gsl(M);
 
 	if( !M ){
 		gsl_vector_free(r);
@@ -123,13 +116,7 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 		//lh_matrix_vector_mul_sparse( p,A,q,NON_TRANSP);
 		gsl_vector_sub(q,q);
 		cs_gaxpy(A,gsl_vector_ptr(p,0),gsl_vector_ptr(q,0));
-		if(iteration == 2)
-		{
-			print_vector_gsl(p);
-			printf("\n");
-			print_vector_gsl(q);
-		}
-		
+
 		alpha = rho / lh_dot_product( p , q);
 
 		/* x = x + alpha * p */
@@ -151,16 +138,13 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 		gsl_vector_add( x0 , temp_v);			  // x = x + temp_v
 
 		/* r = r - alpha * q */
-		//gsl_vector_memcpy(temp_v , q);
 		lh_scalar_vector_mul( temp_v , alpha , q); // temp_v = alpha* p
 		
 		gsl_vector_sub(r,temp_v); // r = r - temp_v 
 				   
 		gsl_vector_free(temp_v);
 	}
-	//print_vector_gsl(x0);
-	/* Debug */
-	printf("Almost done... just to free some memory and out \n");
+	
 	/* clean up */
 	gsl_vector_free(r);
 	gsl_vector_free(z);
