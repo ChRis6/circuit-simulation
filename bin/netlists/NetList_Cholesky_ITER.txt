@@ -1,3 +1,4 @@
+
 I1 4 7 1e-3
 I2 0 6 1e-3
 R1 1 5 1.5
@@ -13,5 +14,6 @@ R10 3 2 2
 C1 7 0 0.1
 C2 2 0 0.2
 
-.PLOT V(1) V(2) V(3)
-.OPTIONS ITER SPD SPARSE
+.OPTIONS SPD ITER
+.PLOT V(1) V(4) V(5)
+

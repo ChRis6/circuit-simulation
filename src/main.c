@@ -55,27 +55,6 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
-/*
- 	int i,j;
- 	sparse_matrix* s_matrix;
- 	sparse_vector* s_vector;
- 	int size;
- 	create_mna(&list,&matrix,&vector);
-
-
- 	s_matrix = create_mna_sparse(&list,&s_vector,&size);
- 	printf("Printing vectors: \n");
- 	for( i = 0 ; i < size ; i++)
- 		printf("vector = %f s_vector = %f \n", gsl_vector_get(vector,i) , s_vector[i] );
-
- 	cs_print(s_matrix , "MATRIX_SPARSE.txt",0);
- 	for( i = 0 ; i < matrix->size1 ; i++)
- 		for( j = 0 ; j < matrix->size2; j++)
- 			if( gsl_matrix_get(matrix,i,j) != 0)
- 				fprintf(stderr, "(%d,%d) = %f\n", i , j , gsl_matrix_get(matrix,i,j) );
-
-*/
-
  	printf("Solving Method = %d\n",list.solving_method);
  	if ( !list.sparse ){
 
@@ -172,15 +151,17 @@ int main( int argc , char* argv[]){
 
 		}
  	}
- 	else {			//  sparse simulation
+ 	else {
+ 		//  sparse simulation
+ 		int vector_size;
+ 		char method;
+ 		int i;
  		sparse_matrix* matrix;
  		sparse_vector* vector;
  		sparse_vector* x;
  		gsl_vector* x_sparse;
 		gsl_vector* vector_sparse;
- 		int vector_size;
- 		char method;
- 		int i;
+ 		
 
  		method = list.solving_method;
  		matrix = (sparse_matrix*)create_mna_sparse( &list , &vector , &vector_size);
@@ -188,11 +169,13 @@ int main( int argc , char* argv[]){
  			fprintf(stderr, "Error creating MNA matrix \n");
  			exit(1);
  		}
- 		printf("Non-zeros: %d\n",vector_size);
+ 		
  		/* Added by hriskons */
+ 		/* conversion of a double into a gsl */
  		x_sparse = gsl_vector_calloc(matrix->n);
 		vector_sparse = gsl_vector_calloc(matrix->n);
  		double_vector_to_gsl_vector(vector_sparse,vector,vector_size);
+
  		/* print sparse matrix */
  		cs_print(matrix,"sparse_matrix.txt",0);
 
@@ -215,7 +198,6 @@ int main( int argc , char* argv[]){
  			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse CG failed\n" );
  			}
- 			printf("Done\n");
  			gsl_vector ** plot_array;
 
 			plot_array = plot_create_vector( 1 , x_sparse->size);
@@ -228,8 +210,6 @@ int main( int argc , char* argv[]){
 			plot_set_vector_index(plot_array ,x_sparse ,0);
 			 		 	
 			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_cg.txt");
-
-
  		}
  		else if( method == METHOD_BICG_SPARSE ){
 			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
