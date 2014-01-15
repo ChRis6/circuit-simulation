@@ -15,7 +15,7 @@ void iter_set_options( int iterations , double itol );
  */
 gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0);
 
-int sparse_solve_bicg();
+gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0);
 
 
 #endif

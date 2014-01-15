@@ -213,7 +213,7 @@ int main( int argc , char* argv[]){
  		}
  		else if ( method == METHOD_CG_SPARSE ){
  			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
- 				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
+ 				fprintf(stderr, "Solving Method Sparse CG failed\n" );
  			}
  			printf("Done\n");
  			gsl_vector ** plot_array;
@@ -232,6 +232,22 @@ int main( int argc , char* argv[]){
 
  		}
  		else if( method == METHOD_BICG_SPARSE ){
+			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
+ 				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
+ 			}
+ 			printf("Done\n");
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , x_sparse->size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		
+			plot_set_vector_index(plot_array ,x_sparse ,0);
+			 		 	
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
 
 
  		}
