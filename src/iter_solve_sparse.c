@@ -13,7 +13,7 @@ static double tolerance = 1e-3;
 static void print_vector_gsl(gsl_vector* A)
 {
 	int i;
-	printf("mesa sto print\n");
+	printf("Mphke sto print vector\n");
 	for(i = 0; i < A->size; i++)
 	{
 		printf("\t%.4f\n",gsl_vector_get(A,i));
@@ -89,7 +89,7 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	double beta;
 	double alpha;
 
-	printf("Prin to while\n");
+	printf("Prin to while cg\n");
 
 	while ( iteration < iter && ( (lh_norm(r) / lh_norm(b)) > tolerance ) ){
 
@@ -164,7 +164,7 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 
 gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	printf("mpike sparse bicg\n");
-	print_vector_gsl(b);
+	//print_vector_gsl(b);
 	//print_matrix_gsl(A);
 
 	int iteration=0;
@@ -348,7 +348,6 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 		gsl_vector_sub(r_t,temp);				   // r_t = r_t - temp_v
 	}
 
-	printf("meta apo while\n");
 	gsl_vector_free(r);
 	gsl_vector_free(r_t);
 	gsl_vector_free(M);
@@ -362,7 +361,7 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 
 	//cs_free(A_T);
 
-	printf("Prin to print\n");
+	printf("going to print x0\n");
 	print_vector_gsl(x0);
 	return x0;
 }
