@@ -216,20 +216,8 @@ int main( int argc , char* argv[]){
  				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
  			}
  			printf("Done\n");
- 			gsl_vector ** plot_array;
 
-			plot_array = plot_create_vector( 1 , x_sparse->size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
-			}
-	 		
-			plot_set_vector_index(plot_array ,x_sparse ,0);
-			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
-
-
+ 			/* code must be written here */
  		}
  		else{
  			fprintf(stderr, "Solving method not specified\n");

@@ -68,4 +68,17 @@ void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v);
  * dot product
  */
 double lh_dot_product(gsl_vector* v1 , gsl_vector* v2);
+
+/*
+* function that takes as parameter a gsl vector and returns a normal vector(pointer)
+* the user has to free the allocated memory.
+*/
+
+double *lh_gslVector_to_pointerVector(gsl_vector *vec);
+
+/*
+* function that takes as parameter a pointer vector and returns the gsl vector
+*/
+
+void lh_pointerVector_to_gslVector(double *vec, gsl_vector *gslVec);
 #endif

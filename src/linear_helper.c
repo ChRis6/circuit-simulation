@@ -162,7 +162,7 @@ gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* A){
 			if (found)
 				diag = A->x[A->i[col+j]];
 			else /* error control in case one of the elements in the diagonial is 0 */
-				exit(0);
+				diag=1;
 			gsl_vector_set(res , i ,  1 / diag);
 			found = 0;
 	}
@@ -185,3 +185,32 @@ void lh_scalar_vector_mul(gsl_vector* res, double s , gsl_vector* v){
 	}
 }
 
+double *lh_gslVector_to_pointerVector(gsl_vector* vec){
+
+	double *result = NULL;
+
+	result = (double *)malloc(sizeof(double)*vec->size);
+	if ( !result )
+	{
+		printf("Error while allocating memory in 'lh_gslVector_to_pointerVector'\n");
+		exit(1);
+	}
+
+	for (int i = 0; i < vec->size; ++i)
+	{
+		*(result+i) = gsl_vector_get(vec,i);
+	}
+
+
+	return result;
+}
+
+void lh_pointerVector_to_gslVector(double *vec, gsl_vector *gslVec){
+
+	for (int i = 0; i < gslVec->size; ++i)
+	{
+		gsl_vector_set(gslVec, i, vec[i]);
+
+	}
+
+}

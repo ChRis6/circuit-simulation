@@ -91,7 +91,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	gsl_vector_memcpy(b1,b);
 	
-	/* r = b - Ax */
+	// r = b - Ax 
 	lh_matrix_vector_mul_and_sum( x0,A,b1,NON_TRANSP,-1.0,1.0);
 	
 	gsl_vector_memcpy(r , b1);
@@ -117,7 +117,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 			//gsl_vector* temp_v = gsl_vector_calloc(p->size);
 			
-			/* p = z + beta*p */
+			// p = z + beta*p 
 			lh_scalar_vector_mul(p, beta,p); //  p = beta* p
 			
 			gsl_vector_add( p , z);			 //  p = z + p
@@ -125,25 +125,12 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		}
 		
 		rho1 = rho;
-		/*if(iteration == 2)
-		{
-			print_vector_gsl(p);
-			printf("\n");
-			print_vector_gsl(q);
-			printf("\n");		
-		}
-		printf("\n");
-		/* q = Ap */
+
 		lh_matrix_vector_mul( p,A,q,NON_TRANSP);
-		/*if(iteration == 2)
-		{
-			print_vector_gsl(p);
-			printf("\n");
-			print_vector_gsl(q);
-		}*/
+
 		alpha = rho / lh_dot_product( p , q);
 		
-		/* x = x + alpha * p */
+		// x = x + alpha * p 
 		gsl_vector* temp_v = gsl_vector_calloc(p->size);
 		if( !temp_v ){
 			gsl_vector_free(r);
@@ -158,7 +145,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		
 		gsl_vector_add( x0 , temp_v);			  // x = x + temp_v
 		
-		/* r = r - alpha * q */
+		// r = r - alpha * q 
 		//gsl_vector_memcpy(temp_v , q);
 		lh_scalar_vector_mul( temp_v , alpha , q); // temp_v = alpha* q
 		
@@ -168,14 +155,14 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	}
 
 
-	/* clean up */
+	// clean up 
 	gsl_vector_free(r);
 	gsl_vector_free(z);
 	gsl_vector_free(p);
 	gsl_vector_free(M);	
 	gsl_vector_free(q);
 
-	/* result is written in x0 */
+	// result is written in x0
 	print_vector_gsl(x0);
 	return x0;
 }
@@ -202,7 +189,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		return NULL;
 	} 
 
-	M = gsl_vector_calloc(b->size);
+	//M = gsl_vector_calloc(b->size);
 	M = lh_get_inv_diag(A);				// init m
 	if( !M){
 		gsl_vector_free(r);
@@ -265,7 +252,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	gsl_vector_memcpy(temp,b);
 	
-	/* b1 = b - Ax; */
+	// b1 = b - Ax; 
 
 	lh_matrix_vector_mul_and_sum( x0,A,temp,NON_TRANSP,-1.0,1.0);
 	
@@ -320,7 +307,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 		alpha = rho/omega;
 
-		/* x = x + alpha*q; */
+		// x = x + alpha*q;
 
 		lh_scalar_vector_mul(temp , alpha , p); // temp = alha * p
 		gsl_vector_add( x0 , temp);			  // x = x + temp

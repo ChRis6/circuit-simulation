@@ -13,7 +13,7 @@ static double tolerance = 1e-3;
 static void print_vector_gsl(gsl_vector* A)
 {
 	int i;
-	printf("Mphke sto print vector\n");
+
 	for(i = 0; i < A->size; i++)
 	{
 		printf("\t%.4f\n",gsl_vector_get(A,i));
@@ -38,6 +38,10 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 
 	int iteration = 0 ;
 	gsl_vector* r;
+
+	double *q_vec,*p_vec;
+
+
 	r = gsl_vector_alloc(b->size);
 	if( !r )
 		return NULL;
@@ -89,8 +93,6 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	double beta;
 	double alpha;
 
-	printf("Prin to while cg\n");
-
 	while ( iteration < iter && ( (lh_norm(r) / lh_norm(b)) > tolerance ) ){
 
 		iteration++;
@@ -118,8 +120,14 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 
 		/* q = Ap */
 		//lh_matrix_vector_mul_sparse( p,A,q,NON_TRANSP);
-		gsl_vector_sub(q,q);
-		cs_gaxpy(A,gsl_vector_ptr(p,0),gsl_vector_ptr(q,0));
+		//gsl_vector_sub(q,q);
+		//cs_gaxpy(A,gsl_vector_ptr(p,0),gsl_vector_ptr(q,0));
+
+		gsl_vector_sub(q, q);
+		q_vec = lh_gslVector_to_pointerVector(q);
+		p_vec = lh_gslVector_to_pointerVector(p);
+		cs_gaxpy(A, p_vec, q_vec);
+		lh_pointerVector_to_gslVector(q_vec, q);
 
 		alpha = rho / lh_dot_product( p , q);
 
@@ -156,20 +164,23 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	gsl_vector_free(M);
 	gsl_vector_free(q);
 
-	/* result written in x0 */
+	free(q_vec);
+	free(p_vec);
+
+	/* result is written in x0 */
 	printf("going to print x0\n");
 	print_vector_gsl(x0);
 	return x0;
 }
 
 gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
-	printf("mpike sparse bicg\n");
-	//print_vector_gsl(b);
-	//print_matrix_gsl(A);
 
 	int iteration=0;
 	double normb;
 	double alpha,beta,rho,rho1,omega;
+
+	double *q_vec, *q_t_vec;
+	double *p_vec, *p_t_vec;
 
 	sparse_matrix* A_T;			// A transposed
 
@@ -180,13 +191,14 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 	gsl_vector *q,*q_t;
 	gsl_vector *temp;
 
+
 	r = gsl_vector_calloc(b->size);
 	r_t = gsl_vector_calloc(b->size);
 	if( !r || !r_t ){
 		return NULL;
 	} 
 
-	M = gsl_vector_calloc(b->size);
+	//M = gsl_vector_calloc(b->size);
 	M = lh_get_inv_diag_sparse(A);				// init m
 	if( !M){
 		gsl_vector_free(r);
@@ -246,8 +258,8 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 		return NULL;
 	}
 
-	A_T = cs_spalloc(A->m, A->n, A->nzmax, 1, 1);
-	A_T = cs_transpose(A_T, 0);
+	//A_T = cs_spalloc(A->m, A->n, A->nzmax, 1, 1);
+	A_T = cs_transpose(A, 1);
 	if( !A_T ){
 		gsl_vector_free(r);
 		gsl_vector_free(r_t);
@@ -262,18 +274,17 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 
 		return NULL;
 	}
-
+	
 
 	gsl_vector_memcpy(temp,b);
 	
 	/* temp = b - Ax; */
 	lh_matrix_vector_mul_and_sum_sparse( x0,A,temp,NON_TRANSP,-1.0,1.0);
-	//lh_matrix_vector_mul_and_sum( x0,A,temp,NON_TRANSP,-1.0,1.0);
+
 	
 	// r = temp & r_t = r
-	gsl_vector_memcpy(r , temp);
-	gsl_vector_memcpy(r_t,r);
-	//gsl_vector_free(b1);
+	gsl_vector_memcpy(r, temp);
+	gsl_vector_memcpy(r_t, r);
 
 	normb = lh_norm(b);
 	if(normb < EPS)
@@ -301,26 +312,31 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 		else{
 			beta = rho/rho1;
 
-			lh_scalar_vector_mul(p, beta,p); //  p = beta* p
+			lh_scalar_vector_mul(p, beta, p); //  p = beta* p
 			gsl_vector_add( p , z);			 //  p = z + p
 
-			lh_scalar_vector_mul(p_t, beta,p_t); //  p_t = beta * p_t
-			gsl_vector_add( p_t , z_t);			 //  p_t = z_t + p_t
+			lh_scalar_vector_mul(p_t, beta, p_t); //  p_t = beta * p_t
+			gsl_vector_add(p_t, z_t);			 //  p_t = z_t + p_t
 
 		}
 
 		rho1 = rho;
+
 		/* q = Ap */
-		//lh_matrix_vector_mul_sparse( p,A,q,NON_TRANSP);
+
 		gsl_vector_sub(q, q);
-		cs_gaxpy(A, gsl_vector_ptr(p,0), gsl_vector_ptr(q,0));
+		q_vec = lh_gslVector_to_pointerVector(q);
+		p_vec = lh_gslVector_to_pointerVector(p);
+		cs_gaxpy(A, p_vec, q_vec);
+		lh_pointerVector_to_gslVector(q_vec, q);
 
 		/* q_t = A_T*p_t */
-		gsl_vector_sub(q_t, q_t);
-		cs_gaxpy(A_T, gsl_vector_ptr(p_t,0), gsl_vector_ptr(q_t,0));
 
-		//lh_matrix_vector_mul( p,A,q,NON_TRANSP);
-		//lh_matrix_vector_mul( p_t,A,q_t,TRANSP);
+		gsl_vector_sub(q_t, q_t);
+		q_t_vec = lh_gslVector_to_pointerVector(q_t);
+		p_t_vec = lh_gslVector_to_pointerVector(p_t);
+		cs_gaxpy(A_T, p_t_vec, q_t_vec);
+		lh_pointerVector_to_gslVector(q_t_vec, q_t);
 
 		omega = lh_dot_product(p_t, q);
 		if( ABS(omega) < EPS ){
@@ -348,6 +364,8 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 		gsl_vector_sub(r_t,temp);				   // r_t = r_t - temp_v
 	}
 
+	// free allocated memory space
+
 	gsl_vector_free(r);
 	gsl_vector_free(r_t);
 	gsl_vector_free(M);
@@ -359,7 +377,12 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 	gsl_vector_free(q_t);
 	gsl_vector_free(temp);
 
-	//cs_free(A_T);
+	free(q_vec);
+	free(q_t_vec);
+	free(p_vec);
+	free(p_t_vec);
+
+	cs_free(A_T);
 
 	printf("going to print x0\n");
 	print_vector_gsl(x0);
