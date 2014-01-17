@@ -215,9 +215,7 @@ int main( int argc , char* argv[]){
 			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
  			}
- 			printf("Done\n");
-
- 			/* code must be written here */
+ 			
  		}
  		else{
  			fprintf(stderr, "Solving method not specified\n");

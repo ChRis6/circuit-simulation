@@ -680,7 +680,7 @@ int cs_lusol (int order, const cs *A, double *b, double tol)
     return (ok) ;
 }
 
-static int cs_vcount (const cs *A, css *S)
+int cs_vcount (const cs *A, css *S)
 {
     int i, k, p, pa, n = A->n, m = A->m, *Ap = A->p, *Ai = A->i, *next, *head,
         *tail, *nque, *pinv, *leftmost, *w, *parent = S->parent ;

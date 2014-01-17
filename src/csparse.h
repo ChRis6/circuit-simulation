@@ -379,7 +379,7 @@ int cs_lusol (int order, const cs *A, double *b, double tol);
  * 	@param S The symbolic analysis of matrix A.
  * 	@return 0 on success and 1 otherwise.
  */
-static int cs_vcount (const cs *A, css *S);
+int cs_vcount (const cs *A, css *S);
 
 
 /*
