@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "circuit_sim_sparse.h"
+#include "plot.h"
+#include "iter_solve_sparse.h"
+#include "linear_helper.h"
 
 #define DEFAULT_NZ 15
 
@@ -271,4 +274,108 @@ int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector
 	memcpy(x,b,n*sizeof(double));
 
 	return cs_cholsol(1 , matrix , x);
+}
+
+int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
+
+	int i;
+
+	int array_size;
+	int vector_len;
+	int vector_row;
+
+	gsl_vector** plot_array = NULL;
+	gsl_vector* plotting_vector = NULL;
+	sparse_vector* b = NULL; 
+	sparse_vector* x = NULL;
+
+	vector_len = matrix->n;
+	plotting_vector = gsl_vector_calloc( vector_len);
+	if( !plotting_vector){
+		fprintf(stderr, "Not enough memory for plotting_vector...\n" );
+		return 0;
+	}
+
+	b = (sparse_vector*) malloc( sizeof(sparse_vector) * vector_len );
+	if(!b){
+		gsl_vector_free(plotting_vector);
+		fprintf(stderr, "Not enough memory for sparse dc sweep using LU solver...\n" );	
+		return 0;
+	}
+
+	x = (sparse_vector*) malloc( sizeof(sparse_vector)* vector_len);
+	if(!x){
+		free(b);
+		fprintf(stderr, "Not enough memory for dc sweep sparse LU solution...\n" );
+		return 0;
+	}
+
+	array_size = plot_find_size( list->dc_sweep.start_v, list->dc_sweep.end_v , list->dc_sweep.inc);
+	plot_array = plot_create_vector( array_size , matrix->n);
+	if( !plot_array ){
+		free(b);
+		free(x);
+		fprintf(stderr, "No memory for plotting results...\n");
+		return 0;
+	}
+
+	memcpy(b, rhs, sizeof(double) * vector_len);
+	/*
+	 * Set initial value for input source (voltage or current)
+	 */
+	if ( list->dc_sweep.node->type == NODE_SOURCE_V_TYPE ){
+		vector_row = list->dc_sweep.node->node.source_v.mna_row;
+
+		b[vector_row] = list->dc_sweep.start_v;
+	}
+	else if ( list->dc_sweep.node->type == NODE_SOURCE_I_TYPE){
+
+		int node1 = list->dc_sweep.node->node.source_v.node1;
+		int node2 = list->dc_sweep.node->node.source_v.node2;
+
+		if(node1 != 0){
+			b[node1 - 1] = list->dc_sweep.start_v; 
+		}
+
+		if(node2 != 0){
+			b[node2 - 1 ] = list->dc_sweep.start_v;
+		}
+	}
+
+	// find all solutions and plot
+	for( i = 0 ; i < array_size ; i++ ){
+
+		// solve sparse system using LU
+		int  flag = sparse_solve_LU(matrix, b, x, vector_len);
+		if( !flag )
+			fprintf(stderr, "DC SWEEP SPARSE ERROR: Solution not found\n");
+
+		// update b vector
+		if ( list->dc_sweep.node->type == NODE_SOURCE_V_TYPE ){
+			b[vector_row] += list->dc_sweep.inc;
+		}
+		else if ( list->dc_sweep.node->type == NODE_SOURCE_I_TYPE){
+
+			int node1 = list->dc_sweep.node->node.source_v.node1;
+			int node2 = list->dc_sweep.node->node.source_v.node2;
+
+			if(node1 != 0){
+				b[node1 - 1] -= list->dc_sweep.inc; 
+			}
+
+			if(node2 != 0){
+				b[node2 - 1 ] += list->dc_sweep.inc;
+			}
+		}
+
+		// store solution found for plotting
+		lh_pointerVector_to_gslVector(x, plotting_vector);
+		plot_set_vector_index(plot_array ,plotting_vector,i);
+	} 
+
+	if( list->plot == PLOT_ON )
+		plot_by_node_name(list->hashtable , plot_array , array_size);
+
+
+	return 1;
 }
