@@ -55,6 +55,28 @@ typedef struct source_v {
 	int mna_row;
 
 	double value;
+	
+	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
+	double i1;
+	double i2;
+	double td1;
+	double td2;
+	double tc1;
+	double tc2; 
+
+	double ia;
+	double fr;
+	double td;
+	double df;
+	double ph;
+
+	double tr;
+	double tf;
+	double pw;
+	double per;
+
+	/*need to implement a dynamic way to add (ti ii) pairs for PWL transient spec*/
+
 }SOURCE_V_T;
 
 typedef struct source_i{
@@ -63,6 +85,27 @@ typedef struct source_i{
 	int node2;
 
 	double value;
+
+	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
+	double i1;
+	double i2;
+	double td1;
+	double td2;
+	double tc1;
+	double tc2; 
+
+	double ia;
+	double fr;
+	double td;
+	double df;
+	double ph;
+
+	double tr;
+	double tf;
+	double pw;
+	double per;
+
+	/*need to implement a dynamic way to add (ti ii) pairs for PWL transient spec*/
 }SOURCE_I_T;
 
 /* MOSFET transistor*/

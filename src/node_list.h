@@ -15,6 +15,9 @@
 #define METHOD_CG_SPARSE       7
 #define METHOD_BICG_SPARSE     8
 
+#define METHOD_TR 9 //Transient Trapezoidal
+#define METHOD_BE 10 //Backward-Euler
+
 
 #define PLOT_ON  1
 #define PLOT_OFF 0
@@ -59,6 +62,9 @@ typedef struct list{
 	double itol;
 	unsigned int nz;
 	char sparse;
+
+	double time_step;
+	double fin_time;
 }LIST;
 
 

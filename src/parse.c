@@ -531,19 +531,223 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 			node->source_v.value = atof(token);
 
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
+			/* NO MORE TOKENS.IF FOUND CHECK FOR TRANSIENT SPEC*/
 			token = strtok(NULL," \n");
 			if( token == NULL ){
 				*type = NODE_SOURCE_V_TYPE;
 				return 1;
 			}
 			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s , garbage token : %s\n" , line , token);
-				return 0;
-			}
 
-		}
+        /*check for exponential transient spec*/
+        if (strcmp(token,"EXP") == 0 || strcmp(token,"exp") == 0){
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          
+          /*store the i1 value*/
+          node->source_v.i1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i2 value of the exponential transient spec\n");
+            return 0;
+          }
+          
+          /*store the i2 value*/
+          node->source_v.i2 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td1 value*/
+          node->source_v.td1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tc1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tc1 value*/
+          node->source_v.tc1 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td2 value*/
+          node->source_v.td2 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tc2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tc2 value*/
+          node->source_v.tc2 = atof(token);
+          *type = NODE_SOURCE_V_TYPE;
+          return 1;
+
+        }
+        /*check for SIN transient spec*/
+        else if(strcmp(token,"SIN") == 0 || strcmp(token,"sin") == 0){
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i1 value*/
+          node->source_v.i1 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the ia value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the ia value*/
+          node->source_v.ia = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the fr value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the fr value*/
+          node->source_v.fr = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td value*/
+          node->source_v.td = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the df value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the df value*/
+          node->source_v.df = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the ph value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the ph value*/
+          node->source_v.ph = atof(token);
+          *type = NODE_SOURCE_V_TYPE;
+          return 1;
+
+        }
+
+        /*check for PULSE transient spec*/
+        else if(strcmp(token,"PULSE") == 0 || strcmp(token,"PULSE") == 0){
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i1 value*/
+          node->source_v.i1 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i2 value*/
+          node->source_v.i2 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td value*/
+          node->source_v.td = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tr value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tr value*/
+          node->source_v.tr = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tf value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tf value*/
+          node->source_v.tf = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the pw value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the pw value*/
+          node->source_v.pw = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the per value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the per value*/
+          node->source_v.per = atof(token);
+          *type = NODE_SOURCE_V_TYPE;
+          return 1;
+
+        }
+
+        else if(strcmp(token,"PWL") == 0 || strcmp(token,"pwl")){
+
+          while(token != NULL){
+            token = strtok(NULL,"() \n");
+            if(token == NULL){
+              printf("No time value specified for the pair\n");
+              return 0;
+            }
+            /*store the ti value of the pair*/
+            
+            token = strtok(NULL,"() \n");
+            if(token == NULL){
+              printf("No voltage value specified for the pair\n");
+              return 0;
+            }
+            /*store the ii voltage value of the pair*/
+
+          }
+        }
+			}
+    }
+
 
 		/*
 		 * CURRENT SOURCE
@@ -652,10 +856,200 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				return 1;
 			}
 			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s  garbage token : %s\n" , line , token);
-				return 0;
-			}
+				
+        /*check for exponential transient spec*/
+        if (strcmp(token,"EXP") == 0 || strcmp(token,"exp") == 0){
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i1 value*/
+          node->source_i.i1 = atof(token);
+
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i2 value*/
+          node->source_i.i2 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td1 value*/
+          node->source_i.td1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tc1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tc1 value*/
+          node->source_i.tc1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td2 value*/
+          node->source_i.td2 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tc2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tc2 value*/
+          node->source_i.tc2 = atof(token);
+          *type = NODE_SOURCE_I_TYPE;
+          return 1;
+
+
+
+        }
+        /*check for SIN transient spec*/
+        else if(strcmp(token,"SIN") == 0 || strcmp(token,"sin") == 0){
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i1 value*/
+          node->source_i.i1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the ia value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the ia value*/
+          node->source_i.ia = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the fr value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the fr value*/
+          node->source_i.fr = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td value*/
+          node->source_i.td = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the df value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the df value*/
+          node->source_i.df = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the ph value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the ph value*/
+          node->source_i.df = atof(token);
+          *type = NODE_SOURCE_I_TYPE;
+          return 1;
+        }
+
+        /*check for PULSE transient spec*/
+        else if(strcmp(token,"PULSE") == 0 || strcmp(token,"PULSE") == 0){
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i1 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i1 value*/
+          node->source_i.i1 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the i2 value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the i2 value*/
+          node->source_i.i2 = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the td value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the td value*/
+          node->source_i.td = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tr value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tr value*/
+          node->source_i.tr = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the tf value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the tf value*/
+          node->source_i.tf = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the pw value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the pw value*/
+          node->source_i.pw = atof(token);
+
+          token = strtok(NULL,"() \n");
+          if(token == NULL){
+            printf("No value specified for the per value of the exponential transient spec\n");
+            return 0;
+          }
+          /*store the per value*/
+          node->source_i.per = atof(token);
+          *type = NODE_SOURCE_I_TYPE;
+          return 1;
+        }
+
+        else if(strcmp(token,"PWL") == 0 || strcmp(token,"pwl")){
+
+          while(token != NULL){
+            token = strtok(NULL,"() \n");
+            if(token == NULL){
+              printf("No time value specified for the pair\n");
+              return 0;
+            }
+            /*store the ti value of the pair*/
+            
+            token = strtok(NULL,"() \n");
+            if(token == NULL){
+              printf("No voltage value specified for the pair\n");
+              return 0;
+            }
+            /*store the ii voltage value of the pair*/
+
+          }
+        }
+      }
+			
 
 		}
 
@@ -1118,14 +1512,44 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           list->solving_method = METHOD_LU_SPARSE;
           list->sparse=1;
 				}
+        else if(strcmp(token,"METHOD=TR") == 0 || strcmp(token,"method=tr") == 0){
+          /*Trapezoidal Transient Method*/
+          list->solving_method = METHOD_TR; 
+        }
+        else if(strcmp(token,"METHOD=BE") == 0 || strcmp(token,"method=be") == 0){
+          /*Trapezoidal Transient Method*/
+          list->solving_method = METHOD_BE; 
+        }
+
+
 				
 				else{
 					printf("No token after .OPTIONS \n");
 					return 0;
 				}
 
-				return 2;
+				//return 2;
 			}
+      else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
+        /*read the time step*/
+        token = strtok(NULL," \n");
+        if( !token ){
+              printf("Error while parsing TRAN command, please define time step...\n");
+              printf("Line: %s\n",line);
+              return 0;
+        }
+        list->time_step = atof( token );
+
+        /*read the finish time*/
+        token = strtok(NULL," \n");
+        if( !token ){
+              printf("Error while parsing TRAN command, please define finish time...\n");
+              printf("Line: %s\n",line);
+              return 0;
+        }
+        list->fin_time = atof( token );
+
+      }
 			else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
 
 /*
@@ -1215,6 +1639,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           			plot_num++;
         		}
 			}
+
 	
 		}	
 	}
