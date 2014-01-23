@@ -91,14 +91,16 @@ int main( int argc , char* argv[]){
 
 					plot_array = plot_create_vector( array_size , x->size);
 					if(plot_array == NULL)
-				{
-					perror("Error while allocating the ploting array\n");
-					exit(0);
-				}
+					{
+						perror("Error while allocating the ploting array\n");
+						exit(0);
+					}
 	 		
-				plot_set_vector_index(plot_array ,x ,0);
-			 		 	
-				plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file.txt");
+					plot_set_vector_index(plot_array ,x ,0);
+			 		if ( list.solving_method == METHOD_LU )
+						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_lu.txt");
+					else
+						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_chol.txt");
 				}
  			}
 		}
@@ -161,6 +163,8 @@ int main( int argc , char* argv[]){
  		sparse_vector* x;
  		gsl_vector* x_sparse;
 		gsl_vector* vector_sparse;
+		gsl_vector* vector_gsl;
+
  		
 
  		method = list.solving_method;
@@ -177,7 +181,7 @@ int main( int argc , char* argv[]){
  		double_vector_to_gsl_vector(vector_sparse,vector,vector_size);
 
  		/* print sparse matrix */
- 		cs_print(matrix,"sparse_matrix.txt",0);
+ 		//cs_print(matrix,"sparse_matrix.txt",0);
 
  		x = (sparse_vector*) malloc( vector_size * sizeof(sparse_vector));
 
@@ -187,13 +191,29 @@ int main( int argc , char* argv[]){
  				fprintf(stderr, "Solving Method Sparse LU failed\n" );
  			}
 
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , vector_size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		vector_gsl = gsl_vector_calloc(vector_size);
+ 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
+
+			plot_set_vector_index(plot_array ,vector_gsl ,0);
+			 		 	
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
+
+
  		}
  		else if( method == METHOD_CHOLESKY_SPARSE ){
 			if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
  				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
  			}
 
- 		}
+ 		}	
  		else if ( method == METHOD_CG_SPARSE ){
  			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse CG failed\n" );
@@ -215,7 +235,20 @@ int main( int argc , char* argv[]){
 			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
  			}
- 			
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , x_sparse->size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		
+			plot_set_vector_index(plot_array ,x_sparse ,0);
+			 		 	
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
+ 
+
  		}
  		else{
  			fprintf(stderr, "Solving method not specified\n");
