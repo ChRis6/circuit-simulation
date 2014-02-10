@@ -12,6 +12,7 @@
 #include "parse.h"
 #include "circuit_hash.h"
 #include "iter_solve.h"
+#include "iter_solve_sparse.h"
 #include "decomposition.h"
 #include "sparse_interface.h"
 #include "circuit_sim_sparse.h"
@@ -30,6 +31,7 @@ int main( int argc , char* argv[]){
 	int flag;
 	
 	gsl_matrix *matrix;
+	gsl_matrix *c_matrix;
 	gsl_vector *vector;
 	gsl_vector *x;
 	gsl_permutation* permutation;
@@ -59,7 +61,7 @@ int main( int argc , char* argv[]){
  	if ( !list.sparse ){
 
 
- 		flag = create_mna(&list, &matrix, &vector );
+ 		flag = create_mna(&list, &matrix, &vector, !TRANSIENT,&c_matrix);
  		if(!flag ){
  			printf("Error creating mna system\n");
  			return -1;
