@@ -1552,6 +1552,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 			}
       else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
         /*read the time step*/
+        list->transient_sim = 1;
         token = strtok(NULL," \n");
         if( !token ){
               printf("Error while parsing TRAN command, please define time step...\n");

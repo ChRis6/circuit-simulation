@@ -62,6 +62,7 @@ typedef struct list{
 	double itol;
 	unsigned int nz;
 	char sparse;
+	char transient_sim;
 
 	double time_step;
 	double fin_time;
