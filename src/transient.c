@@ -1,5 +1,4 @@
 #include "transient.h"
-#include <math.h>
 
 #define PI (3.141592653589793)
 
@@ -70,4 +69,31 @@ double calc_trans_pulse(double i1,double i2,double td,double tr,double tf,double
 	else{
 		return i1;
 	}
+}
+
+
+double calc_trans_pwl(PAIR_LIST* list, double t)
+{
+	int num_of_pairs = list->n;
+	PWL_PAIR_T* curr = list->head;
+	double slope,b;
+	int i = 0;
+
+	while( i < num_of_pairs)
+	{
+		double t1 = curr->ti;
+		double t2 = curr->next->ti;
+		if(t >= t1 && t <= t2)
+		{
+			double i1 = curr->ii;
+			double i2 = curr->next->ii;
+
+			slope = (i2 - i1) / (t2 - t1);
+			b = i1 - slope * t1;
+			return (slope*t + b);
+		}
+		curr = curr->next;
+		i++;
+	}
+	return -1;
 }
