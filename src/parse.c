@@ -594,6 +594,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the tc2 value*/
           node->source_v.tc2 = atof(token);
           *type = NODE_SOURCE_V_TYPE;
+          node->source_v.pulse_type = PULSE_EXP;
           return 1;
 
         }
@@ -653,6 +654,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the ph value*/
           node->source_v.ph = atof(token);
           *type = NODE_SOURCE_V_TYPE;
+          node->source_v.pulse_type = PULSE_SIN;
           return 1;
 
         }
@@ -722,6 +724,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the per value*/
           node->source_v.per = atof(token);
           *type = NODE_SOURCE_V_TYPE;
+          node->source_v.pulse_type = PULSE_PULSE;
           return 1;
 
         }
@@ -908,6 +911,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the tc2 value*/
           node->source_i.tc2 = atof(token);
           *type = NODE_SOURCE_I_TYPE;
+          node->source_i.pulse_type = PULSE_EXP;
           return 1;
 
 
@@ -964,6 +968,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the ph value*/
           node->source_i.df = atof(token);
           *type = NODE_SOURCE_I_TYPE;
+          node->source_i.pulse_type = PULSE_SIN;
           return 1;
         }
 
@@ -1026,27 +1031,42 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /*store the per value*/
           node->source_i.per = atof(token);
           *type = NODE_SOURCE_I_TYPE;
+          node->source_i.pulse_type = PULSE_PULSE;
           return 1;
         }
 
         else if(strcmp(token,"PWL") == 0 || strcmp(token,"pwl")){
 
+
+          PAIR_LIST* pair_list = create_pair_list();
+          if(!pair_list){
+          	printf("Not enough memory for pair list...\n");
+          	return 0;
+          }
+
+          
           while(token != NULL){
+          	double ti,ii;
+            
             token = strtok(NULL,"() \n");
             if(token == NULL){
               printf("No time value specified for the pair\n");
               return 0;
             }
             /*store the ti value of the pair*/
-            
+          	ti = atof(token);
+
             token = strtok(NULL,"() \n");
             if(token == NULL){
               printf("No voltage value specified for the pair\n");
               return 0;
             }
-            /*store the ii voltage value of the pair*/
-
+            ii = atof(token);
+            add_to_pair_list(pair_list, ti, ii);
+            
           }
+          node->source_i.pulse_type = PULSE_PULSE;
+          node->source_i.pair_list = pair_list;
         }
       }
 			

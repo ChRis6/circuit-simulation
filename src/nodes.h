@@ -14,6 +14,25 @@ enum{
 	NODE_BJT_TYPE
 };
 
+enum  {  
+	PULSE_EXP=0,
+	PULSE_SIN,
+	PULSE_PWL,
+	PULSE_PULSE
+};
+
+typedef struct pwl_pair{
+	double ti;
+	double ii;
+
+	struct pwl_pair* next;
+}PWL_PAIR_T;
+
+typedef struct pair_list_t{
+	
+	PWL_PAIR_T* head;
+	int n;
+}PAIR_LIST;
 /*
  * R: resistor
  * C: capacity
@@ -55,7 +74,9 @@ typedef struct source_v {
 	int mna_row;
 
 	double value;
-	
+
+	char pulse_type;
+
 	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
 	double i1;
 	double i2;
@@ -76,6 +97,7 @@ typedef struct source_v {
 	double per;
 
 	/*need to implement a dynamic way to add (ti ii) pairs for PWL transient spec*/
+	PAIR_LIST* pair_list;
 
 }SOURCE_V_T;
 
@@ -86,6 +108,8 @@ typedef struct source_i{
 
 	double value;
 
+	char pulse_type;
+
 	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
 	double i1;
 	double i2;
@@ -106,6 +130,7 @@ typedef struct source_i{
 	double per;
 
 	/*need to implement a dynamic way to add (ti ii) pairs for PWL transient spec*/
+	PAIR_LIST* pair_list;
 }SOURCE_I_T;
 
 /* MOSFET transistor*/

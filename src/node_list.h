@@ -109,4 +109,14 @@ int add_node_to_list( LIST* list, NODE* circuit_node , int type);
  */
 LIST_NODE* list_search_by_name( LIST* list , char *name);
 
+/**
+ * Creates an empty pair list
+ */
+PAIR_LIST* create_pair_list();
+
+/**
+ * Adds a pair to the list
+ */
+int add_to_pair_list(PAIR_LIST* pair_list, double ti, double ii);
+
 #endif

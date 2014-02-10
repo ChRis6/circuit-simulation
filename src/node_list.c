@@ -215,3 +215,45 @@ LIST_NODE* list_search_by_name( LIST* list , char *name){
 
 
 
+/**
+ * Creates an empty pair list
+ */
+PAIR_LIST* create_pair_list(){
+
+	PAIR_LIST* list = NULL;
+
+	list = (PAIR_LIST*) malloc(sizeof(PAIR_LIST));
+	if(!list)
+		return NULL;
+
+	list->head = NULL;
+	list->n = 0;
+}
+
+/**
+ * Adds a pair to the list
+ */
+int add_to_pair_list(PAIR_LIST* pair_list, double ti, double ii){
+
+	PWL_PAIR_T* new_pair = NULL;
+	new_pair = (PWL_PAIR_T*) malloc(sizeof(PWL_PAIR_T));
+	if(!new_pair)
+		return 0;
+
+	new_pair->ti = ti;
+	new_pair->ii = ii;
+	new_pair->next = NULL;
+
+	// add to list
+	if( pair_list->n == 0){
+		pair_list->n = 1;
+		pair_list->head = new_pair; 
+	}
+	else{
+
+		pair_list->n = pair_list->n + 1;
+		new_pair->next = pair_list->head;
+		pair_list->head = new_pair;
+	}
+	return 1;
+}
