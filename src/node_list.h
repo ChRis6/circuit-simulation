@@ -15,8 +15,9 @@
 #define METHOD_CG_SPARSE       7
 #define METHOD_BICG_SPARSE     8
 
-#define METHOD_TR 9 //Transient Trapezoidal
-#define METHOD_BE 10 //Backward-Euler
+#define NON_TRANSIENT 10
+#define METHOD_TR 11 //Transient Trapezoidal
+#define METHOD_BE 12 //backward-Euler
 
 
 #define PLOT_ON  1

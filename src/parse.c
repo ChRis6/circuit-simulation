@@ -1548,11 +1548,11 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
         else if(strcmp(token,"METHOD=TR") == 0 || strcmp(token,"method=tr") == 0){
           /*Trapezoidal Transient Method*/
-          list->transient_sim = 1; 
+          list->transient_sim = METHOD_TR; 
         }
         else if(strcmp(token,"METHOD=BE") == 0 || strcmp(token,"method=be") == 0){
           /*Trapezoidal Transient Method*/
-          list->transient_sim = 2; 
+          list->transient_sim = METHOD_BE; 
         }
 
 

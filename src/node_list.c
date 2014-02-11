@@ -38,7 +38,7 @@ void init_list(LIST* list){
 	list->itol   = 1e-3;
 	list->nz     = 0;
 	list->sparse = 0;
-	list->transient_sim = 0;
+	list->transient_sim = 10;
 }
 
 
