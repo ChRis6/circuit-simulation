@@ -285,7 +285,7 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
 	}
 
 	array_size = plot_find_size( list.dc_sweep.start_v, list.dc_sweep.end_v , list.dc_sweep.inc);
-	printf("Array Size for the plot: %d\n",array_size);
+	//printf("Array Size for the plot: %d\n",array_size);
 
 	plot_array = plot_create_vector( array_size , x->size);
 	if(plot_array == NULL)
@@ -294,7 +294,7 @@ void dc_sweep(LIST list, gsl_matrix* matrix, gsl_vector* vector, gsl_vector* x,g
 		exit(0);
 	}
 	
-	printf("%f %f\n",list.dc_sweep.start_v,list.dc_sweep.end_v);
+	//printf("%f %f\n",list.dc_sweep.start_v,list.dc_sweep.end_v);
 	
  	for (k = 0; k < array_size ; k++)
  	{

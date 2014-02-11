@@ -55,7 +55,7 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
- 	printf("Solving Method = %d\n",list.solving_method);
+ 	printf("Solving Method = %s\n",solving_method_names[list.solving_method-1]);
  	if ( !list.sparse ){
 
 
