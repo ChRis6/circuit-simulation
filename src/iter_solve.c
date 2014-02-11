@@ -265,7 +265,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	if(normb < EPS)
 		normb =1;
 
-	while( iteration < iter && ( (lh_norm(r) / normb) > tolerance )){
+	while( iteration < 5*iter && ( (lh_norm(r) / normb) > tolerance )){
 
 		iteration++;
 
