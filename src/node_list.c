@@ -229,6 +229,8 @@ PAIR_LIST* create_pair_list(){
 
 	list->head = NULL;
 	list->n = 0;
+	
+	return list;
 }
 
 /**
