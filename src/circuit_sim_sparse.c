@@ -14,7 +14,12 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
 	sparse_vector* vector = NULL;
 	sparse_matrix* matrix = NULL;
 	LIST_NODE* curr;
-	
+
+	int num_nodes = ht_get_num_nodes(list->hashtable);
+	int* nodeids = (int*)calloc(num_nodes, sizeof(int));
+	if(!nodeids)
+		return NULL;
+
 
 	int m2_elements_found = 0;       // # of elements in group 2
 
@@ -135,7 +140,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  			curr->node.source_v.mna_row = matrix_row;
 
  			double value;
-
+ 			
  			/* set vector value */
  			value = vector[matrix_row];
  			value += curr->node.source_v.value;
@@ -144,37 +149,50 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  			int plus_node  = curr->node.source_v.node1 - 1;
  			int minus_node = curr->node.source_v.node2 - 1;
 
+
+
+
  			/* <+> */
  			if( plus_node != -1 ){
 
- 				if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
- 				}
+ 				if( nodeids[plus_node] == 0 ){
+ 					if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					nodeids[plus_node] = 1;
+ 				
 
- 				if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
+ 					if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
  				}
+ 			
  			}
 
  			/* <-> */
  			if( minus_node != -1 ){
- 				if( !cs_entry(matrix, matrix_row , minus_node , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
- 				}
- 				if( !cs_entry(matrix, minus_node , matrix_row , -1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
+ 				
+ 				if( nodeids[minus_node] == 0 ){
+ 					if( !cs_entry(matrix, matrix_row , minus_node , -1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					if( !cs_entry(matrix, minus_node , matrix_row , -1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					nodeids[minus_node]=1;
+ 				
  				}
  			}	 
  		}
@@ -185,43 +203,53 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  		else if ( curr->type == NODE_INDUCTANCE_TYPE  ){
  			m2_elements_found++;
  			int matrix_row = list->hashtable->num_nodes  + m2_elements_found - 1 ;
-		
+			
+
  			/* Change the matrix */
  			int plus_node  = curr->node.inductance.node1 - 1;
  			int minus_node = curr->node.inductance.node2 - 1;
  			/* <+> */
  			if( plus_node != -1 ){
+ 				if( nodeids[plus_node] == 0 ){
+ 					if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
 
- 				if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
+ 					if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					nodeids[plus_node]=1;
  				}
-
- 				if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
- 				}
+ 				
  			}
 
  			/* <-> */
  			if( minus_node != -1 ){
- 				if( !cs_entry(matrix, matrix_row , minus_node , 1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
+ 				if( nodeids[minus_node] == 0 ){
+ 					if( !cs_entry(matrix, matrix_row , minus_node , -1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					if( !cs_entry(matrix, minus_node , matrix_row , -1.0 ) ){
+ 		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
+ 						free(vector);
+ 						cs_spfree(matrix);
+ 						return NULL;	
+ 					}
+ 					nodeids[minus_node]=1;
  				}
- 				if( !cs_entry(matrix, minus_node , matrix_row , -1.0 ) ){
- 		 			fprintf(stderr, "Error while inserting element in sparse matrix\n");
- 					free(vector);
- 					cs_spfree(matrix);
- 					return NULL;	
- 				}
+ 				
+
  			}
+ 			
  		}
  	} 	
 
@@ -236,6 +264,8 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  	}
 	*vector_len = matrix->n;
  	*b = vector;
+
+ 	cs_print(matrix,"sparse_matrix.txt",0);
  	return matrix;
 }
 

@@ -216,7 +216,45 @@ LIST_NODE* list_search_by_name( LIST* list , char *name){
 	return NULL;
 }
 
+/*
+ *Search if a voltage source with the same plus node has been added to the sparce matrix
+ * 
+ * Returns -1 if list is NULL, 1 if found and 0 if not found	
+ *
+ */
+int list_search_plus_node(LIST* list, int plus_node){
 
+	LIST_NODE* curr;
+	if( !list)
+		return -1;
+
+	for( curr = list->head ; curr ; curr = curr->next){
+		if( curr->node.source_v.node1 == plus_node || curr->node.source_v.node2 == plus_node )
+			return 1;
+		}
+	
+	return 0;
+}
+
+/*
+ *Search if a voltage source with the same minus node has been added to the sparce matrix
+ * 
+ * Returns -1 if list is NULL, 1 if found and 0 if not found	
+ *
+ */
+int list_search_minus_node(LIST* list, int minus_node){
+
+	LIST_NODE* curr;
+	if( !list)
+		return -1;
+
+	for( curr = list->head ; curr ; curr = curr->next){
+		if( curr->node.source_v.node2 == minus_node || curr->node.source_v.node1 == minus_node )
+			return 1;
+		}
+	
+	return 0;
+}
 
 /**
  * Creates an empty pair list
@@ -261,4 +299,26 @@ int add_to_pair_list(PAIR_LIST* pair_list, double ti, double ii){
 		pair_list->head = new_pair;
 	}
 	return 1;
+}
+
+LIST* create_source_list(LIST* node_list){
+	LIST* new_list;
+	new_list=(LIST*)malloc(sizeof(LIST));
+
+	new_list->head=NULL;
+	new_list->len=0;
+
+	LIST_NODE* curr = node_list->head;
+
+	for(;curr;curr=curr->next){
+		if(curr->type == NODE_SOURCE_V_TYPE || curr->type == NODE_SOURCE_I_TYPE ){
+			if(!add_node_to_list( new_list, &(curr->node) , curr->type))
+				return NULL;
+			
+		}
+
+	}
+
+	return new_list;
+
 }
