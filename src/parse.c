@@ -445,6 +445,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         return 0 ;
       }
       strcpy( node->source_v.name , token);
+      node->source_v.is_ac = 0;
 
       /* read <+> node */
       token = strtok(NULL," ");
@@ -595,6 +596,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.tc2 = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_EXP;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -655,6 +657,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.ph = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_SIN;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -725,6 +728,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.per = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_PULSE;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -761,6 +765,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
           node->source_v.pulse_type = PULSE_PULSE;
           node->source_v.pair_list = pair_list;
+          node->source_v.is_ac = 1;
+          return 1;
         }
       }
     }
@@ -778,6 +784,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         return 0 ;
       }
       strcpy( node->source_i.name , token);
+      node->source_i.is_ac = 0;
 
       /* read <+> node */
       token = strtok(NULL," ");
@@ -926,6 +933,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.tc2 = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_EXP;
+          node->source_i.is_ac = 1;
+
           return 1;
 
 
@@ -983,6 +992,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.df = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_SIN;
+          node->source_i.is_ac = 1;
           return 1;
         }
 
@@ -1046,6 +1056,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.per = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_PULSE;
+          node->source_i.is_ac = 1;
           return 1;
         }
 
@@ -1081,6 +1092,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
           node->source_i.pulse_type = PULSE_PULSE;
           node->source_i.pair_list = pair_list;
+          node->source_i.is_ac = 1;
+          return 1;
         }
       }
       

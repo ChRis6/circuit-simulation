@@ -76,6 +76,7 @@ typedef struct source_v {
 	double value;
 
 	char pulse_type;
+	char is_ac;
 
 	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
 	double i1;
@@ -109,6 +110,7 @@ typedef struct source_i{
 	double value;
 
 	char pulse_type;
+	char is_ac;
 
 	/*values for transient spec, might need to add specific nodes for each type (EXP,SIN etc) to save memory*/
 	double i1;
