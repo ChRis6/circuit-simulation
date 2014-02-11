@@ -5,7 +5,7 @@
 
 #define HASH_SIZE 10000
 
-char *solving_method_names[20] = {"LU","CHOLESKY","CG","BICG","LU-SPARSE","CHOLESKY-SPARSE"
+char *solving_method_names[20] = {"LU","CHOLESKY","CG","BICG","LU-SPARSE","CHOLESKY-SPARSE",
 								  "CG-SPARSE","BICG-SPARSE","TR","BE"};
 
 /*

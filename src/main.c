@@ -18,6 +18,12 @@
 #include "circuit_sim_sparse.h"
 #include "plot.h"
 
+static void print_gsl_vector(gsl_vector* vector){
+	int i;
+	for(i = 0; i < vector->size; i++)
+		fprintf(stderr, "%f\n", gsl_vector_get(vector,i));
+
+}
 
 static void double_vector_to_gsl_vector(gsl_vector* gsl_v,double *doubl_vec,int size_n)
 {
@@ -99,6 +105,8 @@ int main( int argc , char* argv[]){
 					}
 	 		
 					plot_set_vector_index(plot_array ,x ,0);
+					fprintf(stderr, "Priting solution found...\n");
+					print_gsl_vector(x);
 			 		if ( list.solving_method == METHOD_LU )
 						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_lu.txt");
 					else
@@ -107,7 +115,7 @@ int main( int argc , char* argv[]){
  			}
 		}
 		else if ( list.solving_method == METHOD_CG ){
-			printf("Solving using CG...\n");
+			//printf("Solving using CG...\n");
 
 			if( list.dc_sweep.node != NULL ){
 				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
@@ -126,12 +134,13 @@ int main( int argc , char* argv[]){
 				}
 	 		
 				plot_set_vector_index(plot_array ,x ,0);
-			 		 	
+			 	fprintf(stderr, "Priting solution found...\n");
+			 	print_gsl_vector(x);
 				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cg.txt");
 			}
 		}
 		else if( list.solving_method == METHOD_BICG){
-			printf("Solving using BICG...\n");
+			//printf("Solving using BICG...\n");
 			if( list.dc_sweep.node != NULL ){
 				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
 			}
@@ -149,7 +158,8 @@ int main( int argc , char* argv[]){
 				}
 	 		
 				plot_set_vector_index(plot_array ,x ,0);
-			 		 	
+			 	fprintf(stderr, "Priting solution found...\n");
+			 	print_gsl_vector(x);
 				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
 			}
 
@@ -256,10 +266,10 @@ int main( int argc , char* argv[]){
  			fprintf(stderr, "Solving method not specified\n");
  		}
 
- 		fprintf(stderr, "PRINTING SOLUTION FOUND:\n");
- 		for( i = 0 ; i < vector_size ; i++)
- 			fprintf(stderr, "%f\n", x[i]);
- 		fprintf(stderr, "\n");
+ 		//fprintf(stderr, "PRINTING SOLUTION FOUND:\n");
+ 		//for( i = 0 ; i < vector_size ; i++)
+ 		//	fprintf(stderr, "%f\n", x[i]);
+ 		//fprintf(stderr, "\n");
 
  		/* clean up before exit */
  		cs_spfree(matrix);
@@ -268,8 +278,6 @@ int main( int argc , char* argv[]){
  	}
 
  	 	
- 
-
 /*
  * Clean up
  */

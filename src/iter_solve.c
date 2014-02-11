@@ -46,8 +46,8 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 
 	int iteration = 0 ;
 
-	print_vector_gsl(b);
-	print_matrix_gsl(A);
+	//print_vector_gsl(b);
+	//print_matrix_gsl(A);
 
 
 	gsl_vector* r;
