@@ -22,6 +22,8 @@
 #define PLOT_ON  1
 #define PLOT_OFF 0
 
+extern char *solving_method_names[20];
+
 /* a single node  list*/
 typedef struct list_node{
 

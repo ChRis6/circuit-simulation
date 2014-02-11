@@ -168,8 +168,8 @@ gsl_vector* sparse_solve_cg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0){
 	free(p_vec);
 
 	/* result is written in x0 */
-	printf("going to print x0\n");
-	print_vector_gsl(x0);
+	//printf("going to print x0\n");
+	//print_vector_gsl(x0);
 	return x0;
 }
 
@@ -384,7 +384,7 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 
 	cs_free(A_T);
 
-	printf("going to print x0\n");
-	print_vector_gsl(x0);
+	//printf("going to print x0\n");
+	//print_vector_gsl(x0);
 	return x0;
 }

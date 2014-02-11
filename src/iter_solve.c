@@ -77,8 +77,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 		return NULL;
 
 	gsl_vector* M = lh_get_inv_diag(A);
-	//print_vector_gsl(M);
-
+	
 	if( !M ){
 		gsl_vector_free(r);
 		gsl_vector_free(b1);
@@ -168,10 +167,7 @@ gsl_vector* iter_solve_cg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 }
 
 gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
-	printf("mpike \n");
-	print_vector_gsl(b);
-	print_matrix_gsl(A);
-
+	
 	int iteration=0;
 	double normb;
 	double alpha,beta,rho,rho1,omega;
@@ -338,7 +334,7 @@ gsl_vector* iter_solve_bicg(gsl_matrix* A , gsl_vector* b , gsl_vector* x0 ){
 	gsl_vector_free(temp);
 
 
-	print_vector_gsl(x0);
+	//print_vector_gsl(x0);
 	return x0;
 }
 
