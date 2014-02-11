@@ -14,8 +14,8 @@
 #include "plot.h"
 
 
-#define	RESISTANCE_NUM_PARSE_ELEMENTS  4
-#define	CAPACITY_NUM_PARSE_ELEMENTS    4
+#define RESISTANCE_NUM_PARSE_ELEMENTS  4
+#define CAPACITY_NUM_PARSE_ELEMENTS    4
 #define INDUCTANCE_NUM_PARSE_ELEMENTS  4
 #define MOSFET_NUM_PARSE_ELEMENTS      6 
 
@@ -27,55 +27,55 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type);
  */
 int parse_netlist(char* filename , LIST* list){
 
-	char line[ MAX_LINE_SIZE + 1];
-	NODE element_node;
-	int element_type;
-	int line_number;
-	int res;
+  char line[ MAX_LINE_SIZE + 1];
+  NODE element_node;
+  int element_type;
+  int line_number;
+  int res;
 
-	if( !filename || !list  )
-		return 0;
+  if( !filename || !list  )
+    return 0;
 
-	FILE* file;
-	file = fopen(filename,"r");
-	if( !file )
-		return 0;
+  FILE* file;
+  file = fopen(filename,"r");
+  if( !file )
+    return 0;
 
-	line_number = 1 ;
-	/*Read until EOF */
-	while( !feof(file)){
+  line_number = 1 ;
+  /*Read until EOF */
+  while( !feof(file)){
 
-		/* Get a single line */
-		if( fgets( line , MAX_LINE_SIZE , file) != NULL ) {
+    /* Get a single line */
+    if( fgets( line , MAX_LINE_SIZE , file) != NULL ) {
 
-			/* check for comment,else process */
-			if( line[0] != '*'){
-				res = get_node_from_line( list, line , &element_node , &element_type);
-				if( res == 1 ){
+      /* check for comment,else process */
+      if( line[0] != '*'){
+        res = get_node_from_line( list, line , &element_node , &element_type);
+        if( res == 1 ){
 
-					/* add node read and store at list */
-					//printf("NODE READ: %s , %d , %d , %g \n",element_node.resistance.name , element_node.resistance.node1 , element_node.resistance.node2 , element_node.resistance.value);
-					res = add_node_to_list(list , &element_node , element_type);
-					if( !res ){
-						printf("NO MEMORY\n");
-						return 0;
-					}
-				}
-				else if( res == 0 ){
+          /* add node read and store at list */
+          //printf("NODE READ: %s , %d , %d , %g \n",element_node.resistance.name , element_node.resistance.node1 , element_node.resistance.node2 , element_node.resistance.value);
+          res = add_node_to_list(list , &element_node , element_type);
+          if( !res ){
+            printf("NO MEMORY\n");
+            return 0;
+          }
+        }
+        else if( res == 0 ){
 
-					/* Error while parsing line */
-					fclose(file);
-					printf("Error while parsing.Line %d : %s\n",line_number , line);
-					return 0;
-				}
-			}
+          /* Error while parsing line */
+          fclose(file);
+          printf("Error while parsing.Line %d : %s\n",line_number , line);
+          return 0;
+        }
+      }
 
-		}
-		line_number++;
-	}
+    }
+    line_number++;
+  }
 
   if( list->has_reference == 1 ){
-	 return 1;
+   return 1;
   }
   else{
     printf("No reference node (ground) specified\n");
@@ -97,37 +97,37 @@ int parse_netlist(char* filename , LIST* list){
 
 static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
-	char c;
-	char* token;
+  char c;
+  char* token;
   int flag;
   static int node_count = 1;
 
 
-	if( line == NULL || node == NULL  || type == NULL )
-		return 0;
+  if( line == NULL || node == NULL  || type == NULL )
+    return 0;
 
   //printf("\nParsing line: %s\n",line);
-	c = line[0];
+  c = line[0];
 
 
-	switch(c){
-		case 'R':
-		case 'r':{
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
+  switch(c){
+    case 'R':
+    case 'r':{
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
 
-				return 0 ;
-			}
-			strcpy( node->resistance.name , token);
+        return 0 ;
+      }
+      strcpy( node->resistance.name , token);
 
-			/* 
+      /* 
        *Read <+> node
        */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -159,15 +159,15 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->resistance.node1 = n;
         }
       }
-			
+      
 
       /* 
        * Read <-> node
        */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
 
       /* check for reference node (ground) */
@@ -199,45 +199,45 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           ht_get(list->hashtable,token,&n);
           node->resistance.node2 = n;
         }
-      }      	
+      }       
 
       //node->resistance.node2 = atoi(token);
 
-			/* read value node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
-    			
+      /* read value node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
+          
       node->resistance.value = atof(token);
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_RESISTANCE_TYPE;
-				return 1;
-			}
-			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s , garbage token : %s\n" , line , token);
-				return 0;
-			}
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_RESISTANCE_TYPE;
+        return 1;
+      }
+      else{
+        /* tokens were found.print for debugging...*/
+        printf("LINE: %s , garbage token : %s\n" , line , token);
+        return 0;
+      }
 
-		}
-		case 'C':
-		case 'c':{
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->capacity.name , token);			
+    }
+    case 'C':
+    case 'c':{
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->capacity.name , token);     
 
-			/* read <+> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read <+> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -269,13 +269,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
       } 
 
-//			node->capacity.node1 = atoi(token);
-			
-			/* read <-> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+//      node->capacity.node1 = atoi(token);
+      
+      /* read <-> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -307,40 +307,40 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
       } 
 
-			/* read value node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
-			node->capacity.value = atof(token);
+      /* read value node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
+      node->capacity.value = atof(token);
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_CAPACITY_TYPE;
-				return 1;
-			}
-			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s , garbage token : %s\n" , line , token);
-				return 0;
-			}
-		}
-		case 'L':
-		case 'l':{
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_CAPACITY_TYPE;
+        return 1;
+      }
+      else{
+        /* tokens were found.print for debugging...*/
+        printf("LINE: %s , garbage token : %s\n" , line , token);
+        return 0;
+      }
+    }
+    case 'L':
+    case 'l':{
 
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->inductance.name , token);
-			
-			/* read <+> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->inductance.name , token);
+      
+      /* read <+> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
         node->inductance.node1 = 0;
@@ -372,13 +372,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
       } 
 
 
-//			node->inductance.node1 = atoi(token);
-			
-			/* read <-> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+//      node->inductance.node1 = atoi(token);
+      
+      /* read <-> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -411,46 +411,46 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
       } 
 
 
-			//node->inductance.node2 = atoi(token);
+      //node->inductance.node2 = atoi(token);
 
-			/* read value node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
-			node->inductance.value = atof(token);
+      /* read value node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
+      node->inductance.value = atof(token);
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_INDUCTANCE_TYPE;
-				return 1;
-			}
-			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s , garbage token: %s\n" , line , token);
-				return 0;
-			}			
-		}
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_INDUCTANCE_TYPE;
+        return 1;
+      }
+      else{
+        /* tokens were found.print for debugging...*/
+        printf("LINE: %s , garbage token: %s\n" , line , token);
+        return 0;
+      }     
+    }
 
-		/*
-		 * VOLTAGE SOURCE
-		 */
-		case 'v':
-		case 'V':{
+    /*
+     * VOLTAGE SOURCE
+     */
+    case 'v':
+    case 'V':{
 
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->source_v.name , token);
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->source_v.name , token);
 
-			/* read <+> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read <+> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -483,13 +483,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
       } 
 
 
-			//node->source_v.node1 = atoi(token);
+      //node->source_v.node1 = atoi(token);
 
-			/* read <-> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read <-> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -521,23 +521,23 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
       } 
 
-			//node->source_v.node2 = atoi(token);
+      //node->source_v.node2 = atoi(token);
 
-			/* read value node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
-			node->source_v.value = atof(token);
+      /* read value node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
+      node->source_v.value = atof(token);
 
 
-			/* NO MORE TOKENS.IF FOUND CHECK FOR TRANSIENT SPEC*/
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_SOURCE_V_TYPE;
-				return 1;
-			}
-			else{
+      /* NO MORE TOKENS.IF FOUND CHECK FOR TRANSIENT SPEC*/
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_SOURCE_V_TYPE;
+        return 1;
+      }
+      else{
 
         /*check for exponential transient spec*/
         if (strcmp(token,"EXP") == 0 || strcmp(token,"exp") == 0){
@@ -731,6 +731,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
         else if(strcmp(token,"PWL") == 0 || strcmp(token,"pwl")){
 
+
           PAIR_LIST* pair_list = create_pair_list();
           if(!pair_list){
             printf("Not enough memory for pair list...\n");
@@ -760,28 +761,29 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
           node->source_v.pulse_type = PULSE_PULSE;
           node->source_v.pair_list = pair_list;
-			}
+        }
+      }
     }
 
 
-		/*
-		 * CURRENT SOURCE
-		 */
-		case 'i':
-		case 'I':{
+    /*
+     * CURRENT SOURCE
+     */
+    case 'i':
+    case 'I':{
 
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->source_i.name , token);
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->source_i.name , token);
 
-			/* read <+> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read <+> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -815,13 +817,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
       }
 
 
-			//node->source_i.node1 = atoi(token);
+      //node->source_i.node1 = atoi(token);
 
-			/* read <-> node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
+      /* read <-> node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -854,24 +856,24 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
       }
 
-			//node->source_i.node2 = atoi(token);
+      //node->source_i.node2 = atoi(token);
 
-			/* read value node */
-			token = strtok(NULL," ");
-			if( token == NULL){
-				return 0;
-			}
-			node->source_i.value = atof(token);
+      /* read value node */
+      token = strtok(NULL," ");
+      if( token == NULL){
+        return 0;
+      }
+      node->source_i.value = atof(token);
 
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_SOURCE_I_TYPE;
-				return 1;
-			}
-			else{
-				
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_SOURCE_I_TYPE;
+        return 1;
+      }
+      else{
+        
         /*check for exponential transient spec*/
         if (strcmp(token,"EXP") == 0 || strcmp(token,"exp") == 0){
           token = strtok(NULL,"() \n");
@@ -1052,13 +1054,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
           PAIR_LIST* pair_list = create_pair_list();
           if(!pair_list){
-          	printf("Not enough memory for pair list...\n");
-          	return 0;
+            printf("Not enough memory for pair list...\n");
+            return 0;
           }
 
           
           while(token != NULL){
-          	double ti,ii;
+            double ti,ii;
             
             token = strtok(NULL,"() \n");
             if(token == NULL){
@@ -1066,7 +1068,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
             }
             /*store the ti value of the pair*/
-          	ti = atof(token);
+            ti = atof(token);
 
             token = strtok(NULL,"() \n");
             if(token == NULL){
@@ -1081,27 +1083,27 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.pair_list = pair_list;
         }
       }
-			
+      
 
-		}
+    }
 
-		/*
-		 * MOSFET transistor
-		 */
-		case 'M':
-		case 'm':{
+    /*
+     * MOSFET transistor
+     */
+    case 'M':
+    case 'm':{
 
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->mosfet.name , token);
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->mosfet.name , token);
 
-			/* read drain */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read drain */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1134,13 +1136,13 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
       }
 
-			//node->mosfet.drain = atoi(token);
+      //node->mosfet.drain = atoi(token);
 
-			/* read gate */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
-			
+      /* read gate */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
+      
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
         node->mosfet.gate = 0;
@@ -1175,10 +1177,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       //node->mosfet.gate = atoi(token);
 
-			/* read source */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read source */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1213,10 +1215,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       //node->mosfet.source = atoi(token);
 
-			/* read body */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read body */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1251,47 +1253,47 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       //node->mosfet.body = atoi(token);
 
-			/* read length */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
-			node->mosfet.l = atof(token);
+      /* read length */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
+      node->mosfet.l = atof(token);
 
-			/* read width */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
-			node->mosfet.w = atof(token);
+      /* read width */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
+      node->mosfet.w = atof(token);
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_MOSFET_TYPE;
-				return 1;
-			}
-			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s  garbage token : %s\n" , line , token);
-				return 0;
-			}
-		}
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_MOSFET_TYPE;
+        return 1;
+      }
+      else{
+        /* tokens were found.print for debugging...*/
+        printf("LINE: %s  garbage token : %s\n" , line , token);
+        return 0;
+      }
+    }
 
-		/*
-		 * Bipolar junction transistor
-		 */
-		case 'Q':
-		case 'q':{
-			/* read name */
-			token = strtok(line," ");
-			if( token == NULL ){
-				return 0 ;
-			}
-			strcpy( node->bjt.name , token);
+    /*
+     * Bipolar junction transistor
+     */
+    case 'Q':
+    case 'q':{
+      /* read name */
+      token = strtok(line," ");
+      if( token == NULL ){
+        return 0 ;
+      }
+      strcpy( node->bjt.name , token);
 
-			/* read collector */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read collector */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1326,10 +1328,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       //node->bjt.collector = atoi(token);
 
-			/* read base */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read base */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1364,10 +1366,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       //node->bjt.base  = atoi(token);
 
-			/* read emitter */
-			token = strtok(NULL," ");
-			if( token == NULL )
-				return 0;
+      /* read emitter */
+      token = strtok(NULL," ");
+      if( token == NULL )
+        return 0;
 
       /* check for reference node (ground) */
       if( strcmp(token,"0") == 0 ){
@@ -1398,173 +1400,172 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           ht_get(list->hashtable,token,&n);
           node->bjt.emitter = n;
         }
-      }			
+      }     
 
 
       //node->bjt.emitter = atoi(token);
 
-			/* more will be added later */
-			//
-			//			HERE
-			//
+      /* more will be added later */
+      //
+      //      HERE
+      //
 
 
-			/* NO MORE TOKENS.IF FOUND RETURN ERROR */
-			token = strtok(NULL," \n");
-			if( token == NULL ){
-				*type = NODE_BJT_TYPE;
-				return 1;
-			}
-			else{
-				/* tokens were found.print for debugging...*/
-				printf("LINE: %s  garbage token : %s\n" , line , token);
-				return 0;
-			}
+      /* NO MORE TOKENS.IF FOUND RETURN ERROR */
+      token = strtok(NULL," \n");
+      if( token == NULL ){
+        *type = NODE_BJT_TYPE;
+        return 1;
+      }
+      else{
+        /* tokens were found.print for debugging...*/
+        printf("LINE: %s  garbage token : %s\n" , line , token);
+        return 0;
+      }
 
-		}
+    }
 
-		/*
-		 * DIODE
-		 */
+    /*
+     * DIODE
+     */
 
 
-		/*
-		 * Commands
-		 */
-		case '.':{
+    /*
+     * Commands
+     */
+    case '.':{
 
-			char* temp = line;
-			token = strtok(temp," ");
-				
-			if( !token )
-				return 0;
+      char* temp = line;
+      token = strtok(temp," ");
+        
+      if( !token )
+        return 0;
 
-			/* solving method */
-			if( strcmp(token,".OPTIONS") == 0 || strcmp(token,".options") == 0 ){
+      /* solving method */
+      if( strcmp(token,".OPTIONS") == 0 || strcmp(token,".options") == 0 ){
 
-				token = strtok(NULL," \n");
-				//printf("Token after .options :%s\n",token);
-				if( !token ){
-					printf("Error while parsing...\n");
+        token = strtok(NULL," \n");
+        //printf("Token after .options :%s\n",token);
+        if( !token ){
+          printf("Error while parsing...\n");
           printf("Must define an option \n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
+          printf("Line : %s\n", line );
+          return 0;
+        }
         if( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0 ){
           list->solving_method = METHOD_LU_SPARSE;
           list->sparse = 1;
           return 2;
         }
-				//printf("TOKEN AFTER .OPTIONS :%s\n",token);
-				else if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
-					token = strtok(NULL," \n");
-					if(!token){
-						list->solving_method = METHOD_CHOLESKY;
-						return 2;
-					}
+        //printf("TOKEN AFTER .OPTIONS :%s\n",token);
+        else if( strcmp(token,"SPD") == 0 || strcmp(token,"spd") == 0 ){
+          token = strtok(NULL," \n");
+          if(!token){
+            list->solving_method = METHOD_CHOLESKY;
+            return 2;
+          }
 
-					/*------  .OPTIONS SPD ITER----------------*/
-					if( strcmp(token,"ITER") == 0 || strcmp(token,"ITER") == 0){
-						list->solving_method = METHOD_CG;
-						return 2;
-					}
+          /*------  .OPTIONS SPD ITER----------------*/
+          if( strcmp(token,"ITER") == 0 || strcmp(token,"ITER") == 0){
+            list->solving_method = METHOD_CG;
+            return 2;
+          }
 
           /*------------ .OPTIONS SPD SPARSE--------------*/
-					else if (strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
-						/* cholesky solution with sparce arrays   */
+          else if (strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
+            /* cholesky solution with sparce arrays   */
             list->solving_method = METHOD_CHOLESKY_SPARSE;
             list->sparse=1;
-					}
-				}
-				else if( strcmp(token,"ITER") == 0 || strcmp(token,"iter") == 0 ){
-					token = strtok(NULL," \n");
-					if( !token ){					
-						list->solving_method = METHOD_BICG;
-						return 2;
-					}
-						
-					/*----------- .OPTIONS ITER SPARSE ---------------*/
-					if( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
-						/*   Bi-CG with sparce arrays  */
+          }
+        }
+        else if( strcmp(token,"ITER") == 0 || strcmp(token,"iter") == 0 ){
+          token = strtok(NULL," \n");
+          if( !token ){         
+            list->solving_method = METHOD_BICG;
+            return 2;
+          }
+            
+          /*----------- .OPTIONS ITER SPARSE ---------------*/
+          if( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
+            /*   Bi-CG with sparce arrays  */
             list->solving_method = METHOD_BICG_SPARSE;
             list->sparse=1;
-					}
+          }
           /*----------- .OPTIONS ITER SPD || ITER SPD SPARCE-------*/
-					else if( strcmp(token, "SPD") == 0 || strcmp(token, "spd") == 0){
-						token = strtok(NULL," \n");
-						if( !token ){					
-							list->solving_method = METHOD_CG;
-							return 2;
-						}
-						else if ( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
-							/*   CG solving method with sparce arrays   */
+          else if( strcmp(token, "SPD") == 0 || strcmp(token, "spd") == 0){
+            token = strtok(NULL," \n");
+            if( !token ){         
+              list->solving_method = METHOD_CG;
+              return 2;
+            }
+            else if ( strcmp(token,"SPARSE") == 0 || strcmp(token,"sparse") == 0){
+              /*   CG solving method with sparce arrays   */
               list->solving_method = METHOD_CG_SPARSE;
               list->sparse=1;
-						}
-					}
-					
-				}
-				else if( strcmp(token,"ITOL") == 0 || strcmp(token,"itol") == 0){
-					/* tolerance */
-					token = strtok(NULL," \n");
-					if ( !token ){
-						printf("Error while parsing...\n");
-						printf("Line: %s\n",line);
-						return 0;
-					}
+            }
+          }
+          
+        }
+        else if( strcmp(token,"ITOL") == 0 || strcmp(token,"itol") == 0){
+          /* tolerance */
+          token = strtok(NULL," \n");
+          if ( !token ){
+            printf("Error while parsing...\n");
+            printf("Line: %s\n",line);
+            return 0;
+          }
 
 
-					if( strcmp(token,"=") ==  0 ){
-						/* now read the tolerance value */
-						token = strtok(NULL," \n");
+          if( strcmp(token,"=") ==  0 ){
+            /* now read the tolerance value */
+            token = strtok(NULL," \n");
 
-						if( !token ){
-							printf("Error while parsing..\n");
-							printf("Line: %s\n",line);
-							return 0;
+            if( !token ){
+              printf("Error while parsing..\n");
+              printf("Line: %s\n",line);
+              return 0;
 
-						}
-						else{
-							double val;
-							val = atof(token);
-						
-							list->itol = val;
-							return 2;
-						}  
-					}
-					else{
-						printf("Error while parsing...\n");
-						printf("Line: %s\n",line);
-						return 0;
-					}
+            }
+            else{
+              double val;
+              val = atof(token);
+            
+              list->itol = val;
+              return 2;
+            }  
+          }
+          else{
+            printf("Error while parsing...\n");
+            printf("Line: %s\n",line);
+            return 0;
+          }
 
-				}
-				else if(strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
-					/*LU with sparce arrays*/
+        }
+        else if(strcmp(token,"SPARCE") == 0 || strcmp(token,"sparce") == 0){
+          /*LU with sparce arrays*/
           list->solving_method = METHOD_LU_SPARSE;
           list->sparse=1;
-				}
+        }
         else if(strcmp(token,"METHOD=TR") == 0 || strcmp(token,"method=tr") == 0){
           /*Trapezoidal Transient Method*/
-          list->transient_sim=1; 
+          list->transient_sim = 1; 
         }
         else if(strcmp(token,"METHOD=BE") == 0 || strcmp(token,"method=be") == 0){
-          /*Backward Euler Transient Method*/
-          list->transient_sim=2; 
+          /*Trapezoidal Transient Method*/
+          list->transient_sim = 2; 
         }
 
 
-				
-				else{
-					printf("No token after .OPTIONS \n");
-					return 0;
-				}
+        
+        else{
+          printf("No token after .OPTIONS \n");
+          return 0;
+        }
 
-				//return 2;
-			}
+        //return 2;
+      }
       else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
         /*read the time step*/
-
         token = strtok(NULL," \n");
         if( !token ){
               printf("Error while parsing TRAN command, please define time step...\n");
@@ -1583,101 +1584,100 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         list->fin_time = atof( token );
 
       }
-			else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
-          list->transient_sim=0;
+      else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
+
 /*
-				token = strtok(temp," ");
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
-
+        token = strtok(temp," ");
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
 */
-				token = strtok(NULL , " ");
-				if( !token ){
-				//	list->solving_method = METHOD_LU;
+        token = strtok(NULL , " ");
+        if( !token ){
+        //  list->solving_method = METHOD_LU;
 
-					//printf("Error while parsing...\n");
-					//printf("Line : %s\n", line );
-					return 2;
-				}
-				list->dc_sweep.name = strdup(token);
-				//printf("DC: name = %s \n",list->dc_sweep.name);
+          //printf("Error while parsing...\n");
+          //printf("Line : %s\n", line );
+          return 2;
+        }
+        list->dc_sweep.name = strdup(token);
+        //printf("DC: name = %s \n",list->dc_sweep.name);
 
-				token = strtok(NULL , " ");
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
-				list->dc_sweep.start_v = atof( token );
+        token = strtok(NULL , " ");
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+        list->dc_sweep.start_v = atof( token );
 
-				token = strtok(NULL , " ");
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
-				list->dc_sweep.end_v = atof(token);
+        token = strtok(NULL , " ");
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+        list->dc_sweep.end_v = atof(token);
 
-				token = strtok(NULL , " ");
-				if( !token ){
-					printf("Error while parsing...\n");
-					printf("Line : %s\n", line );
-					return 0;
-				}
-				list->dc_sweep.inc = atof(token);
-
-
-				// check if node already declared 
-				list->dc_sweep.node = list_search_by_name(list , list->dc_sweep.name );
-				if( !(list->dc_sweep.node)){
-					printf(".DC Error: %s element not found\n",list->dc_sweep.name);
-					exit(1);
-				}
-				list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
-
-			}
-			else if( strcmp(token,".PLOT") == 0 || strcmp(token,".plot") == 0 ){
-  			
-  			    int plot_num=0;
-				//reading the PLOT command keyword
+        token = strtok(NULL , " ");
+        if( !token ){
+          printf("Error while parsing...\n");
+          printf("Line : %s\n", line );
+          return 0;
+        }
+        list->dc_sweep.inc = atof(token);
 
 
-				plot_init();
-    	    	list->plot = PLOT_ON;
+        // check if node already declared 
+        list->dc_sweep.node = list_search_by_name(list , list->dc_sweep.name );
+        if( !(list->dc_sweep.node)){
+          printf(".DC Error: %s element not found\n",list->dc_sweep.name);
+          exit(1);
+        }
+        list->dc_sweep.oldval = list->dc_sweep.node->node.source_v.value ; 
+
+      }
+      else if( strcmp(token,".PLOT") == 0 || strcmp(token,".plot") == 0 ){
+        
+            int plot_num=0;
+        //reading the PLOT command keyword
 
 
-        		while(1){
-					//reading the source type for plotting
-					token = strtok(NULL," (\n");
-					if( !token && plot_num == 0 ){
-           				printf("Error while parsing...\n");
-						printf("Line : %s\n", line );
-						return 0;
-				  	}
-          			else if(!token && plot_num>0)
-            			break;
+        plot_init();
+            list->plot = PLOT_ON;
+
+
+            while(1){
+          //reading the source type for plotting
+          token = strtok(NULL," (\n");
+          if( !token && plot_num == 0 ){
+                  printf("Error while parsing...\n");
+            printf("Line : %s\n", line );
+            return 0;
+            }
+                else if(!token && plot_num>0)
+                  break;
           
 
-					//reading the node name
-					token = strtok(NULL,")");
-					printf("Going to plot results for node: %s \n", token);
-					if( !token ){
-						printf("Error while parsing...\n");
-						printf("Line : %s\n", line );
-						return 0;
-					}
-          			plot_add_node(token);
-          			plot_num++;
-        		}
-			}
+          //reading the node name
+          token = strtok(NULL,")");
+          printf("Going to plot results for node: %s \n", token);
+          if( !token ){
+            printf("Error while parsing...\n");
+            printf("Line : %s\n", line );
+            return 0;
+          }
+                plot_add_node(token);
+                plot_num++;
+            }
+      }
 
-	
-		}	
-	}
+  
+    } 
+  }
 
 
-	return 2;
+  return 2;
 }
