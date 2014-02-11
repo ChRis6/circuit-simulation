@@ -211,48 +211,25 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector, int trans
  			if( plus_node != -1 ){
 
  				value = gsl_matrix_get(tmp_matrix , matrix_row , plus_node);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , matrix_row , plus_node , value);
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , matrix_row , plus_node , 1);
  				//printf("VOLTAGE SOURCE : (%d,%d) +1\n",matrix_row,plus_node);
 
  				value = gsl_matrix_get(tmp_matrix , plus_node , matrix_row);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , plus_node , matrix_row , value); 
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , plus_node , matrix_row , 1); 
  				//printf("VOLTAGE SOURCE : (%d,%d) + 1 \n",plus_node,matrix_row);				
  			
- 				/* Added for c_matrix */
- 				if(transient){
- 					c_value = gsl_matrix_get(tmp_c_matrix , matrix_row , plus_node);
- 					c_value++;
- 					gsl_matrix_set(tmp_c_matrix , matrix_row , plus_node , c_value);
- 					//printf("VOLTAGE SOURCE : (%d,%d) +1\n",matrix_row,plus_node);	
-
- 					c_value = gsl_matrix_get(tmp_c_matrix , plus_node , matrix_row);
- 					c_value++;
- 					gsl_matrix_set(tmp_c_matrix , plus_node , matrix_row , c_value); 
- 					//printf("VOLTAGE SOURCE : (%d,%d) + 1 \n",plus_node,matrix_row);	
- 				}
  			} 
  			/* <->*/
  			if( minus_node != -1 ){
- 				value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , value);
+ 				//value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , -1);
 
- 				value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
- 				value--;
- 				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , value);
-
- 				if(transient){
- 					/* Added for c_matrix */
- 					c_value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
- 					c_value++;
- 					gsl_matrix_set(tmp_matrix , matrix_row , minus_node , c_value);
-
- 					c_value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
- 					c_value--;
- 					gsl_matrix_set(tmp_matrix , minus_node , matrix_row , c_value);
- 				}
+ 				//value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
+ 				//value--;
+ 				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , -1);
  			}
  		}
  		/*
@@ -273,28 +250,30 @@ int create_mna(LIST *list , gsl_matrix **matrix , gsl_vector** vector, int trans
  			if( plus_node != -1 ){
 
  				value = gsl_matrix_get(tmp_matrix , matrix_row , plus_node);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , matrix_row , plus_node , value);
- 				
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , matrix_row , plus_node , 1);
+ 				//printf("VOLTAGE SOURCE : (%d,%d) +1\n",matrix_row,plus_node);
 
  				value = gsl_matrix_get(tmp_matrix , plus_node , matrix_row);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , plus_node , matrix_row , value); 
- 								
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , plus_node , matrix_row , 1); 
+ 				//printf("VOLTAGE SOURCE : (%d,%d) + 1 \n",plus_node,matrix_row);				
+ 			
  			} 
  			/* <->*/
  			if( minus_node != -1 ){
- 				value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
- 				value++;
- 				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , value);
+ 				//value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
+ 				//value++;
+ 				gsl_matrix_set(tmp_matrix , matrix_row , minus_node , -1);
 
- 				value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
- 				value--;
- 				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , value);
+ 				//value = gsl_matrix_get(tmp_matrix , minus_node , matrix_row);
+ 				//value--;
+ 				gsl_matrix_set(tmp_matrix , minus_node , matrix_row , -1);
  			}
 
  			if(transient)
  			{
+ 				//value = gsl_matrix_get(tmp_matrix , matrix_row , minus_node);
  				c_value = c_value * (-1);
  				gsl_matrix_set(tmp_matrix , matrix_row , matrix_row , c_value);
  			}
