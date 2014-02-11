@@ -731,23 +731,35 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
         else if(strcmp(token,"PWL") == 0 || strcmp(token,"pwl")){
 
+          PAIR_LIST* pair_list = create_pair_list();
+          if(!pair_list){
+            printf("Not enough memory for pair list...\n");
+            return 0;
+          }
+
+          
           while(token != NULL){
+            double ti,ii;
+            
             token = strtok(NULL,"() \n");
             if(token == NULL){
               printf("No time value specified for the pair\n");
               return 0;
             }
             /*store the ti value of the pair*/
-            
+            ti = atof(token);
+
             token = strtok(NULL,"() \n");
             if(token == NULL){
               printf("No voltage value specified for the pair\n");
               return 0;
             }
-            /*store the ii voltage value of the pair*/
-
+            ii = atof(token);
+            add_to_pair_list(pair_list, ti, ii);
+            
           }
-        }
+          node->source_v.pulse_type = PULSE_PULSE;
+          node->source_v.pair_list = pair_list;
 			}
     }
 
@@ -1534,11 +1546,11 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 				}
         else if(strcmp(token,"METHOD=TR") == 0 || strcmp(token,"method=tr") == 0){
           /*Trapezoidal Transient Method*/
-          list->solving_method = METHOD_TR; 
+          list->transient_sim=1; 
         }
         else if(strcmp(token,"METHOD=BE") == 0 || strcmp(token,"method=be") == 0){
-          /*Trapezoidal Transient Method*/
-          list->solving_method = METHOD_BE; 
+          /*Backward Euler Transient Method*/
+          list->transient_sim=2; 
         }
 
 
@@ -1552,7 +1564,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 			}
       else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
         /*read the time step*/
-        list->transient_sim = 1;
+
         token = strtok(NULL," \n");
         if( !token ){
               printf("Error while parsing TRAN command, please define time step...\n");
@@ -1572,7 +1584,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
       }
 			else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
-
+          list->transient_sim=0;
 /*
 				token = strtok(temp," ");
 				if( !token ){
@@ -1580,6 +1592,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 					printf("Line : %s\n", line );
 					return 0;
 				}
+
 */
 				token = strtok(NULL , " ");
 				if( !token ){
