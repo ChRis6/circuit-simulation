@@ -9,6 +9,7 @@
 
 sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len){
 
+	int i;
 	int rows;
 	int columns;
 	sparse_vector* vector = NULL;
@@ -16,10 +17,12 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
 	LIST_NODE* curr;
 
 	int num_nodes = ht_get_num_nodes(list->hashtable);
-	int* nodeids = (int*)calloc(num_nodes, sizeof(int));
+	int* nodeids = (int*)malloc(sizeof(int) * num_nodes);
 	if(!nodeids)
 		return NULL;
 
+	for( i = 0; i < num_nodes; i++)
+		nodeids[i] = 0;
 
 	int m2_elements_found = 0;       // # of elements in group 2
 
@@ -149,13 +152,12 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  			int plus_node  = curr->node.source_v.node1 - 1;
  			int minus_node = curr->node.source_v.node2 - 1;
 
-
-
+ 			//printf("Voltage %s plus = %d minus = %d matrix_row = %d\n", curr->node.source_v.name,plus_node,minus_node,matrix_row );
 
  			/* <+> */
  			if( plus_node != -1 ){
-
- 				if( nodeids[plus_node] == 0 ){
+ 				//if( nodeids[plus_node] == 0 ){
+ 					//printf("mphke plus node...\n");
  					if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
@@ -163,23 +165,21 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  						return NULL;	
  					}
  					
- 				
-
  					if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
  						cs_spfree(matrix);
  						return NULL;	
  					}
- 					nodeids[plus_node] = 1;
- 				}
- 			
+ 					//nodeids[plus_node] = 1;
+ 				//}			
  			}
 
  			/* <-> */
  			if( minus_node != -1 ){
  				
- 				if( nodeids[minus_node] == 0 ){
+ 				//if( nodeids[minus_node] == 0 ){
+ 					//printf("mphke minus node...\n");
  					if( !cs_entry(matrix, matrix_row , minus_node , -1.0 ) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
@@ -192,9 +192,9 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  						cs_spfree(matrix);
  						return NULL;	
  					}
- 					nodeids[minus_node]=1;
+ 					//nodeids[minus_node] = 1;
  				
- 				}
+ 				//}
  			}	 
  		}
 
@@ -209,30 +209,32 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  			/* Change the matrix */
  			int plus_node  = curr->node.inductance.node1 - 1;
  			int minus_node = curr->node.inductance.node2 - 1;
+ 			// printf("Inductance %s plus = %d minus = %d\n matrix_row = %d\n", curr->node.inductance.name,plus_node,minus_node,matrix_row);
+
  			/* <+> */
  			if( plus_node != -1 ){
- 				if( nodeids[plus_node] == 0 ){
- 					if( !cs_entry(matrix, matrix_row , plus_node , 1.0 ) ){
+ 				//if( nodeids[plus_node] == 0 ){
+ 					printf("mphke inductance sto plus...\n");
+ 					if( !cs_entry(matrix, matrix_row , plus_node , 1.0) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
  						cs_spfree(matrix);
  						return NULL;	
  					}
 
- 					if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
+ 					if( !cs_entry(matrix, plus_node , matrix_row , 1.0) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
  						cs_spfree(matrix);
  						return NULL;	
  					}
- 					nodeids[plus_node]=1;
- 				}
- 				
+ 					//nodeids[plus_node] = 1;
+ 				//} 				
  			}
-
  			/* <-> */
  			if( minus_node != -1 ){
- 				if( nodeids[minus_node] == 0 ){
+ 				//if( nodeids[minus_node] == 0 ){
+ 					//printf("mpahke Inductance minus_node...\n");
  					if( !cs_entry(matrix, matrix_row , minus_node , -1.0 ) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
@@ -245,12 +247,9 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  						cs_spfree(matrix);
  						return NULL;	
  					}
- 					nodeids[minus_node]=1;
- 				}
- 				
-
- 			}
- 			
+ 					//nodeids[minus_node] = 1;
+ 				//}
+ 			} 			
  		}
  	} 	
 
