@@ -445,6 +445,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         return 0 ;
       }
       strcpy( node->source_v.name , token);
+      node->source_v.is_ac = 0;
 
       /* read <+> node */
       token = strtok(NULL," ");
@@ -595,6 +596,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.tc2 = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_EXP;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -655,6 +657,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.ph = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_SIN;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -725,6 +728,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_v.per = atof(token);
           *type = NODE_SOURCE_V_TYPE;
           node->source_v.pulse_type = PULSE_PULSE;
+          node->source_v.is_ac = 1;
           return 1;
 
         }
@@ -761,6 +765,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
           node->source_v.pulse_type = PULSE_PULSE;
           node->source_v.pair_list = pair_list;
+          node->source_v.is_ac = 1;
+          return 1;
         }
       }
     }
@@ -778,6 +784,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         return 0 ;
       }
       strcpy( node->source_i.name , token);
+      node->source_i.is_ac = 0;
 
       /* read <+> node */
       token = strtok(NULL," ");
@@ -926,6 +933,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.tc2 = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_EXP;
+          node->source_i.is_ac = 1;
+
           return 1;
 
 
@@ -983,6 +992,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.df = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_SIN;
+          node->source_i.is_ac = 1;
           return 1;
         }
 
@@ -1046,6 +1056,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           node->source_i.per = atof(token);
           *type = NODE_SOURCE_I_TYPE;
           node->source_i.pulse_type = PULSE_PULSE;
+          node->source_i.is_ac = 1;
           return 1;
         }
 
@@ -1081,6 +1092,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
           node->source_i.pulse_type = PULSE_PULSE;
           node->source_i.pair_list = pair_list;
+          node->source_i.is_ac = 1;
+          return 1;
         }
       }
       
@@ -1548,11 +1561,11 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
         }
         else if(strcmp(token,"METHOD=TR") == 0 || strcmp(token,"method=tr") == 0){
           /*Trapezoidal Transient Method*/
-          list->transient_sim = 1; 
+          list->transient_sim = METHOD_TR; 
         }
         else if(strcmp(token,"METHOD=BE") == 0 || strcmp(token,"method=be") == 0){
           /*Trapezoidal Transient Method*/
-          list->transient_sim = 2; 
+          list->transient_sim = METHOD_BE; 
         }
 
 
@@ -1564,7 +1577,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
         //return 2;
       }
-      else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
+      else if(strcmp(token,".TRAN") == 0 || strcmp(token,".tran") == 0){
         /*read the time step*/
         token = strtok(NULL," \n");
         if( !token ){
@@ -1573,6 +1586,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
         }
         list->time_step = atof( token );
+        
 
         /*read the finish time*/
         token = strtok(NULL," \n");
@@ -1582,6 +1596,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
         }
         list->fin_time = atof( token );
+        
 
       }
       else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC

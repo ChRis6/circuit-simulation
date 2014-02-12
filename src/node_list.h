@@ -15,8 +15,9 @@
 #define METHOD_CG_SPARSE       7
 #define METHOD_BICG_SPARSE     8
 
-#define METHOD_TR 9 //Transient Trapezoidal
-#define METHOD_BE 10 //Backward-Euler
+#define NON_TRANSIENT 10
+#define METHOD_TR 11 //Transient Trapezoidal
+#define METHOD_BE 12 //backward-Euler
 
 
 #define PLOT_ON  1
@@ -102,7 +103,7 @@ int add_to_list(LIST* list,int type,void* element,int size);
  * 
  * returns: 1 success
  *          0 fail
- */
+ */	
 int add_node_to_list( LIST* list, NODE* circuit_node , int type);
 
 /*
@@ -111,6 +112,27 @@ int add_node_to_list( LIST* list, NODE* circuit_node , int type);
  *			 0 otherwise
  */
 LIST_NODE* list_search_by_name( LIST* list , char *name);
+
+
+/*
+ *Search if a voltage source with the same plus node has been added to the sparce matrix
+ * 
+ * Returns -1 if list is NULL, 1 if found and 0 if not found	
+ *
+ */
+
+int list_search_plus_node(LIST* list, int plus_node);
+
+
+/*
+ *Search if a voltage source with the same plus node has been added to the sparce matrix
+ * 
+ * Returns -1 if list is NULL, 1 if found and 0 if not found	
+ *
+ */
+
+int list_search_minus_node(LIST* list, int minus_node);
+
 
 /**
  * Creates an empty pair list
@@ -121,5 +143,8 @@ PAIR_LIST* create_pair_list();
  * Adds a pair to the list
  */
 int add_to_pair_list(PAIR_LIST* pair_list, double ti, double ii);
+
+/* function to create list with current and voltage sources */
+LIST* create_source_list(LIST* node_list);
 
 #endif

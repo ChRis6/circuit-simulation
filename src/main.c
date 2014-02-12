@@ -33,6 +33,22 @@ static void double_vector_to_gsl_vector(gsl_vector* gsl_v,double *doubl_vec,int 
 		gsl_vector_set(gsl_v,i,doubl_vec[i]);
 	}
 }
+
+static void print_matrix_gsl(gsl_matrix* A)
+{
+	int i,j;
+
+	printf("Going to print gsl_matrix \n");
+	for(i = 0; i < A->size1; i++)
+	{
+		for(j = 0; j < A->size2; j++)
+		{
+			printf("%.4f ",gsl_matrix_get(A,i,j));
+		}
+		printf("\n");
+	}
+}
+
 int main( int argc , char* argv[]){
 	int flag;
 	
@@ -63,11 +79,15 @@ int main( int argc , char* argv[]){
  		return -1;
  	}
 
+ 	LIST* source_list = create_source_list(&list);
+ 	print_list(*source_list);
+
  	printf("Solving Method = %s\n",solving_method_names[list.solving_method-1]);
  	if ( !list.sparse ){
 
 
  		flag = create_mna(&list, &matrix, &vector, !TRANSIENT,&c_matrix);
+ 		print_matrix_gsl(matrix);
  		if(!flag ){
  			printf("Error creating mna system\n");
  			return -1;
