@@ -1577,7 +1577,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
         //return 2;
       }
-      else if(strcmp(token,"TRAN") == 0 || strcmp(token,"tran") == 0){
+      else if(strcmp(token,".TRAN") == 0 || strcmp(token,".tran") == 0){
         /*read the time step*/
         token = strtok(NULL," \n");
         if( !token ){
@@ -1586,6 +1586,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
         }
         list->time_step = atof( token );
+        
 
         /*read the finish time*/
         token = strtok(NULL," \n");
@@ -1595,6 +1596,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
         }
         list->fin_time = atof( token );
+        
 
       }
       else if( strcmp(token,".DC") == 0 || strcmp(token,".dc") == 0 ){  // check for .DC
