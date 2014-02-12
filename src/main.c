@@ -236,7 +236,7 @@ int main( int argc , char* argv[]){
 
 			plot_set_vector_index(plot_array ,vector_gsl ,0);
 			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
+			//plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
 
 
  		}
