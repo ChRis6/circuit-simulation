@@ -81,259 +81,257 @@ int main( int argc , char* argv[]){
 
  	LIST* source_list = create_source_list(&list);
  	print_list(*source_list);
+ 	if(list.transient_sim != NON_TRANSIENT)
+ 	{
+ 		transient_simulation(&list, matrix , c_matrix , vector , x , permutation);
 
- 	printf("Solving Method = %s\n",solving_method_names[list.solving_method-1]);
- 	if ( !list.sparse ){
-
-
- 		flag = create_mna(&list, &matrix, &vector, !TRANSIENT,&c_matrix);
- 		print_matrix_gsl(matrix);
- 		if(!flag ){
- 			printf("Error creating mna system\n");
- 			return -1;
- 		}
+ 	}else{
+	 	printf("Solving Method = %s\n",solving_method_names[list.solving_method-1]);
+	 	if ( !list.sparse ){
 
 
-		x = gsl_vector_calloc(matrix->size1);
- 		if( !x ){
- 			printf("X vector : no memory\n");
- 			exit(1);
- 		}
-	
-		/* Cholesky or LU */
-		if( list.solving_method == METHOD_LU || list.solving_method == METHOD_CHOLESKY ){
+	 		flag = create_mna(&list, &matrix, &vector, !TRANSIENT,&c_matrix);
+	 		print_matrix_gsl(matrix);
+	 		if(!flag ){
+	 			printf("Error creating mna system\n");
+	 			return -1;
+	 		}
 
- 			decomposition(matrix,&permutation,&sign,list.solving_method);
- 	
- 			if(list.dc_sweep.node != NULL)
- 			{
- 	 			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
- 			}
- 			else
- 			{
 
- 				int array_size = 1;
- 				solve(matrix,vector,x,permutation,list.solving_method);
- 				
- 				if(list.plot == PLOT_ON)
-				{
- 					gsl_vector ** plot_array;
+			x = gsl_vector_calloc(matrix->size1);
+	 		if( !x ){
+	 			printf("X vector : no memory\n");
+	 			exit(1);
+	 		}
+		
+			/* Cholesky or LU */
+			if( list.solving_method == METHOD_LU || list.solving_method == METHOD_CHOLESKY ){
 
-					plot_array = plot_create_vector( array_size , x->size);
+	 			decomposition(matrix,&permutation,&sign,list.solving_method);
+	 	
+	 			if(list.dc_sweep.node != NULL)
+	 			{
+	 	 			dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+	 			}
+	 			else
+	 			{
+
+	 				int array_size = 1;
+	 				solve(matrix,vector,x,permutation,list.solving_method);
+	 				
+	 				if(list.plot == PLOT_ON)
+					{
+	 					gsl_vector ** plot_array;
+
+						plot_array = plot_create_vector( array_size , x->size);
+						if(plot_array == NULL)
+						{
+							perror("Error while allocating the ploting array\n");
+							exit(0);
+						}
+		 		
+						plot_set_vector_index(plot_array ,x ,0);
+
+				 		if ( list.solving_method == METHOD_LU )
+							plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_lu.txt");
+						else
+							plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_chol.txt");
+					}
+					fprintf(stderr, "Priting solution found...\n");
+					print_gsl_vector(x);
+	 			}
+			}
+			else if ( list.solving_method == METHOD_CG ){
+				//printf("Solving using CG...\n");
+
+				if( list.dc_sweep.node != NULL ){
+					dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+				}
+				else {
+					iter_solve_cg( matrix , vector , x);
+
+
+					gsl_vector ** plot_array;
+
+					plot_array = plot_create_vector( 1 , x->size);
 					if(plot_array == NULL)
 					{
 						perror("Error while allocating the ploting array\n");
 						exit(0);
 					}
-	 		
+		 		
 					plot_set_vector_index(plot_array ,x ,0);
-
-			 		if ( list.solving_method == METHOD_LU )
-						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_lu.txt");
-					else
-						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_chol.txt");
+				 	fprintf(stderr, "Priting solution found...\n");
+				 	print_gsl_vector(x);
+					plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cg.txt");
 				}
+			}
+			else if( list.solving_method == METHOD_BICG){
+				//printf("Solving using BICG...\n");
+				if( list.dc_sweep.node != NULL ){
+					dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
+				}
+				else {
+					iter_solve_bicg( matrix , vector , x);
+
+
+					gsl_vector ** plot_array;
+
+					plot_array = plot_create_vector( 1 , x->size);
+					if(plot_array == NULL)
+					{
+						perror("Error while allocating the ploting array\n");
+						exit(0);
+					}
+		 		
+					plot_set_vector_index(plot_array ,x ,0);
+				 	fprintf(stderr, "Priting solution found...\n");
+				 	print_gsl_vector(x);
+					plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
+				}
+
+			}
+	 	}
+	 	else {
+	 		//  sparse simulation
+	 		int vector_size;
+	 		char method;
+	 		int i;
+	 		sparse_matrix* matrix;
+	 		sparse_vector* vector;
+	 		sparse_vector* x;
+	 		gsl_vector* x_sparse;
+			gsl_vector* vector_sparse;
+			gsl_vector* vector_gsl;
+
+	 		
+
+	 		method = list.solving_method;
+	 		matrix = (sparse_matrix*)create_mna_sparse( &list , &vector , &vector_size);
+	 		if( !matrix ){
+	 			fprintf(stderr, "Error creating MNA matrix \n");
+	 			exit(1);
+	 		}
+	 		
+	 		/* Added by hriskons */
+	 		/* conversion of a double into a gsl */
+	 		x_sparse = gsl_vector_calloc(matrix->n);
+			vector_sparse = gsl_vector_calloc(matrix->n);
+	 		double_vector_to_gsl_vector(vector_sparse,vector,vector_size);
+
+	 		/* print sparse matrix */
+	 		//cs_print(matrix,"sparse_matrix.txt",0);
+
+	 		x = (sparse_vector*) malloc( vector_size * sizeof(sparse_vector));
+
+
+	 		if( method == METHOD_LU_SPARSE ){
+	 			
+	 			if( !sparse_solve_LU( matrix,vector,x,vector_size) ){
+	 				fprintf(stderr, "Solving Method Sparse LU failed\n" );
+	 			}
+
+	 			gsl_vector ** plot_array;
+
+				plot_array = plot_create_vector( 1 , vector_size);
+				if(plot_array == NULL)
+				{
+					perror("Error while allocating the ploting array\n");
+					exit(0);
+				}
+		 		vector_gsl = gsl_vector_calloc(vector_size);
+	 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
+
+				plot_set_vector_index(plot_array ,vector_gsl ,0);
+				 		 	
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
 				fprintf(stderr, "Priting solution found...\n");
-				print_gsl_vector(x);
- 			}
-		}
-		else if ( list.solving_method == METHOD_CG ){
-			//printf("Solving using CG...\n");
-
-			if( list.dc_sweep.node != NULL ){
-				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
-			}
-			else {
-				iter_solve_cg( matrix , vector , x);
+				print_gsl_vector(vector_gsl);
 
 
-				gsl_vector ** plot_array;
+	 		}
+	 		else if( method == METHOD_CHOLESKY_SPARSE ){
+				if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
+	 				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
+	 			}
 
-				plot_array = plot_create_vector( 1 , x->size);
+	 			gsl_vector ** plot_array;
+
+				plot_array = plot_create_vector( 1 , vector_size);
 				if(plot_array == NULL)
 				{
 					perror("Error while allocating the ploting array\n");
 					exit(0);
 				}
-	 		
-				plot_set_vector_index(plot_array ,x ,0);
-			 	fprintf(stderr, "Priting solution found...\n");
-			 	print_gsl_vector(x);
-				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cg.txt");
-			}
-		}
-		else if( list.solving_method == METHOD_BICG){
-			//printf("Solving using BICG...\n");
-			if( list.dc_sweep.node != NULL ){
-				dc_sweep(list,matrix,vector,x,permutation,list.solving_method);
-			}
-			else {
-				iter_solve_bicg( matrix , vector , x);
+		 		vector_gsl = gsl_vector_calloc(vector_size);
+	 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
 
+				plot_set_vector_index(plot_array ,vector_gsl ,0);
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cholesky_sparse.txt");
 
-				gsl_vector ** plot_array;
+	 			fprintf(stderr, "Priting solution found...\n");
+				print_gsl_vector(vector_gsl);
 
-				plot_array = plot_create_vector( 1 , x->size);
+	 		}	
+	 		else if ( method == METHOD_CG_SPARSE ){
+	 			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
+	 				fprintf(stderr, "Solving Method Sparse CG failed\n" );
+	 			}
+	 			gsl_vector ** plot_array;
+
+				plot_array = plot_create_vector( 1 , x_sparse->size);
 				if(plot_array == NULL)
 				{
 					perror("Error while allocating the ploting array\n");
 					exit(0);
 				}
-	 		
-				plot_set_vector_index(plot_array ,x ,0);
-			 	fprintf(stderr, "Priting solution found...\n");
-			 	print_gsl_vector(x);
-				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_bicg.txt");
-			}
+		 		
+				plot_set_vector_index(plot_array ,x_sparse ,0);
+				 		 	
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_cg.txt");
+	 			fprintf(stderr, "Priting solution found...\n");
+				print_gsl_vector(x_sparse);
+	 		}
+	 		else if( method == METHOD_BICG_SPARSE ){
+				if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
+	 				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
+	 			}
+	 			gsl_vector ** plot_array;
 
-		}
- 	}
- 	else {
- 		//  sparse simulation
- 		int vector_size;
- 		char method;
- 		int i;
- 		sparse_matrix* matrix;
- 		sparse_vector* vector;
- 		sparse_vector* x;
- 		gsl_vector* x_sparse;
-		gsl_vector* vector_sparse;
-		gsl_vector* vector_gsl;
+				plot_array = plot_create_vector( 1 , x_sparse->size);
+				if(plot_array == NULL)
+				{
+					perror("Error while allocating the ploting array\n");
+					exit(0);
+				}
+		 		
+				plot_set_vector_index(plot_array ,x_sparse ,0);
+				 		 	
+				plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
+	 			fprintf(stderr, "Priting solution found...\n");
+				print_gsl_vector(x_sparse);
 
- 		
+	 		}
+	 		else{
+	 			fprintf(stderr, "Solving method not specified\n");
+	 		}
 
- 		method = list.solving_method;
- 		matrix = (sparse_matrix*)create_mna_sparse( &list , &vector , &vector_size);
- 		if( !matrix ){
- 			fprintf(stderr, "Error creating MNA matrix \n");
- 			exit(1);
- 		}
- 		
- 		/* Added by hriskons */
- 		/* conversion of a double into a gsl */
- 		x_sparse = gsl_vector_calloc(matrix->n);
-		vector_sparse = gsl_vector_calloc(matrix->n);
- 		double_vector_to_gsl_vector(vector_sparse,vector,vector_size);
+	 		//fprintf(stderr, "PRINTING SOLUTION FOUND:\n");
+	 		//for( i = 0 ; i < vector_size ; i++)
+	 		//	fprintf(stderr, "%f\n", x[i]);
+	 		//fprintf(stderr, "\n");
 
- 		/* print sparse matrix */
- 		//cs_print(matrix,"sparse_matrix.txt",0);
-
- 		x = (sparse_vector*) malloc( vector_size * sizeof(sparse_vector));
-
-
- 		if( method == METHOD_LU_SPARSE ){
- 			
- 			if( !sparse_solve_LU( matrix,vector,x,vector_size) ){
- 				fprintf(stderr, "Solving Method Sparse LU failed\n" );
- 			}
-
- 			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , vector_size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
-			}
-	 		vector_gsl = gsl_vector_calloc(vector_size);
- 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
-
-			plot_set_vector_index(plot_array ,vector_gsl ,0);
-			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
-			fprintf(stderr, "Priting solution found...\n");
-			print_gsl_vector(vector_gsl);
-
-
- 		}
- 		else if( method == METHOD_CHOLESKY_SPARSE ){
-			if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
- 				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
- 			}
-
- 			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , vector_size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
-			}
-	 		vector_gsl = gsl_vector_calloc(vector_size);
- 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
-
-			plot_set_vector_index(plot_array ,vector_gsl ,0);
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cholesky_sparse.txt");
-
- 			fprintf(stderr, "Priting solution found...\n");
-			print_gsl_vector(vector_gsl);
-
- 		}	
- 		else if ( method == METHOD_CG_SPARSE ){
- 			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
- 				fprintf(stderr, "Solving Method Sparse CG failed\n" );
- 			}
- 			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , x_sparse->size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
-			}
-	 		
-			plot_set_vector_index(plot_array ,x_sparse ,0);
-			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_cg.txt");
- 			fprintf(stderr, "Priting solution found...\n");
-			print_gsl_vector(x_sparse);
- 		}
- 		else if( method == METHOD_BICG_SPARSE ){
-			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
- 				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
- 			}
- 			gsl_vector ** plot_array;
-
-			plot_array = plot_create_vector( 1 , x_sparse->size);
-			if(plot_array == NULL)
-			{
-				perror("Error while allocating the ploting array\n");
-				exit(0);
-			}
-	 		
-			plot_set_vector_index(plot_array ,x_sparse ,0);
-			 		 	
-			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
- 			fprintf(stderr, "Priting solution found...\n");
-			print_gsl_vector(x_sparse);
-
- 		}
- 		else{
- 			fprintf(stderr, "Solving method not specified\n");
- 		}
-
- 		//fprintf(stderr, "PRINTING SOLUTION FOUND:\n");
- 		//for( i = 0 ; i < vector_size ; i++)
- 		//	fprintf(stderr, "%f\n", x[i]);
- 		//fprintf(stderr, "\n");
-
- 		/* clean up before exit */
- 		cs_spfree(matrix);
- 		free(vector);
- 		free(x);
- 	}
-
+	 		/* clean up before exit */
+	 		cs_spfree(matrix);
+	 		free(vector);
+	 		free(x);
+	 	}
+	}
  	 	
 /*
  * Clean up
  */
  	free_list(&list);
-
- 	if( !list.sparse){
- 		gsl_vector_free(vector);
- 		gsl_matrix_free(matrix);
- 		//gsl_permutation_free(permutation);
- 	}
 
 	return 0;
 }
