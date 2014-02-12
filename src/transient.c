@@ -195,14 +195,14 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 
 		if(list->transient_sim == METHOD_TR)
 		{
-			gsl_matrix_scale(c_matrix, (time_step/2));
+			gsl_matrix_scale(c_matrix, (2/time_step));
 			gsl_matrix_add(tmp_matrix,c_matrix);
 
 			gsl_matrix_sub(right_matrix,c_matrix);
 
 		}else
 		{
-			gsl_matrix_scale (c_matrix, (1 / time_step));
+			gsl_matrix_scale (c_matrix, 1/time_step);
 			gsl_matrix_add(tmp_matrix,c_matrix);
 
 			gsl_matrix_memcpy(right_matrix , c_matrix);
@@ -252,8 +252,9 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	printf("fin_time: %lf\n",fin_time);
 
 	print_vector_gsl(vector);
-	for(curr_time = (-1)*time_step; curr_time <= 3; curr_time += time_step)
+	for(curr_time = (-1)*time_step; curr_time <= 0.1; curr_time += time_step)
 	{
+
 		if(curr_time == 0)
 		{
 			gsl_matrix_memcpy(matrix,tmp_matrix);
@@ -263,39 +264,28 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 			gsl_vector_memcpy(prev_vector,vector);
 			gsl_vector_memcpy(prev_x,x);
 			
-			//printf("Prev_x before\n");
-			print_vector_gsl(prev_x);
-			lh_matrix_vector_mul( prev_x, right_matrix , temp_vector , NON_TRANSP);
-			//printf("Prev_x after\n");
-			//print_vector_gsl(prev_x);
 			//print_vector_gsl(temp_vector);
-
+			lh_matrix_vector_mul( prev_x, right_matrix , temp_vector , NON_TRANSP);
+			//print_vector_gsl(temp_vector);
+			printf("\n\n\n\n");
+			vector = calc_right_hand_vect(v_i_list , vector ,curr_time);
 			if(list->transient_sim == METHOD_TR)
 			{
 				gsl_vector_sub(prev_vector, temp_vector);
 				gsl_vector_memcpy(temp_vector,prev_vector);
-			}
+
+				gsl_vector_add(vector,temp_vector);
+
+			}			
+
 			LIST_NODE* curr;
-			
-			vector = calc_right_hand_vect(v_i_list , vector ,curr_time);
-			gsl_vector_add(vector,temp_vector);
 
 		}
-		/*
-		printf("matrix:\n");
-		print_matrix_gsl(matrix);
-		printf("Tmp Matrix:\n");
-		print_matrix_gsl(tmp_matrix);
-		printf("right_matrix:\n");
-		print_matrix_gsl(right_matrix);
-		printf("c_matrix:\n");
-		print_matrix_gsl(c_matrix);
-		*/
+		
 		for(i = 0; i < x->size; i++)
 			gsl_vector_set(x,i,0);
 
-		//print_matrix_gsl(matrix);
-		//print_matrix_gsl(right_matrix);
+		
 	 	if ( !list->sparse ){
 
 			/* Cholesky or LU */
@@ -305,7 +295,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 
 	 			decomposition(matrix,&permutation,&sign,list->solving_method);
 				
-	 	
+
 	 			if(list->dc_sweep.node != NULL)
 	 			{
 	 	 			dc_sweep(*list,matrix,vector,x,permutation,list->solving_method);
@@ -313,8 +303,9 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	 			else
 	 			{
 	 				int array_size = 1;
+
 	 				solve(matrix,vector,x,permutation,list->solving_method);
-					//print_vector_gsl(x);
+	 				print_vector_gsl(vector);
 
 	 				if(list->plot == PLOT_ON)
 					{
@@ -335,7 +326,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 					}
 	 			}
 	 			gsl_matrix_memcpy(matrix , curr_matrix);
-				//print_matrix_gsl(matrix);
+
 			}
 			else if ( list->solving_method == METHOD_CG ){
 

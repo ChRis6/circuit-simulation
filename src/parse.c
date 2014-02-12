@@ -743,14 +743,16 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           }
 
           
+          token = strtok(NULL,"() \n");
+            if(token == NULL){
+              printf("No value pairs for PWL given in netlist\n");
+              return 0;
+            }
+
           while(token != NULL){
             double ti,ii;
             
-            token = strtok(NULL,"() \n");
-            if(token == NULL){
-              printf("No time value specified for the pair\n");
-              return 0;
-            }
+            
             /*store the ti value of the pair*/
             ti = atof(token);
 
@@ -762,6 +764,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
             ii = atof(token);
             add_to_pair_list(pair_list, ti, ii);
             
+            token = strtok(NULL,"() \n");
+  
           }
           node->source_v.pulse_type = PULSE_PULSE;
           node->source_v.pair_list = pair_list;
@@ -1069,15 +1073,16 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
             return 0;
           }
 
-          
-          while(token != NULL){
-            double ti,ii;
-            
-            token = strtok(NULL,"() \n");
+          token = strtok(NULL,"() \n");
             if(token == NULL){
               printf("No time value specified for the pair\n");
               return 0;
             }
+
+          while(token != NULL){
+            double ti,ii;
+            
+            
             /*store the ti value of the pair*/
             ti = atof(token);
 
@@ -1087,7 +1092,10 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
               return 0;
             }
             ii = atof(token);
+            
             add_to_pair_list(pair_list, ti, ii);
+
+            token = strtok(NULL,"() \n");            
             
           }
           node->source_i.pulse_type = PULSE_PULSE;
