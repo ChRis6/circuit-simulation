@@ -290,7 +290,7 @@ gsl_vector* sparse_solve_bicg(sparse_matrix* A , gsl_vector* b , gsl_vector* x0)
 	if(normb < EPS)
 		normb =1;
 
-	while( iteration < iter && ( (lh_norm(r) / normb) > tolerance )){
+	while( iteration < 5*iter && ( (lh_norm(r) / normb) > tolerance )){
 
 		iteration++;
 
