@@ -162,7 +162,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  						cs_spfree(matrix);
  						return NULL;	
  					}
- 					nodeids[plus_node] = 1;
+ 					
  				
 
  					if( !cs_entry(matrix, plus_node , matrix_row , 1.0 ) ){
@@ -171,6 +171,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  						cs_spfree(matrix);
  						return NULL;	
  					}
+ 					nodeids[plus_node] = 1;
  				}
  			
  			}
