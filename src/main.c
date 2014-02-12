@@ -111,8 +111,10 @@ int main( int argc , char* argv[]){
  			}
  			else
  			{
+
  				int array_size = 1;
  				solve(matrix,vector,x,permutation,list.solving_method);
+ 				
  				if(list.plot == PLOT_ON)
 				{
  					gsl_vector ** plot_array;
@@ -125,13 +127,14 @@ int main( int argc , char* argv[]){
 					}
 	 		
 					plot_set_vector_index(plot_array ,x ,0);
-					fprintf(stderr, "Priting solution found...\n");
-					print_gsl_vector(x);
+
 			 		if ( list.solving_method == METHOD_LU )
 						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_lu.txt");
 					else
 						plot_to_file(list.hashtable,plot_array,array_size,"results_plot_file_chol.txt");
 				}
+				fprintf(stderr, "Priting solution found...\n");
+				print_gsl_vector(x);
  			}
 		}
 		else if ( list.solving_method == METHOD_CG ){
@@ -219,6 +222,7 @@ int main( int argc , char* argv[]){
 
 
  		if( method == METHOD_LU_SPARSE ){
+ 			
  			if( !sparse_solve_LU( matrix,vector,x,vector_size) ){
  				fprintf(stderr, "Solving Method Sparse LU failed\n" );
  			}
@@ -236,7 +240,9 @@ int main( int argc , char* argv[]){
 
 			plot_set_vector_index(plot_array ,vector_gsl ,0);
 			 		 	
-			//plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_lu_sparse.txt");
+			fprintf(stderr, "Priting solution found...\n");
+			print_gsl_vector(vector_gsl);
 
 
  		}
@@ -244,6 +250,23 @@ int main( int argc , char* argv[]){
 			if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
  				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
  			}
+
+ 			gsl_vector ** plot_array;
+
+			plot_array = plot_create_vector( 1 , vector_size);
+			if(plot_array == NULL)
+			{
+				perror("Error while allocating the ploting array\n");
+				exit(0);
+			}
+	 		vector_gsl = gsl_vector_calloc(vector_size);
+ 			double_vector_to_gsl_vector(vector_gsl,x,vector_size);
+
+			plot_set_vector_index(plot_array ,vector_gsl ,0);
+			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_cholesky_sparse.txt");
+
+ 			fprintf(stderr, "Priting solution found...\n");
+			print_gsl_vector(vector_gsl);
 
  		}	
  		else if ( method == METHOD_CG_SPARSE ){
@@ -262,6 +285,8 @@ int main( int argc , char* argv[]){
 			plot_set_vector_index(plot_array ,x_sparse ,0);
 			 		 	
 			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_cg.txt");
+ 			fprintf(stderr, "Priting solution found...\n");
+			print_gsl_vector(x_sparse);
  		}
  		else if( method == METHOD_BICG_SPARSE ){
 			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
@@ -279,7 +304,8 @@ int main( int argc , char* argv[]){
 			plot_set_vector_index(plot_array ,x_sparse ,0);
 			 		 	
 			plot_to_file(list.hashtable,plot_array,1  ,"results_plot_file_sparse_bicg.txt");
- 
+ 			fprintf(stderr, "Priting solution found...\n");
+			print_gsl_vector(x_sparse);
 
  		}
  		else{
