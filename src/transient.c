@@ -141,6 +141,8 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	int flag;
 	gsl_vector *prev_vector;
 	gsl_vector *temp_vector;
+	gsl_vector *e_t;
+	gsl_vector *e_t_minus_one;
 
 	gsl_vector *prev_x;
 
@@ -242,39 +244,81 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	printf("c_matrix:\n");
 	print_matrix_gsl(c_matrix);
 	*/
+	
 	prev_vector = gsl_vector_calloc(vector->size);
 	temp_vector = gsl_vector_calloc(vector->size);
+	
+	if( !prev_vector || !temp_vector){
+	  printf("Couldn't allocate memory for prev_vector & temp_vector");
+	  return 0;
+	}
 
 	prev_x = gsl_vector_calloc(x->size);
+	
+	if( !prev_x ){
+	  printf("Couldn't allocate memory for prev_x");
+	  return 0;
+	}
+	
+	e_t_minus_one = gsl_vector_calloc(vector->size);
+	e_t = gsl_vector_calloc(vector->size);
+	
+	if( !e_t || !e_t_minus_one){
+	    printf("Couldn't allocate memory for e(t) & e(t-1)");
+	    return 0;
+	}
+	  
 
 
 	printf("TRANSIENT: Solving Method = %d\n",list->solving_method);
 	printf("fin_time: %lf\n",fin_time);
 
-	print_vector_gsl(vector);
-	for(curr_time = (-1)*time_step; curr_time <= 0.1; curr_time += time_step)
+	for(curr_time = (-1)*time_step; curr_time <= 3; curr_time += time_step)
 	{
 
 		if(curr_time == 0)
 		{
+			gsl_vector_memcpy(e_t_minus_one,vector);		//dc initialize
 			gsl_matrix_memcpy(matrix,tmp_matrix);
 		}
 		if(curr_time >= 0)
 		{
-			gsl_vector_memcpy(prev_vector,vector);
+			// x(t-1)
 			gsl_vector_memcpy(prev_x,x);
 			
 			//print_vector_gsl(temp_vector);
+			
+			// right_matrix * x(t-1)
 			lh_matrix_vector_mul( prev_x, right_matrix , temp_vector , NON_TRANSP);
+			
 			//print_vector_gsl(temp_vector);
-			printf("\n\n\n\n");
-			vector = calc_right_hand_vect(v_i_list , vector ,curr_time);
+			
+			// calculate e(t)
+			e_t = calc_right_hand_vect(v_i_list , e_t_minus_one ,curr_time);
+
+			/*gsl_vector_memcpy(prev_vector,e_t);
+			gsl_vector_add(prev_vector,e_t_minus_one);
+			printf("e(t) + e(t-1) = \n");
+			print_vector_gsl(prev_vector); */
+			
+			// get ready for next math operations
+			gsl_vector_memcpy(prev_vector,e_t_minus_one);
+			gsl_vector_memcpy(vector,e_t);
+			
 			if(list->transient_sim == METHOD_TR)
 			{
+				// e(t-1) - right_matrix*x(t-1)
 				gsl_vector_sub(prev_vector, temp_vector);
-				gsl_vector_memcpy(temp_vector,prev_vector);
+				
+				
+				// e(t) + e(t-1) - right_matrix*x(t-1)
+				gsl_vector_add(vector,prev_vector);
 
-				gsl_vector_add(vector,temp_vector);
+				printf("b = \n");
+				print_vector_gsl(vector);
+				
+				// e_t_minus_one = e_t for the next iteration
+				gsl_vector_memcpy(e_t_minus_one,e_t);
 
 			}			
 
@@ -305,7 +349,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	 				int array_size = 1;
 
 	 				solve(matrix,vector,x,permutation,list->solving_method);
-	 				print_vector_gsl(vector);
+	 				print_vector_gsl(x);
 
 	 				if(list->plot == PLOT_ON)
 					{
