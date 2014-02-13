@@ -306,7 +306,7 @@ int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector
 	return cs_cholsol(1 , matrix , x);
 }
 
-int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
+int sparse_dc_sweep(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
 
 	int i;
 
@@ -316,13 +316,29 @@ int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
 
 	gsl_vector** plot_array = NULL;
 	gsl_vector* plotting_vector = NULL;
+	gsl_vector* iter_gsl_vector = NULL;
+	gsl_vector* gsl_x_and_startup = NULL;
 	sparse_vector* b = NULL; 
 	sparse_vector* x = NULL;
+
+
 
 	vector_len = matrix->n;
 	plotting_vector = gsl_vector_calloc( vector_len);
 	if( !plotting_vector){
 		fprintf(stderr, "Not enough memory for plotting_vector...\n" );
+		return 0;
+	}
+
+	gsl_x_and_startup = gsl_vector_calloc(vector_len);
+	if(!gsl_x_and_startup){
+		fprintf(stderr, "Not enough memory\n");
+		return 0;
+	}
+
+	iter_gsl_vector = gsl_vector_calloc(vector_len);
+	if(!iter_gsl_vector){
+		fprintf(stderr, "Not enough memory...\n");
 		return 0;
 	}
 
@@ -376,7 +392,25 @@ int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
 	for( i = 0 ; i < array_size ; i++ ){
 
 		// solve sparse system using LU
-		int  flag = sparse_solve_LU(matrix, b, x, vector_len);
+		int  flag;
+		if( list->solving_method == METHOD_LU_SPARSE ){ 
+			flag = sparse_solve_LU(matrix, b, x, vector_len);
+
+		}
+		else if( list->solving_method == METHOD_CHOLESKY_SPARSE){
+			flag =  sparse_solve_cholesky(matrix, b, x, vector_len);
+		}
+		else if( list->solving_method == METHOD_CG_SPARSE){
+			lh_pointerVector_to_gslVector(b, iter_gsl_vector);
+			sparse_solve_cg(matrix, iter_gsl_vector, gsl_x_and_startup);
+			flag = 1;
+		}
+		else if( list->solving_method == METHOD_BICG_SPARSE){
+			lh_pointerVector_to_gslVector(b, iter_gsl_vector);
+			sparse_solve_bicg(matrix, iter_gsl_vector, gsl_x_and_startup);
+			flag = 1;
+		}
+		
 		if( !flag )
 			fprintf(stderr, "DC SWEEP SPARSE ERROR: Solution not found\n");
 
@@ -400,12 +434,32 @@ int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs){
 
 		// store solution found for plotting
 		lh_pointerVector_to_gslVector(x, plotting_vector);
-		plot_set_vector_index(plot_array ,plotting_vector,i);
+		if( list->solving_method == METHOD_CG_SPARSE || list->solving_method == METHOD_BICG_SPARSE ){
+			plot_set_vector_index(plot_array, gsl_x_and_startup, i);
+
+			int k;
+			fprintf(stderr, "Priting solution: Iter = %d\n", i);
+			for( k = 0 ; k < vector_len; k++)
+				fprintf(stderr, "node %d: %f\n", k, gsl_vector_get(gsl_x_and_startup,k));
+		}
+		else{ 
+			plot_set_vector_index(plot_array ,plotting_vector,i);
+				
+			int k;
+			fprintf(stderr, "Priting solution: Iter = %d\n", i);
+			for( k = 0 ; k < vector_len; k++)
+				fprintf(stderr, "node %d: %f\n", k, gsl_vector_get(plotting_vector, k));
+		}
+		int k;
+		for( k = 0 ; k < gsl_x_and_startup->size; k++)
+			gsl_vector_set(gsl_x_and_startup, k, 0);
+
 	} 
 
 	if( list->plot == PLOT_ON )
 		plot_by_node_name(list->hashtable , plot_array , array_size);
 
-
+	gsl_vector_free(gsl_x_and_startup);
+	gsl_vector_free(plotting_vector);
 	return 1;
 }

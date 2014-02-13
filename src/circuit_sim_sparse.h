@@ -40,5 +40,5 @@ int sparse_solve_cholesky(sparse_matrix* matrix, sparse_vector* b, sparse_vector
  * Returns : 1 on success
  *			 0 on failure
  */
-int sparse_dc_sweep_lu(LIST *list , sparse_matrix* matrix , sparse_vector* rhs);
+int sparse_dc_sweep(LIST *list , sparse_matrix* matrix , sparse_vector* rhs);
 #endif

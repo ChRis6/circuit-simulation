@@ -167,11 +167,11 @@ gsl_vector* lh_get_inv_diag_sparse(sparse_matrix* A){
 			found = 0;
 	}
 	/* debug */
-	printf("The diagonial from the sparse vector:\n");
-	for(i = 0 ; i < A->n; i++)
-	{
-		printf("%f\n",gsl_vector_get(res,i));
-	}
+	//printf("The diagonial from the sparse vector:\n");
+	//for(i = 0 ; i < A->n; i++)
+	//{
+	//	printf("%f\n",gsl_vector_get(res,i));
+	//}
 	return res;
 }
 

@@ -80,7 +80,7 @@ int main( int argc , char* argv[]){
  	}
 
  	LIST* source_list = create_source_list(&list);
- 	print_list(*source_list);
+ 	//print_list(*source_list);
 
  	printf("Solving Method = %s\n",solving_method_names[list.solving_method-1]);
  	if ( !list.sparse ){
@@ -222,7 +222,17 @@ int main( int argc , char* argv[]){
 
 
  		if( method == METHOD_LU_SPARSE ){
- 			
+
+			// check for dc sweep
+			if( list.dc_sweep.node != NULL ){
+				if( !sparse_dc_sweep(&list, matrix, vector)){
+					fprintf(stderr, "SPARSE LU DC SWEEP FAILED.EXIT\n");
+					exit(1);
+				}
+				fprintf(stderr, "SIMULATION TERMINATED\n");
+				return 0;
+			}
+
  			if( !sparse_solve_LU( matrix,vector,x,vector_size) ){
  				fprintf(stderr, "Solving Method Sparse LU failed\n" );
  			}
@@ -247,6 +257,17 @@ int main( int argc , char* argv[]){
 
  		}
  		else if( method == METHOD_CHOLESKY_SPARSE ){
+
+			// check for dc sweep
+			if( list.dc_sweep.node != NULL ){
+				if( !sparse_dc_sweep(&list, matrix, vector)){
+					fprintf(stderr, "SPARSE CHOLESKY DC SWEEP FAILED.EXIT\n");
+					exit(1);
+				}
+				fprintf(stderr, "SIMULATION TERMINATED\n");
+				return 0;
+			}
+
 			if( !sparse_solve_cholesky( matrix,vector,x,vector_size) ){
  				fprintf(stderr, "Solving Method Sparse Cholesky failed\n" );
  			}
@@ -270,6 +291,19 @@ int main( int argc , char* argv[]){
 
  		}	
  		else if ( method == METHOD_CG_SPARSE ){
+
+ 						// check for dc sweep
+			if( list.dc_sweep.node != NULL ){
+				if( !sparse_dc_sweep(&list, matrix, vector)){
+					fprintf(stderr, "SPARSE CG DC SWEEP FAILED.EXIT\n");
+					exit(1);
+				}
+				fprintf(stderr, "SIMULATION TERMINATED\n");
+				return 0;
+			}
+
+
+
  			if( !sparse_solve_cg( matrix,vector_sparse,x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse CG failed\n" );
  			}
@@ -289,6 +323,16 @@ int main( int argc , char* argv[]){
 			print_gsl_vector(x_sparse);
  		}
  		else if( method == METHOD_BICG_SPARSE ){
+			
+	 		// check for dc sweep
+			if( list.dc_sweep.node != NULL ){
+				if( !sparse_dc_sweep(&list, matrix, vector)){
+					fprintf(stderr, "SPARSE BICG DC SWEEP FAILED.EXIT\n");
+					exit(1);
+				}
+				fprintf(stderr, "SIMULATION TERMINATED\n");
+				return 0;
+			}		
 			if( !sparse_solve_bicg( matrix, vector_sparse, x_sparse) ){
  				fprintf(stderr, "Solving Method Sparse BiCG failed\n" );
  			}
