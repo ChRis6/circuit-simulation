@@ -137,7 +137,8 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	double fin_time = list->fin_time;
 	double curr_time = 0;
 	double time_step = list->time_step;
-	time_step = 0.1;
+
+	//time_step = 0.1;
 	int flag;
 	gsl_vector *prev_vector;
 	gsl_vector *temp_vector;
@@ -273,7 +274,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	printf("TRANSIENT: Solving Method = %d\n",list->solving_method);
 	printf("fin_time: %lf\n",fin_time);
 
-	for(curr_time = (-1)*time_step; curr_time <= 3; curr_time += time_step)
+	for(curr_time = (-1)*time_step; curr_time <= fin_time; curr_time += time_step)
 	{
 
 		if(curr_time == 0)
@@ -314,8 +315,8 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 				// e(t) + e(t-1) - right_matrix*x(t-1)
 				gsl_vector_add(vector,prev_vector);
 
-				printf("b = \n");
-				print_vector_gsl(vector);
+				//printf("b = \n");
+				//print_vector_gsl(vector);
 				
 				// e_t_minus_one = e_t for the next iteration
 				gsl_vector_memcpy(e_t_minus_one,e_t);
@@ -349,7 +350,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	 				int array_size = 1;
 
 	 				solve(matrix,vector,x,permutation,list->solving_method);
-	 				print_vector_gsl(x);
+	 				//print_vector_gsl(x);
 
 	 				if(list->plot == PLOT_ON)
 					{
@@ -491,6 +492,7 @@ int transient_simulation(LIST* list, gsl_matrix *matrix , gsl_matrix *c_matrix ,
 	 		}
 	 	}
 	}
+	print_vector_gsl(x);
 	/* clean up before exit */
 	if(list->sparse)
 		cs_spfree(sp_matrix);
