@@ -49,9 +49,9 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  		if( curr->type == NODE_RESISTANCE_TYPE ){
 
   			double conductance = 1 / curr->node.resistance.value ;
- 			int plus_node  = curr->node.resistance.node1 - 1 ;
- 			int minus_node = curr->node.resistance.node2  - 1;
- 			
+ 			long plus_node  = curr->node.resistance.node1 - 1;
+ 			long minus_node = curr->node.resistance.node2  - 1;
+ 			//printf("plus_node: %d minus_node: %d\n",plus_node,minus_node);
  			/* <+> is ground */
  		 	if( plus_node == -1 ){
 
@@ -149,8 +149,8 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
  			value += curr->node.source_v.value;
  			vector[ matrix_row ] = value;
 
- 			int plus_node  = curr->node.source_v.node1 - 1;
- 			int minus_node = curr->node.source_v.node2 - 1;
+ 			long plus_node  = curr->node.source_v.node1 - 1;
+ 			long minus_node = curr->node.source_v.node2 - 1;
 
  			//printf("Voltage %s plus = %d minus = %d matrix_row = %d\n", curr->node.source_v.name,plus_node,minus_node,matrix_row );
 
@@ -207,14 +207,14 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
 			
 
  			/* Change the matrix */
- 			int plus_node  = curr->node.inductance.node1 - 1;
- 			int minus_node = curr->node.inductance.node2 - 1;
+ 			long plus_node  = curr->node.inductance.node1 - 1;
+ 			long minus_node = curr->node.inductance.node2 - 1;
  			// printf("Inductance %s plus = %d minus = %d\n matrix_row = %d\n", curr->node.inductance.name,plus_node,minus_node,matrix_row);
 
  			/* <+> */
  			if( plus_node != -1 ){
  				//if( nodeids[plus_node] == 0 ){
- 					printf("mphke inductance sto plus...\n");
+ 					//printf("mphke inductance sto plus...\n");
  					if( !cs_entry(matrix, matrix_row , plus_node , 1.0) ){
  		 				fprintf(stderr, "Error while inserting element in sparse matrix\n");
  						free(vector);
@@ -265,7 +265,7 @@ sparse_matrix* create_mna_sparse(LIST *list, sparse_vector** b, int* vector_len)
 	*vector_len = matrix->n;
  	*b = vector;
 
- 	cs_print(matrix,"sparse_matrix.txt",0);
+ 	//cs_print(matrix,"sparse_matrix.txt",0);
  	return matrix;
 }
 
