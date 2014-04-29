@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <limits.h>
-
 #include "circuit_hash.h"
 
 /*
@@ -44,13 +42,12 @@ hashtable_t* ht_init( int size ){
  */
 unsigned int hash(hashtable_t *hashtable,char* key){
 
-	unsigned long int h = 0;
-    int i = 0;
+	unsigned h = 0;
+    int i;
     int len;
 
-    /*
     len = strlen(key);
-
+  
 	for ( i = 0; i < len; i++ ) {
     	h += key[i];
     	h += ( h << 10 );
@@ -60,14 +57,6 @@ unsigned int hash(hashtable_t *hashtable,char* key){
 	h += ( h << 3 );
 	h ^= ( h >> 11 );
 	h += ( h << 15 );
-	*/
-    /* Convert our string to an integer */
-	while( h < ULONG_MAX && i < strlen( key ) ) {
-		h = h << 8;
-		h += key[ i ];
-		i++;
-	}
-
 	return h % hashtable->size ;
 }
 
@@ -90,9 +79,7 @@ entry_t* ht_create_pair(char* key,int value){
 		free( newpair );
 		return NULL;
 	}
-
-	newpair->value =  value;
-
+	newpair->value = value;
 	newpair->next = NULL;
 
 	return newpair;
@@ -108,10 +95,8 @@ entry_t* ht_create_pair(char* key,int value){
 int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 
 	entry_t* newpair = NULL;
-	//entry_t* curr = NULL;
-	//entry_t* head = NULL;
-	entry_t* next = NULL;
-	entry_t* last = NULL;
+	entry_t* curr = NULL;
+	entry_t* head = NULL;
 	int index;
 
 	if( !key || !hashtable )
@@ -123,11 +108,8 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 		return 0;
 
 	index = hash(hashtable , key );
+	head = hashtable->table[index];
 
-	//head = hashtable->table[index];
-	next = hashtable->table[index];
-
-#if 0
 	if( head == NULL ){
 		/* no element is here.just insert */
 		
@@ -146,7 +128,7 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 				/* key already exists.DONT REPLACE */
 				free(newpair->key);
 				free(newpair);
-				printf("key : \"%s\" already exits at index: %d\n",key,index);
+				//printf("key : \"%s\" already exits at index: %d\n",key,index);
 				return -1;
 		}
 		/* no matching key found on the list.*/
@@ -157,40 +139,7 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
 		/* success */
 		return 1;
 	}
-#endif
 
-	while( next != NULL && next->key != NULL && strcmp( key, next->key ) > 0 ) {
-		last = next;
-		next = next->next;
-	}
-
-	/* There's already a pair.  Let's replace that string. */
-	if( next != NULL && next->key != NULL && strcmp( key, next->key ) == 0 ) {
-		return -1;
-	/* Nope, could't find it.  Time to grow a pair. */
-	} else {
-		newpair = ht_create_pair( key, value );
-		hashtable->num_nodes++;
-
-		/* We're at the start of the linked list in this bin. */
-		if( next == hashtable->table[ index ] ) {
-			newpair->next = next;
-			hashtable->table[ index ] = newpair;
-			return 1;
-
-		/* We're at the end of the linked list in this bin. */
-		} else if ( next == NULL ) {
-			last->next = newpair;
-			return 1;
-
-		/* We're in the middle of the list. */
-		} else  {
-			newpair->next = next;
-			last->next = newpair;
-			return 1;
-		}
-
-	}
 	return 0;
 }
 
@@ -202,31 +151,8 @@ int ht_insert_pair(hashtable_t *hashtable, char* key, int value ){
  */
 int ht_get(hashtable_t* hashtable , char* key , int *ret){
 	
-	int bin;
-	entry_t* pair = NULL;
-
-	bin = hash( hashtable, key );
-
-	/* Step through the bin, looking for our value. */
-	pair = hashtable->table[ bin ];
-	while( pair != NULL && pair->key != NULL && strcmp( key, pair->key ) > 0 ) {
-		pair = pair->next;
-	}
-
-	/* Did we actually find anything? */
-	if( pair == NULL || pair->key == NULL || strcmp( key, pair->key ) != 0 ) {
-		return 0;
-
-	} else {
-		*ret = pair->value;
-		return 1;
-	}
-#if 0
 	int index;
-
 	entry_t* curr = NULL;
-
-	index = ht_hash( hashtable, key );
 
 	if( !hashtable || !key || !ret )
 		return 0;
@@ -238,10 +164,9 @@ int ht_get(hashtable_t* hashtable , char* key , int *ret){
 			return 1;
 		}
 	}
+
 	/* key not found */
 	return 0;
-#endif
-
 }
 
 
