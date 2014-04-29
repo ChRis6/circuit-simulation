@@ -1715,7 +1715,7 @@ int cs_print(const cs *A, const char *outputFilename, int brief) {
 			}
 		}
 	}
-
+	fflush(outputFilePtr);
 	fclose(outputFilePtr);
 	return (1);
 }

@@ -47,14 +47,19 @@ int main( int argc , char* argv[]){
 		fprintf(stderr, "Error creating MNA matrix \n");
 		exit(1);
 	}
-		/* clean up before exit */
+
+	/* Print the matrix in a file */
+	cs_print(matrix, "output_sparse_matrix", 0);
+
+	/* clean up before exit */
 	cs_spfree(matrix);
+
 	//free(vector);
 	//free(x);
 /*
  * Clean up
  */
- 	free_list(&list);
+	free_list(&list);
 
 	return 0;
 }

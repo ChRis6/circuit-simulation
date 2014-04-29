@@ -100,7 +100,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
   char c;
   char* token;
   int flag;
-  static int node_count = 1;
+  static long node_count = 1;
 
 
   if( line == NULL || node == NULL  || type == NULL )
@@ -144,6 +144,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           /* successfull insertion */
           node->resistance.node1 = node_count;
           node_count++;    // get ready for the next node
+
         }
         else if( flag == 0 ){
           /* NULL pointer or out of memory */
@@ -155,11 +156,16 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
 
           int n;
           //printf("Node : \"%s\" already on hash table \n",token);
-          ht_get(list->hashtable,token,&n);
+          if (!ht_get(list->hashtable,token,&n))
+          {
+        	  printf("Token failed: %s \n",token);
+        	  perror("Key was not found in the hash table\n The program will exit\n");
+        	  exit(0);
+          }
           node->resistance.node1 = n;
         }
       }
-      
+      //printf("Resistance node number: %ld\n",node->resistance.node1);
 
       /* 
        * Read <-> node
@@ -773,6 +779,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           return 1;
         }
       }
+      break;
     }
 
 
@@ -1104,8 +1111,7 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
           return 1;
         }
       }
-      
-
+      break;
     }
 
     /*
@@ -1700,7 +1706,8 @@ static int get_node_from_line( LIST* list,char* line , NODE* node , int* type){
   
     } 
   }
-
+  printf("Total node count: %ld \n",node_count);
+  printf("Hash_table nodes: %d\n",list->hashtable->num_nodes);
 
   return 2;
 }
